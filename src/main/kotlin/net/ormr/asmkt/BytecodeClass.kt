@@ -40,7 +40,7 @@ import org.objectweb.asm.tree.TypeAnnotationNode
  * @property [sourceDebug] TODO
  */
 @AsmKtDsl
-public class BytecodeClass(
+public data class BytecodeClass(
     public val type: ReferenceType,
     public val version: BytecodeVersion,
     override val access: Int = Modifiers.PUBLIC,
@@ -163,7 +163,6 @@ public class BytecodeClass(
         )
     }
 
-    @JvmOverloads
     @AsmKtDsl
     public fun defineModule(name: String, access: Int, version: String? = null): BytecodeModule {
         val module = BytecodeModule(name, access, version, this)
@@ -188,7 +187,6 @@ public class BytecodeClass(
         innerClasses[innerName] = child
     }
 
-    @JvmOverloads
     @AsmKtDsl
     public fun defineField(
         name: String,
@@ -343,30 +341,6 @@ public class BytecodeClass(
         return node
     }
 
-    override fun equals(other: Any?): Boolean = when {
-        this === other -> true
-        other !is BytecodeClass -> false
-        type != other.type -> false
-        access != other.access -> false
-        superType != other.superType -> false
-        interfaces != other.interfaces -> false
-        sourceFile != other.sourceFile -> false
-        sourceDebug != other.sourceDebug -> false
-        enclosingClass != other.enclosingClass -> false
-        else -> true
-    }
-
-    override fun hashCode(): Int {
-        var result = type.hashCode()
-        result = 31 * result + access
-        result = 31 * result + superType.hashCode()
-        result = 31 * result + interfaces.hashCode()
-        result = 31 * result + (sourceFile?.hashCode() ?: 0)
-        result = 31 * result + (sourceDebug?.hashCode() ?: 0)
-        result = 31 * result + (enclosingClass?.hashCode() ?: 0)
-        return result
-    }
-
     override fun toString(): String =
-        "BytecodeClass(type='${type.className}', access=$access, superType='${superType.className}', interfaces=$interfaces, sourceFile=$sourceFile, sourceDebug=$sourceDebug, enclosingClass=${enclosingClass?.type?.className})"
+        "BytecodeClass(type='${type.className}', version=$version, access=$access, superType='${superType.className}', interfaces=$interfaces, sourceFile=$sourceFile, sourceDebug=$sourceDebug, enclosingClass=${enclosingClass?.type?.className})"
 }
