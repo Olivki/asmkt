@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-@file:JvmName("AsmUtils")
-
 package net.ormr.asmkt
 
-import net.ormr.asmkt.types.MethodType
-import net.ormr.asmkt.types.PrimitiveVoid
-import net.ormr.asmkt.types.ReferenceType
-import net.ormr.asmkt.types.Type
+import net.ormr.asmkt.types.*
 import org.objectweb.asm.Handle
 import org.objectweb.asm.Opcodes
+import java.lang.invoke.ConstantBootstraps
 
-@JvmOverloads
 fun handleOf(
     tag: Int,
     owner: ReferenceType,
@@ -33,7 +28,7 @@ fun handleOf(
     type: Type,
     isInterface: Boolean = false,
 ): Handle {
-    require(type !is PrimitiveVoid) { "'type' must not be 'void'" }
+    requireNotVoid(type)
     return Handle(tag, owner.internalName, name, type.descriptor, isInterface)
 }
 

@@ -28,7 +28,7 @@ data class BytecodeField internal constructor(
     override val access: Int,
     val type: FieldType,
     val signature: String?,
-    val value: Any?
+    val value: Any?,
 ) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode {
     init {
         require(type.isValidFieldType) { "'type' must not be a 'void' type." }
@@ -38,13 +38,13 @@ data class BytecodeField internal constructor(
      * Returns `true` if `this` field is [volatile][Modifiers.VOLATILE], otherwise `false`.
      */
     val isVolatile: Boolean
-        get() = access and Modifiers.VOLATILE != 0
+        get() = Modifiers.contains(access, Modifiers.VOLATILE)
 
     /**
      * Returns `true` if `this` field is [volatile][Modifiers.VOLATILE], otherwise `false`.
      */
     val isTransient: Boolean
-        get() = access and Modifiers.TRANSIENT != 0
+        get() = Modifiers.contains(access, Modifiers.TRANSIENT)
 
     // annotations
     private val visibleAnnotations: MutableList<BytecodeAnnotation> = mutableListOf()
@@ -66,7 +66,7 @@ data class BytecodeField internal constructor(
         typePath: TypePath?,
         annotationType: ReferenceType,
         isVisible: Boolean,
-        allowRepeats: Boolean
+        allowRepeats: Boolean,
     ): BytecodeAnnotation {
         val annotation =
             BytecodeAnnotation(annotationType, TypeAnnotationNode(typeRef, typePath, annotationType.descriptor))
@@ -80,7 +80,6 @@ data class BytecodeField internal constructor(
         )
     }
 
-    @JvmSynthetic
     internal fun toNode(): FieldNode {
         val node = FieldNode(access, name, type.descriptor, signature, value)
         // annotations

@@ -14,35 +14,27 @@
  * limitations under the License.
  */
 
-@file:JvmName("BytecodeMethodUtils")
-
 package net.ormr.asmkt
 
-import net.ormr.asmkt.types.ArrayType
-import net.ormr.asmkt.types.FieldType
-import net.ormr.asmkt.types.MethodType
-import net.ormr.asmkt.types.ReferenceType
-import net.ormr.asmkt.types.PrimitiveType
-import net.ormr.asmkt.types.PrimitiveVoid
+import net.ormr.asmkt.types.*
 import org.objectweb.asm.Label
 
 /**
  * Creates the instruction for invoking the constructor of [owner].
  *
  * @param [owner] the object to invoke the constructor of
- * @param [type] the type of the constructor, must have a `returnType` of [void][PrimitiveVoid]
+ * @param [type] the type of the constructor, must have a `returnType` of [void][PrimitiveType.Void]
  *
  * @return `this` *(for chaining)*
  *
- * @throws [IllegalArgumentException] if the [return type][MethodType.returnType] is not [void][PrimitiveVoid]
+ * @throws [IllegalArgumentException] if the [return type][MethodType.returnType] is not [void][PrimitiveType.Void]
  */
-@JvmOverloads
 @AsmKtDsl
 fun BytecodeMethod.invokeConstructor(
     owner: ReferenceType,
-    type: MethodType = MethodType.VOID
+    type: MethodType = MethodType.VOID,
 ): BytecodeMethod = apply {
-    require(type.returnType is PrimitiveVoid) { "return type of a constructor must be 'void', was '$type'." }
+    require(type.returnType is PrimitiveType.Void) { "return type of a constructor must be 'void', was '$type'." }
     invokeSpecial(owner, "<init>", type)
 }
 
@@ -57,11 +49,10 @@ fun BytecodeMethod.loadThis(): BytecodeMethod = apply {
     loadLocal(0, parentType)
 }
 
-@JvmOverloads
 @AsmKtDsl
 fun BytecodeMethod.throwException(
     exception: ReferenceType,
-    message: String? = null
+    message: String? = null,
 ): BytecodeMethod = apply {
     val constructorType = when {
         message != null -> MethodType.ofVoid(ReferenceType.STRING)
@@ -81,7 +72,7 @@ fun BytecodeMethod.throwException(
 
 @AsmKtDsl
 fun BytecodeMethod.box(type: PrimitiveType): BytecodeMethod = apply {
-    if (type is PrimitiveVoid) {
+    if (type is PrimitiveType.Void) {
         // a boxed 'void' would actually be the 'Void' object, but we can't create instances of that
         // so 'null' is the best we'll get
         push(null)
@@ -109,23 +100,23 @@ fun BytecodeMethod.unbox(type: FieldType): BytecodeMethod = apply {
     require(type !is ArrayType) { "'type' must not be an array type." }
 
     // we can't unbox a 'void' primitive in any manner
-    if (type is PrimitiveVoid) {
+    if (type is PrimitiveType.Void) {
         return this
     }
 
     val boxedType = when (type) {
-        PrimitiveType.CHAR -> ReferenceType.CHAR
-        PrimitiveType.BOOLEAN -> ReferenceType.BOOLEAN
+        PrimitiveType.Char -> ReferenceType.CHAR
+        PrimitiveType.Boolean -> ReferenceType.BOOLEAN
         else -> ReferenceType.NUMBER
     }
 
     val unboxMethodType: MethodType? = when (type) {
-        PrimitiveType.BOOLEAN -> MethodType.BOOLEAN
-        PrimitiveType.CHAR -> MethodType.CHAR
-        PrimitiveType.BYTE, PrimitiveType.SHORT, PrimitiveType.INT -> MethodType.INT
-        PrimitiveType.LONG -> MethodType.LONG
-        PrimitiveType.FLOAT -> MethodType.FLOAT
-        PrimitiveType.DOUBLE -> MethodType.DOUBLE
+        PrimitiveType.Boolean -> MethodType.BOOLEAN
+        PrimitiveType.Char -> MethodType.CHAR
+        PrimitiveType.Byte, PrimitiveType.Short, PrimitiveType.Int -> MethodType.INT
+        PrimitiveType.Long -> MethodType.LONG
+        PrimitiveType.Float -> MethodType.FLOAT
+        PrimitiveType.Double -> MethodType.DOUBLE
         else -> null
     }
 
@@ -147,7 +138,7 @@ fun BytecodeMethod.unbox(type: FieldType): BytecodeMethod = apply {
  */
 @AsmKtDsl
 fun BytecodeMethod.valueOf(type: PrimitiveType): BytecodeMethod = apply {
-    if (type is PrimitiveVoid) {
+    if (type is PrimitiveType.Void) {
         // a boxed 'void' would actually be the 'Void' object, but we can't create instances of that
         // so 'null' is the best we'll get
         push(null)
@@ -168,13 +159,12 @@ fun BytecodeMethod.valueOf(type: PrimitiveType): BytecodeMethod = apply {
  *
  * @throws [IllegalArgumentException] if [keys] is not sorted in an ascending order
  */
-@JvmOverloads
 @AsmKtDsl
 inline fun BytecodeMethod.tableSwitch(
     keys: IntArray,
     generateCase: (key: Int, end: Label) -> Unit,
     generateDefaultCase: () -> Unit,
-    useTable: Boolean = calculateKeyDensity(keys) >= 0.5F
+    useTable: Boolean = calculateKeyDensity(keys) >= 0.5F,
 ): BytecodeMethod = apply {
     for (i in 1 until keys.size) {
         require(keys[i] >= keys[i - 1]) { "keys must be sorted in ascending order" }
@@ -223,7 +213,6 @@ inline fun BytecodeMethod.tableSwitch(
     mark(endLabel)
 }
 
-@JvmSynthetic
 @PublishedApi
 internal fun calculateKeyDensity(keys: IntArray): Float = when {
     keys.isEmpty() -> 0.0F
@@ -273,25 +262,23 @@ fun BytecodeMethod.pushBooleanValue(): BytecodeMethod = apply {
     invokeVirtual(ReferenceType.BOOLEAN, "booleanValue", MethodType.BOOLEAN)
 }
 
-@JvmSynthetic
 @AsmKtDsl
 inline fun <reified A : Annotation> BytecodeMethod.defineParameterAnnotation(
     index: Int,
     isVisible: Boolean = true,
     allowRepeats: Boolean = false,
-    scope: BytecodeAnnotation.() -> Unit = {}
+    scope: BytecodeAnnotation.() -> Unit = {},
 ) {
     defineParameterAnnotation(index, ReferenceType<A>(), isVisible, allowRepeats).apply(scope)
 }
 
-@JvmSynthetic
 @AsmKtDsl
 inline fun BytecodeMethod.defineParameterAnnotation(
     index: Int,
     type: ReferenceType,
     isVisible: Boolean = true,
     allowRepeats: Boolean = false,
-    scope: BytecodeAnnotation.() -> Unit
+    scope: BytecodeAnnotation.() -> Unit,
 ) {
     defineParameterAnnotation(index, type, isVisible, allowRepeats).apply(scope)
 }

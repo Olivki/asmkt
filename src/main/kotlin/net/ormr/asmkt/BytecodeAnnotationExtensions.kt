@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:JvmName("BytecodeAnnotationUtils")
-
 package net.ormr.asmkt
 
 import net.ormr.asmkt.BytecodeAnnotation.ArrayBuilder
@@ -34,10 +32,9 @@ import org.objectweb.asm.AnnotationVisitor
  * @see [AnnotationVisitor.visitAnnotation]
  */
 @AsmKtDsl
-@JvmSynthetic
 inline fun <reified A : Annotation> BytecodeAnnotation.annotation(
     name: String,
-    scope: BytecodeAnnotation.() -> Unit = {}
+    scope: BytecodeAnnotation.() -> Unit = {},
 ) {
     annotation(name, ReferenceType<A>()).apply(scope)
 }
@@ -52,7 +49,6 @@ inline fun <reified A : Annotation> BytecodeAnnotation.annotation(
  * @see [AnnotationVisitor.visitArray]
  */
 @AsmKtDsl
-@JvmSynthetic
 inline fun BytecodeAnnotation.array(name: String, scope: ArrayBuilder.() -> Unit) {
     array(name).apply(scope)
 }
@@ -67,7 +63,6 @@ inline fun BytecodeAnnotation.array(name: String, scope: ArrayBuilder.() -> Unit
  * @see [AnnotationVisitor.visitAnnotation]
  */
 @AsmKtDsl
-@JvmSynthetic
 inline fun <reified A : Annotation> ArrayBuilder.annotation(scope: BytecodeAnnotation.() -> Unit) {
     annotation(ReferenceType<A>()).apply(scope)
 }
@@ -83,21 +78,19 @@ inline fun <reified A : Annotation> ArrayBuilder.annotation(scope: BytecodeAnnot
  * @see [AnnotationVisitor.visitAnnotation]
  */
 @AsmKtDsl
-@JvmSynthetic
 inline fun ArrayBuilder.annotation(type: ReferenceType, scope: BytecodeAnnotation.() -> Unit) {
     annotation(type).apply(scope)
 }
 
-@JvmSynthetic
 internal fun isValidAnnotationValue(value: Any): Boolean = when (value) {
     is Boolean, is Char, is String, is Byte, is Short, is Int, is Long, is Float, is Double -> true
     is ReferenceType, is ArrayType -> true
     else -> false
 }
 
-@JvmSynthetic
 internal fun isPrimitiveArray(value: Any): Boolean = when (value) {
     is BooleanArray, is CharArray, is ByteArray, is ShortArray, is IntArray, is LongArray, is FloatArray,
-    is DoubleArray -> true
+    is DoubleArray,
+    -> true
     else -> false
 }

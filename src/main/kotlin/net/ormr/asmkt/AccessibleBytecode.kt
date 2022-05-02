@@ -36,65 +36,52 @@ interface AccessibleBytecode {
      * type of `this` element.
      */
     val access: Int
-
-    // -- UTIL FUNCTIONS -- \\
-    // these properties are never overridden, but they are defined inside of here rather than as extension functions
-    // to make usage of them cleaner from the Java side. The properties defined here are also just ones that effect
-    // more than one general implementation, more specific ones are defined in the respective classes
-
-    /**
-     * Returns `true` if `this` element is [static][Modifiers.STATIC], otherwise `false`.
-     */
-    @JvmDefault
-    val isStatic: Boolean
-        get() = access and STATIC != 0
-
-    /**
-     * Returns `true` if `this` element is [final][Modifiers.FINAL], otherwise `false`.
-     */
-    @JvmDefault
-    val isFinal: Boolean
-        get() = access and FINAL != 0
-
-    /**
-     * Returns `true` if `this` element is [abstract][Modifiers.ABSTRACT], otherwise `false`.
-     */
-    @JvmDefault
-    val isAbstract: Boolean
-        get() = access and ABSTRACT != 0
-
-    /**
-     * Returns `true` if `this` element is [public][Modifiers.PUBLIC], otherwise `false`.
-     */
-    @JvmDefault
-    val isPublic: Boolean
-        get() = access and PUBLIC != 0
-
-    /**
-     * Returns `true` if `this` element is [protected][Modifiers.PROTECTED], otherwise `false`.
-     */
-    @JvmDefault
-    val isProtected: Boolean
-        get() = access and PROTECTED != 0
-
-    /**
-     * Returns `true` if `this` element is [private][Modifiers.PRIVATE], otherwise `false`.
-     */
-    @JvmDefault
-    val isPrivate: Boolean
-        get() = access and PRIVATE != 0
-
-    /**
-     * Returns `true` if `this` element is [mandated][Modifiers.MANDATED], otherwise `false`.
-     */
-    @JvmDefault
-    val isMandated: Boolean
-        get() = access and MANDATED != 0
-
-    /**
-     * Returns `true` if `this` element is [synthetic][Modifiers.SYNTHETIC], otherwise `false`.
-     */
-    @JvmDefault
-    val isSynthetic: Boolean
-        get() = access and SYNTHETIC != 0
 }
+
+/**
+ * Returns `true` if `this` element is [static][Modifiers.STATIC], otherwise `false`.
+ */
+val AccessibleBytecode.isStatic: Boolean
+    get() = Modifiers.contains(access, STATIC)
+
+/**
+ * Returns `true` if `this` element is [final][Modifiers.FINAL], otherwise `false`.
+ */
+val AccessibleBytecode.isFinal: Boolean
+    get() = Modifiers.contains(access, FINAL)
+
+/**
+ * Returns `true` if `this` element is [abstract][Modifiers.ABSTRACT], otherwise `false`.
+ */
+val AccessibleBytecode.isAbstract: Boolean
+    get() = Modifiers.contains(access, ABSTRACT)
+
+/**
+ * Returns `true` if `this` element is [public][Modifiers.PUBLIC], otherwise `false`.
+ */
+val AccessibleBytecode.isPublic: Boolean
+    get() = Modifiers.contains(access, PUBLIC)
+
+/**
+ * Returns `true` if `this` element is [protected][Modifiers.PROTECTED], otherwise `false`.
+ */
+val AccessibleBytecode.isProtected: Boolean
+    get() = Modifiers.contains(access, PROTECTED)
+
+/**
+ * Returns `true` if `this` element is [private][Modifiers.PRIVATE], otherwise `false`.
+ */
+val AccessibleBytecode.isPrivate: Boolean
+    get() = Modifiers.contains(access, PRIVATE)
+
+/**
+ * Returns `true` if `this` element is [mandated][Modifiers.MANDATED], otherwise `false`.
+ */
+val AccessibleBytecode.isMandated: Boolean
+    get() = Modifiers.contains(access, MANDATED)
+
+/**
+ * Returns `true` if `this` element is [synthetic][Modifiers.SYNTHETIC], otherwise `false`.
+ */
+val AccessibleBytecode.isSynthetic: Boolean
+    get() = Modifiers.contains(access, SYNTHETIC)

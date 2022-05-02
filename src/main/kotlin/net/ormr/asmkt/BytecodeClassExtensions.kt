@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-@file:JvmName("BytecodeClassUtils")
-
 package net.ormr.asmkt
 
 import net.ormr.asmkt.Modifiers.STATIC
-import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
 import net.ormr.asmkt.types.MethodType
 import net.ormr.asmkt.types.ReferenceType
+import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
 import org.objectweb.asm.Opcodes
 
 // -- BYTECODE CLASS -- \\
-@JvmSynthetic
 @AsmKtDsl
 inline fun defineClass(
     type: ReferenceType,
@@ -34,22 +31,20 @@ inline fun defineClass(
     interfaces: List<ReferenceType> = emptyList(),
     sourceFile: String? = null,
     sourceDebug: String? = null,
-    scope: BytecodeClass.() -> Unit
+    scope: BytecodeClass.() -> Unit,
 ): BytecodeClass = BytecodeClass(type, access, superType, interfaces, sourceFile, sourceDebug).apply(scope)
 
 // -- MODULES -- \\
 // TODO: document the throws
-@JvmSynthetic
 @AsmKtDsl
 inline fun BytecodeClass.defineModule(
     name: String,
     access: Int,
     version: String? = null,
-    scope: BytecodeModule.() -> Unit
+    scope: BytecodeModule.() -> Unit,
 ): BytecodeModule = defineModule(name, access, version).apply(scope)
 
 // -- FIELDS -- \\
-@JvmSynthetic
 @AsmKtDsl
 fun BytecodeClass.defineField(
     name: String,
@@ -57,12 +52,11 @@ fun BytecodeClass.defineField(
     type: ReferenceType,
     signature: String? = null,
     value: Any? = null,
-    scope: BytecodeField.() -> Unit
+    scope: BytecodeField.() -> Unit,
 ): BytecodeField = defineField(name, access, type, signature, value).apply(scope)
 
 // -- METHODS -- \\
 // TODO: document the throws
-@JvmSynthetic
 @AsmKtDsl
 inline fun BytecodeClass.defineMethod(
     name: String,
@@ -70,18 +64,16 @@ inline fun BytecodeClass.defineMethod(
     type: MethodType,
     signature: String? = null,
     exceptions: List<ReferenceType> = emptyList(),
-    scope: BytecodeMethod.() -> Unit
+    scope: BytecodeMethod.() -> Unit,
 ): BytecodeMethod = defineMethod(name, access, type, signature, exceptions).apply(scope)
 
-@JvmSynthetic
 @AsmKtDsl
 inline fun BytecodeClass.defineConstructor(
     access: Int = Modifiers.PUBLIC,
     descriptor: MethodType = MethodType.VOID,
-    body: BytecodeMethod.() -> Unit
+    body: BytecodeMethod.() -> Unit,
 ): BytecodeMethod = defineConstructor(access, descriptor).apply(body)
 
-@JvmSynthetic
 @AsmKtDsl
 inline fun BytecodeClass.defineStaticInit(body: BytecodeMethod.() -> Unit = {}): BytecodeMethod =
     defineMethod("<clinit>", STATIC, MethodType.VOID).apply(body)
@@ -89,7 +81,6 @@ inline fun BytecodeClass.defineStaticInit(body: BytecodeMethod.() -> Unit = {}):
 /**
  * Defines a skeleton implementation of the `equals` method for `this` class.
  */
-@JvmSynthetic
 @AsmKtDsl
 inline fun BytecodeClass.defineEquals(isFinal: Boolean = false, body: BytecodeMethod.() -> Unit): BytecodeMethod =
     defineEquals(isFinal).apply(body)
@@ -97,7 +88,6 @@ inline fun BytecodeClass.defineEquals(isFinal: Boolean = false, body: BytecodeMe
 /**
  * Defines a skeleton implementation of the `hashCode` method for `this` class.
  */
-@JvmSynthetic
 @AsmKtDsl
 inline fun BytecodeClass.defineHashCode(isFinal: Boolean = false, body: BytecodeMethod.() -> Unit): BytecodeMethod =
     defineHashCode(isFinal).apply(body)
@@ -105,7 +95,6 @@ inline fun BytecodeClass.defineHashCode(isFinal: Boolean = false, body: Bytecode
 /**
  * Defines a skeleton implementation of the `toString` method for `this` class.
  */
-@JvmSynthetic
 @AsmKtDsl
 inline fun BytecodeClass.defineToString(isFinal: Boolean = false, body: BytecodeMethod.() -> Unit): BytecodeMethod =
     defineToString(isFinal).apply(body)

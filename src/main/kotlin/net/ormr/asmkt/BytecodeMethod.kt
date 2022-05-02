@@ -45,6 +45,12 @@ data class BytecodeMethod internal constructor(
     val block: BytecodeBlock = BytecodeBlock(),
 ) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode {
     private companion object {
+        // +0.0
+        private const val POSITIVE_ZERO = 0L
+
+        // 1.0
+        private const val ONE = 0x3FF0000000000000L
+
         private val primitiveClassHandle: Handle by lazy {
             constantBootstrapsHandleOf(
                 "primitiveClass",
@@ -62,31 +68,31 @@ data class BytecodeMethod internal constructor(
      * Returns `true` if `this` method is [synchronized][Modifiers.SYNCHRONIZED], otherwise `false`.
      */
     val isSynchronized: Boolean
-        get() = access and Modifiers.SYNCHRONIZED != 0
+        get() = Modifiers.contains(access, Modifiers.SYNCHRONIZED)
 
     /**
      * Returns `true` if `this` method is [bridge][Modifiers.BRIDGE], otherwise `false`.
      */
     val isBridge: Boolean
-        get() = access and Modifiers.BRIDGE != 0
+        get() = Modifiers.contains(access, Modifiers.BRIDGE)
 
     /**
      * Returns `true` if `this` method is [varargs][Modifiers.VARARGS], otherwise `false`.
      */
     val isVarargs: Boolean
-        get() = access and Modifiers.VARARGS != 0
+        get() = Modifiers.contains(access, Modifiers.VARARGS)
 
     /**
      * Returns `true` if `this` method is [native][Modifiers.NATIVE], otherwise `false`.
      */
     val isNative: Boolean
-        get() = access and Modifiers.NATIVE != 0
+        get() = Modifiers.contains(access, Modifiers.NATIVE)
 
     /**
      * Returns `true` if `this` method is [strict][Modifiers.STRICT], otherwise `false`.
      */
     val isStrict: Boolean
-        get() = access and Modifiers.STRICT != 0
+        get() = Modifiers.contains(access, Modifiers.STRICT)
 
     /**
      * Returns the return type of `this` method.
@@ -152,7 +158,6 @@ data class BytecodeMethod internal constructor(
     private val visibleTypeParameterAnnotations: MutableList<BytecodeAnnotation> = mutableListOf()
     private val invisibleTypeParameterAnnotations: MutableList<BytecodeAnnotation> = mutableListOf()
 
-    @get:JvmName("returns")
     val returns: Boolean
         get() = block.returns
 
@@ -160,7 +165,7 @@ data class BytecodeMethod internal constructor(
      * Returns `true` if no instructions have been added to `this` block, otherwise `false`.
      */
     fun isEmpty(): Boolean = tryCatchBlocks.isEmpty() && localVariableNodes.isEmpty() && parameterNodes.isEmpty()
-        && visibleAnnotations.isEmpty() && block.isEmpty()
+            && visibleAnnotations.isEmpty() && block.isEmpty()
 
     /**
      * Returns `true` if any instructions have been added to `this` block, otherwise `false`.
@@ -181,7 +186,7 @@ data class BytecodeMethod internal constructor(
     // -- CONST INSTRUCTIONS -- \\
     private fun isValidLdcValue(value: Any): Boolean =
         value is String || value is Int || value is Long || value is Float || value is Double || value is Type
-            || value is AsmType || value is Handle || value is ConstantDynamic
+                || value is AsmType || value is Handle || value is ConstantDynamic
 
     /**
      * Pushes a `LDC` instruction for the given [value] onto the stack.
@@ -387,7 +392,7 @@ data class BytecodeMethod internal constructor(
     fun pushDouble(value: Double): BytecodeMethod = apply {
         val bits = value.toBits()
 
-        if (bits == 0L || bits == 0x3FF0000000000000L) { // +0.0 and 1.0
+        if (bits == POSITIVE_ZERO || bits == ONE) {
             block.addInstruction(DCONST_0 + value.toInt())
         } else {
             block.ldc(value)
@@ -405,6 +410,8 @@ data class BytecodeMethod internal constructor(
     @AsmKtDsl
     fun pushType(value: FieldType): BytecodeMethod = apply {
         if (value is PrimitiveType) {
+            // TODO: this will only work for Java 15(?) and above, as it doesn't exist on the lower ones
+            //       we need to handle this properly in some manner so that we don't generate faulty bytecode
             pushConstantDynamic(value.descriptor, ReferenceType.CLASS, primitiveClassHandle)
         } else {
             ldc(value.toAsmType())
@@ -439,7 +446,7 @@ data class BytecodeMethod internal constructor(
         bootStrapMethod: Handle,
         vararg bootStrapMethodArguments: Any,
     ): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'" }
+        requireNotVoid(type)
         val arguments = bootStrapMethodArguments.replaceTypes()
         pushConstantDynamic(ConstantDynamic(name, type.descriptor, bootStrapMethod, *arguments))
     }
@@ -447,26 +454,26 @@ data class BytecodeMethod internal constructor(
     // -- LOAD INSTRUCTIONS -- \\
     @AsmKtDsl
     fun loadLocal(index: Int, type: FieldType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addVarInstruction(type.getOpcode(ILOAD), index)
     }
 
     @AsmKtDsl
     fun arrayLoad(type: FieldType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(IALOAD))
     }
 
     // -- STORE INSTRUCTIONS -- \\
     @AsmKtDsl
     fun storeLocal(index: Int, type: FieldType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addVarInstruction(type.getOpcode(ISTORE), index)
     }
 
     @AsmKtDsl
     fun arrayStore(type: FieldType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(IASTORE))
     }
 
@@ -490,7 +497,7 @@ data class BytecodeMethod internal constructor(
      */
     @AsmKtDsl
     fun newArray(type: FieldType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
 
         if (type is TypeWithInternalName) {
             block.anewarray(type.internalName)
@@ -498,14 +505,14 @@ data class BytecodeMethod internal constructor(
         }
 
         val arrayType = when (type) {
-            is PrimitiveBoolean -> T_BOOLEAN
-            is PrimitiveChar -> T_CHAR
-            is PrimitiveByte -> T_BYTE
-            is PrimitiveShort -> T_SHORT
-            is PrimitiveInt -> T_INT
-            is PrimitiveFloat -> T_FLOAT
-            is PrimitiveLong -> T_LONG
-            is PrimitiveDouble -> T_DOUBLE
+            is PrimitiveType.Boolean -> T_BOOLEAN
+            is PrimitiveType.Char -> T_CHAR
+            is PrimitiveType.Byte -> T_BYTE
+            is PrimitiveType.Short -> T_SHORT
+            is PrimitiveType.Int -> T_INT
+            is PrimitiveType.Float -> T_FLOAT
+            is PrimitiveType.Long -> T_LONG
+            is PrimitiveType.Double -> T_DOUBLE
             else -> throw IllegalStateException("Exhaustive switch was not exhaustive for '$type'.")
         }
 
@@ -514,7 +521,7 @@ data class BytecodeMethod internal constructor(
 
     @AsmKtDsl
     fun newMultiArray(type: FieldType, dimensions: Int): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.multianewarray(type.descriptor, dimensions)
     }
 
@@ -591,26 +598,26 @@ data class BytecodeMethod internal constructor(
     // TODO: 'getStaticField'?
     @AsmKtDsl
     fun getStatic(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'descriptor' must not be 'void'." }
+        requireNotVoid(type, name = "descriptor")
         block.getstatic(owner.internalName, name, type.descriptor)
     }
 
     // TODO: 'putStaticField'?
     @AsmKtDsl
     fun putStatic(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'descriptor' must not be 'void'." }
+        requireNotVoid(type, name = "descriptor")
         block.putstatic(owner.internalName, name, type.descriptor)
     }
 
     @AsmKtDsl
     fun getField(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'descriptor' must not be 'void'." }
+        requireNotVoid(type, name = "descriptor")
         block.getfield(owner.internalName, name, type.descriptor)
     }
 
     @AsmKtDsl
     fun putField(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'descriptor' must not be 'void'." }
+        requireNotVoid(type, name = "descriptor")
         block.putfield(owner.internalName, name, type.descriptor)
     }
 
@@ -650,7 +657,7 @@ data class BytecodeMethod internal constructor(
     @AsmKtDsl
     fun checkCast(type: ReferenceType): BytecodeMethod = apply {
         // there is no point in casting something to 'Object' as everything that isn't a primitive will be extending
-        // 'Object' anyways, and we only accept 'ReferenceType' values here anyways, so 'type' can't be a primitive
+        // 'Object' anyway, and we only accept 'ReferenceType' values here anyways, so 'type' can't be a primitive
         if (type != OBJECT) {
             block.checkcast(type.internalName)
         }
@@ -718,7 +725,7 @@ data class BytecodeMethod internal constructor(
 
     @AsmKtDsl
     fun ifObjectsEqual(type: FieldType, label: Label): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'" }
+        requireNotVoid(type)
 
         invokeStatic(ReferenceType.OBJECTS, "equals", MethodType.ofBoolean(OBJECT, OBJECT))
         TODO("implement label usage")
@@ -760,19 +767,19 @@ data class BytecodeMethod internal constructor(
 
     @AsmKtDsl
     private fun ifCmp(type: FieldType, mode: ComparisonMode, label: Label): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'" }
+        requireNotVoid(type)
 
         when (type) {
-            is PrimitiveLong -> {
+            is PrimitiveType.Long -> {
                 block.addInstruction(LCMP)
                 block.addJumpInstruction(mode.code, label)
             }
-            is PrimitiveDouble -> {
+            is PrimitiveType.Double -> {
                 val instruction = if (mode == GREATER_OR_EQUAL || mode == GREATER) DCMPL else DCMPG
                 block.addInstruction(instruction)
                 block.addJumpInstruction(mode.code, label)
             }
-            is PrimitiveFloat -> {
+            is PrimitiveType.Float -> {
                 val instruction = if (mode == GREATER_OR_EQUAL || mode == GREATER) FCMPL else FCMPG
                 block.addInstruction(instruction)
                 block.addJumpInstruction(mode.code, label)
@@ -799,86 +806,86 @@ data class BytecodeMethod internal constructor(
     @AsmKtDsl
     fun not(): BytecodeMethod = apply {
         pushBoolean(true)
-        xor(PrimitiveInt)
+        xor(PrimitiveType.Int)
     }
 
     @AsmKtDsl
     fun add(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(IADD))
     }
 
     @AsmKtDsl
     fun subtract(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(ISUB))
     }
 
     @AsmKtDsl
     fun multiply(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(IMUL))
     }
 
     @AsmKtDsl
     fun divide(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(IDIV))
     }
 
     @AsmKtDsl
     fun remainder(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(IREM))
     }
 
     @AsmKtDsl
     fun negate(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(INEG))
     }
 
     @AsmKtDsl
     fun shiftLeft(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(ISHL))
     }
 
     @AsmKtDsl
     fun shiftRight(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(ISHR))
     }
 
     @AsmKtDsl
     fun unsignedShiftRight(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(IUSHR))
     }
 
     @AsmKtDsl
     fun and(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(IAND))
     }
 
     @AsmKtDsl
     fun or(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(IOR))
     }
 
     @AsmKtDsl
     fun xor(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         block.addInstruction(type.getOpcode(IXOR))
     }
 
     @AsmKtDsl
     fun cmpl(type: PrimitiveType): BytecodeMethod = apply {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
 
-        if (type is PrimitiveFloat) {
+        if (type is PrimitiveType.Float) {
             block.fcmpl()
         } else {
             block.dcmpl()
@@ -887,9 +894,9 @@ data class BytecodeMethod internal constructor(
 
     @AsmKtDsl
     fun cmpg(type: PrimitiveType) {
-        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
+        requireNotVoid(type)
 
-        if (type is PrimitiveFloat) {
+        if (type is PrimitiveType.Float) {
             block.fcmpg()
         } else {
             block.dcmpg()
@@ -918,40 +925,42 @@ data class BytecodeMethod internal constructor(
      */
     @AsmKtDsl
     fun cast(from: PrimitiveType, to: PrimitiveType): BytecodeMethod = apply {
+        requireNotVoid(from, "from")
+        requireNotVoid(to, "from")
         if (from != to) {
             when (from) {
-                is PrimitiveDouble -> when (to) {
-                    is PrimitiveLong -> block.d2l()
-                    is PrimitiveFloat -> block.d2f()
+                is PrimitiveType.Double -> when (to) {
+                    is PrimitiveType.Long -> block.d2l()
+                    is PrimitiveType.Float -> block.d2f()
                     else -> {
                         block.d2i()
-                        cast(PrimitiveInt, to)
+                        cast(PrimitiveType.Int, to)
                     }
                 }
-                is PrimitiveFloat -> when (to) {
-                    is PrimitiveLong -> block.f2l()
-                    is PrimitiveDouble -> block.f2d()
+                is PrimitiveType.Float -> when (to) {
+                    is PrimitiveType.Long -> block.f2l()
+                    is PrimitiveType.Double -> block.f2d()
                     else -> {
                         block.f2i()
-                        cast(PrimitiveInt, to)
+                        cast(PrimitiveType.Int, to)
                     }
                 }
-                is PrimitiveLong -> when (to) {
-                    is PrimitiveFloat -> block.l2f()
-                    is PrimitiveDouble -> block.l2d()
+                is PrimitiveType.Long -> when (to) {
+                    is PrimitiveType.Float -> block.l2f()
+                    is PrimitiveType.Double -> block.l2d()
                     else -> {
                         block.l2i()
-                        cast(PrimitiveInt, to)
+                        cast(PrimitiveType.Int, to)
                     }
                 }
                 else -> when (to) {
-                    is PrimitiveChar -> block.i2c()
-                    is PrimitiveShort -> block.i2s()
-                    is PrimitiveByte -> block.i2b()
-                    is PrimitiveLong -> block.i2l()
-                    is PrimitiveFloat -> block.i2f()
-                    is PrimitiveDouble -> block.i2d()
-                    else -> throw IllegalStateException()
+                    is PrimitiveType.Char -> block.i2c()
+                    is PrimitiveType.Short -> block.i2s()
+                    is PrimitiveType.Byte -> block.i2b()
+                    is PrimitiveType.Long -> block.i2l()
+                    is PrimitiveType.Float -> block.i2f()
+                    is PrimitiveType.Double -> block.i2d()
+                    else -> error("Unknown type: $to")
                 }
             }
         }

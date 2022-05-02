@@ -18,18 +18,14 @@ package net.ormr.asmkt
 
 import net.ormr.asmkt.types.ReferenceType
 import org.objectweb.asm.Opcodes
-import org.objectweb.asm.tree.ModuleExportNode
-import org.objectweb.asm.tree.ModuleNode
-import org.objectweb.asm.tree.ModuleOpenNode
-import org.objectweb.asm.tree.ModuleProvideNode
-import org.objectweb.asm.tree.ModuleRequireNode
+import org.objectweb.asm.tree.*
 
 @AsmKtDsl
 data class BytecodeModule internal constructor(
     val name: String,
     override val access: Int,
     val version: String?,
-    val mainClass: BytecodeClass
+    val mainClass: BytecodeClass,
 ) : AccessibleBytecode {
     private val packages: MutableList<String> = mutableListOf()
     private val requires: MutableList<ModuleRequireNode> = mutableListOf()
@@ -42,51 +38,43 @@ data class BytecodeModule internal constructor(
     //       'internalName' from 'Type.getInternalName' or they mean 'className' from 'Type.getClassName'
 
     @AsmKtDsl
-    @JvmName("addPackage")
     fun `package`(pack: String): BytecodeModule = apply {
         packages += pack
     }
 
-    @JvmOverloads
     @AsmKtDsl
-    @JvmName("addRequire")
     fun require(module: String, access: Int, version: String? = null): BytecodeModule = apply {
         requires += ModuleRequireNode(module, access, version)
     }
 
     // TODO: document the throws
     @AsmKtDsl
-    @JvmName("addExport")
     fun export(pack: String, access: Int, vararg modules: String): BytecodeModule = apply {
         exports += ModuleExportNode(pack, access, modules.toMutableList())
     }
 
     // TODO: document the throws
     @AsmKtDsl
-    @JvmName("addOpen")
     fun open(pack: String, access: Int, vararg modules: String): BytecodeModule = apply {
         opens += ModuleOpenNode(pack, access, modules.toMutableList())
     }
 
     @AsmKtDsl
-    @JvmName("addUse")
     fun use(service: ReferenceType): BytecodeModule = apply {
         uses += service.internalName
     }
 
     @AsmKtDsl
-    @JvmName("addProvide")
     fun provide(service: ReferenceType, vararg providers: ReferenceType): BytecodeModule = apply {
         provides += ModuleProvideNode(service.internalName, providers.mapTo(mutableListOf()) { it.internalName })
     }
 
-    @JvmSynthetic
     internal fun toNode(): ModuleNode =
         ModuleNode(Opcodes.ASM8, name, access, version, requires, exports, opens, uses, provides)
-
-    /**
-     * Returns `true` if `this` module is [open][Modifiers.OPEN], otherwise `false`.
-     */
-    val isOpen: Boolean
-        get() = access and Modifiers.OPEN != 0
 }
+
+/**
+ * Returns `true` if `this` module is [open][Modifiers.OPEN], otherwise `false`.
+ */
+val BytecodeModule.isOpen: Boolean
+    get() = Modifiers.contains(access, Modifiers.OPEN)

@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:JvmName("AnnotatableBytecodeUtils")
-
 package net.ormr.asmkt
 
 import net.ormr.asmkt.types.ReferenceType
@@ -24,7 +22,7 @@ import org.objectweb.asm.TypePath
 /**
  * Annotates `this` with an annotation of type [A].
  *
- * The value of [isVisible] determines whether or not the annotation will be visible at runtime through reflection,
+ * The value of [isVisible] determines whether the annotation will be visible at runtime through reflection,
  * if it's `true` then it's visible at runtime, otherwise it's not.
  *
  * If [allowRepeats] is `false` and `this` is already annotated with an annotation of the same type as `type` then
@@ -38,11 +36,10 @@ import org.objectweb.asm.TypePath
  * @return a new [BytecodeAnnotation] instance used to build an annotation of type [type]
  */
 @AsmKtDsl
-@JvmSynthetic
 inline fun <reified A : Annotation> AnnotatableBytecode.defineAnnotation(
     isVisible: Boolean = true,
     allowRepeats: Boolean = false,
-    scope: BytecodeAnnotation.() -> Unit = {}
+    scope: BytecodeAnnotation.() -> Unit = {},
 ): BytecodeAnnotation = defineAnnotation(ReferenceType<A>(), isVisible, allowRepeats).apply(scope)
 
 /**
@@ -63,34 +60,31 @@ inline fun <reified A : Annotation> AnnotatableBytecode.defineAnnotation(
  * @return a new [BytecodeAnnotation] instance used to build an annotation of type [type]
  */
 @AsmKtDsl
-@JvmSynthetic
 inline fun AnnotatableBytecode.defineAnnotation(
     type: ReferenceType,
     isVisible: Boolean = true,
     allowRepeats: Boolean = false,
-    scope: BytecodeAnnotation.() -> Unit
+    scope: BytecodeAnnotation.() -> Unit,
 ): BytecodeAnnotation = defineAnnotation(type, isVisible, allowRepeats).apply(scope)
 
 // TODO: documentation
 @AsmKtDsl
-@JvmSynthetic
 inline fun <reified A : Annotation> AnnotatableTypeBytecode.defineTypeAnnotation(
     typeRef: Int,
     typePath: TypePath?,
     isVisible: Boolean = true,
     allowRepeats: Boolean = false,
-    scope: BytecodeAnnotation.() -> Unit
-): BytecodeAnnotation = defineTypeAnnotation(typeRef, typePath,
-    ReferenceType<A>(), isVisible, allowRepeats).apply(scope)
+    scope: BytecodeAnnotation.() -> Unit,
+): BytecodeAnnotation =
+    defineTypeAnnotation(typeRef, typePath, ReferenceType<A>(), isVisible, allowRepeats).apply(scope)
 
-@JvmSynthetic
 internal fun handleAnnotations(
     target: Any,
     annotation: BytecodeAnnotation,
     visible: MutableList<BytecodeAnnotation>,
     invisible: MutableList<BytecodeAnnotation>,
     isVisible: Boolean,
-    allowRepeats: Boolean
+    allowRepeats: Boolean,
 ): BytecodeAnnotation {
     val type = annotation.type
 
@@ -115,9 +109,7 @@ internal fun handleAnnotations(
     return annotation
 }
 
-@JvmSynthetic
 internal fun disallowedRepeatingAnnotation(target: Any, type: ReferenceType): Nothing =
     throw UnsupportedOperationException("'$target' is already annotated with an annotation of type '${type.className}'.")
 
-@JvmSynthetic
 internal fun List<BytecodeAnnotation>.containsType(type: ReferenceType): Boolean = any { it.type == type }

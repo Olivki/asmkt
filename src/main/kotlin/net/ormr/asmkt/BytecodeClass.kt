@@ -16,10 +16,7 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.types.FieldType
-import net.ormr.asmkt.types.MethodType
-import net.ormr.asmkt.types.PrimitiveVoid
-import net.ormr.asmkt.types.ReferenceType
+import net.ormr.asmkt.types.*
 import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
@@ -39,7 +36,7 @@ import org.objectweb.asm.tree.TypeAnnotationNode
  * @property [sourceDebug] TODO
  */
 @AsmKtDsl
-class BytecodeClass @JvmOverloads constructor(
+class BytecodeClass(
     val type: ReferenceType,
     override val access: Int = Modifiers.PUBLIC,
     val superType: ReferenceType = OBJECT,
@@ -98,7 +95,6 @@ class BytecodeClass @JvmOverloads constructor(
      * The method that this class belongs to, or `null` if this class does not belong to a method.
      */
     var enclosingMethod: BytecodeMethod? = null
-        @JvmSynthetic
         internal set
 
     private val innerClasses: MutableMap<String, BytecodeClass> = mutableMapOf()
@@ -202,8 +198,6 @@ class BytecodeClass @JvmOverloads constructor(
         return field
     }
 
-    // TODO: document the throws
-    @JvmOverloads
     @AsmKtDsl
     fun defineMethod(
         name: String,
@@ -220,10 +214,9 @@ class BytecodeClass @JvmOverloads constructor(
     /**
      * Defines a skeleton implementation of a constructor for `this` class.
      */
-    @JvmOverloads
     @AsmKtDsl
     fun defineConstructor(access: Int = Modifiers.PUBLIC, type: MethodType = MethodType.VOID): BytecodeMethod {
-        require(type.returnType is PrimitiveVoid) { "return type of a constructor must be 'void', was '$type'." }
+        require(type.returnType is PrimitiveType.Void) { "return type of a constructor must be 'void', was '$type'." }
         return defineMethod("<init>", access, type)
     }
 
@@ -231,7 +224,6 @@ class BytecodeClass @JvmOverloads constructor(
      * Defines a basic constructor for `this` class with the given [access] that just invokes the no-arg constructor
      * if its [superType].
      */
-    @JvmOverloads
     @AsmKtDsl
     fun defineDefaultConstructor(
         access: Int = Modifiers.PUBLIC,
@@ -245,7 +237,6 @@ class BytecodeClass @JvmOverloads constructor(
      * Defines a constructor for `this` class that will throw a [UnsupportedOperationException] with the given
      * [message] when its invoked.
      */
-    @JvmOverloads
     @AsmKtDsl
     fun defineInaccessibleConstructor(
         access: Int = Modifiers.PRIVATE,
@@ -260,7 +251,6 @@ class BytecodeClass @JvmOverloads constructor(
     /**
      * Defines a skeleton implementation of the `equals` method for `this` class.
      */
-    @JvmOverloads
     @AsmKtDsl
     fun defineEquals(isFinal: Boolean = false): BytecodeMethod {
         val flags = if (isFinal) Modifiers.PUBLIC_FINAL else Modifiers.PUBLIC
@@ -270,7 +260,6 @@ class BytecodeClass @JvmOverloads constructor(
     /**
      * Defines a skeleton implementation of the `hashCode` method for `this` class.
      */
-    @JvmOverloads
     @AsmKtDsl
     fun defineHashCode(isFinal: Boolean = false): BytecodeMethod {
         val flags = if (isFinal) Modifiers.PUBLIC_FINAL else Modifiers.PUBLIC
@@ -280,7 +269,6 @@ class BytecodeClass @JvmOverloads constructor(
     /**
      * Defines a skeleton implementation of the `toString` method for `this` class.
      */
-    @JvmOverloads
     @AsmKtDsl
     fun defineToString(isFinal: Boolean = false): BytecodeMethod {
         val flags = if (isFinal) Modifiers.PUBLIC_FINAL else Modifiers.PUBLIC
