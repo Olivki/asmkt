@@ -426,7 +426,7 @@ public data class BytecodeMethod internal constructor(
      * behavior will happen:
      * - If `version` >= [BytecodeVersion.JAVA_11] then a [constant dynamic][pushConstantDynamic] pointing to the
      * [ConstantBootstraps.primitiveClass] function is pushed onto the stack.
-     * - If `version` < [BytecodeVersion.JAVA_11] then a [GETSTATIC][getStatic] instruction pointing to the `TYPE` field
+     * - If `version` < [BytecodeVersion.JAVA_11] then a [GETSTATIC][getStaticField] instruction pointing to the `TYPE` field
      * located in the [wrapper][PrimitiveType.toBoxed] class for `value` is pushed onto the stack.
      *
      * @return `this` *(for chaining)*
@@ -437,7 +437,7 @@ public data class BytecodeMethod internal constructor(
             if (parent.version >= BytecodeVersion.JAVA_11) {
                 pushConstantDynamic(value.descriptor, ReferenceType.CLASS, primitiveClassHandle)
             } else {
-                getStatic(value.toBoxed(), "TYPE", ReferenceType.CLASS)
+                getStaticField(value.toBoxed(), "TYPE", ReferenceType.CLASS)
             }
         } else {
             ldc(value.toAsmType())
@@ -623,16 +623,14 @@ public data class BytecodeMethod internal constructor(
     }
 
     // -- FIELD INSTRUCTIONS -- \\
-    // TODO: 'getStaticField'?
     @AsmKtDsl
-    public fun getStatic(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
+    public fun getStaticField(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
         requireNotVoid(type, name = "descriptor")
         block.getstatic(owner.internalName, name, type.descriptor)
     }
 
-    // TODO: 'putStaticField'?
     @AsmKtDsl
-    public fun putStatic(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
+    public fun putStaticField(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
         requireNotVoid(type, name = "descriptor")
         block.putstatic(owner.internalName, name, type.descriptor)
     }
@@ -651,13 +649,13 @@ public data class BytecodeMethod internal constructor(
 
     // local fields
     @AsmKtDsl
-    public fun getLocalStatic(name: String, type: FieldType): BytecodeMethod = apply {
-        getStatic(parentType, name, type)
+    public fun getLocalStaticField(name: String, type: FieldType): BytecodeMethod = apply {
+        getStaticField(parentType, name, type)
     }
 
     @AsmKtDsl
-    public fun putLocalStatic(name: String, type: FieldType): BytecodeMethod = apply {
-        putStatic(parentType, name, type)
+    public fun putLocalStaticField(name: String, type: FieldType): BytecodeMethod = apply {
+        putStaticField(parentType, name, type)
     }
 
     @AsmKtDsl

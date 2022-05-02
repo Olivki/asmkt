@@ -243,7 +243,7 @@ public fun BytecodeMethod.pushBoxedBoolean(value: Boolean): BytecodeMethod = app
  */
 @AsmKtDsl
 public fun BytecodeMethod.pushBoxedTrue(): BytecodeMethod = apply {
-    getStatic(ReferenceType.BOOLEAN, "TRUE", ReferenceType.BOOLEAN)
+    getStaticField(ReferenceType.BOOLEAN, "TRUE", ReferenceType.BOOLEAN)
 }
 
 /**
@@ -253,7 +253,7 @@ public fun BytecodeMethod.pushBoxedTrue(): BytecodeMethod = apply {
  */
 @AsmKtDsl
 public fun BytecodeMethod.pushBoxedFalse(): BytecodeMethod = apply {
-    getStatic(ReferenceType.BOOLEAN, "FALSE", ReferenceType.BOOLEAN)
+    getStaticField(ReferenceType.BOOLEAN, "FALSE", ReferenceType.BOOLEAN)
 }
 
 @AsmKtDsl
