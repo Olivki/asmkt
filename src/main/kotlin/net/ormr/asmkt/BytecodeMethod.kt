@@ -222,7 +222,7 @@ public data class BytecodeMethod internal constructor(
      * Unlike [ldc] this function accepts a wider variety of types for `value` and it also outputs optimized bytecode
      * where possible.
      *
-     * For example, `aconst(3)` pushes the `ICONST_3` instruction onto the stack, and `aconst(true)` pushes the
+     * For example, `push(3)` pushes the `ICONST_3` instruction onto the stack, and `push(true)` pushes the
      * `ICONST_1` instruction onto the stack.
      *
      * @param [value] the value to generate the instruction for, must be one of the following types; `null`, [Boolean],
@@ -231,6 +231,7 @@ public data class BytecodeMethod internal constructor(
      * @throws [IllegalArgumentException] if [value] is not one of the allowed types
      *
      * @see [ldc]
+     * @see [pushNull]
      * @see [pushBoolean]
      * @see [pushString]
      * @see [pushByte]
@@ -247,7 +248,7 @@ public data class BytecodeMethod internal constructor(
     @AsmKtDsl
     public fun push(value: Any?): BytecodeMethod = apply {
         when (value) {
-            null -> block.aconst_null()
+            null -> pushNull()
             is Boolean -> pushBoolean(value)
             is Char -> pushInt(value.code)
             is String -> pushString(value)
@@ -262,6 +263,16 @@ public data class BytecodeMethod internal constructor(
             is Double -> pushDouble(value)
             else -> throw IllegalArgumentException("Can't push value '$value' (${value.javaClass.name}) onto the stack.")
         }
+    }
+
+    /**
+     * Pushes the `ACONST_NULL` instruction onto the stack.
+     *
+     * @return `this` *(for chaining)*
+     */
+    @AsmKtDsl
+    public fun pushNull(): BytecodeMethod = apply {
+        block.aconst_null()
     }
 
     /**
