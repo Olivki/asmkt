@@ -28,134 +28,140 @@ import java.lang.invoke.MethodType as JMethodType
 /**
  * Represents the type of method.
  */
-class MethodType private constructor(override val delegate: AsmType) : Type() {
-    companion object {
+public class MethodType private constructor(override val delegate: AsmType) : Type() {
+    public companion object {
         private val cachedTypes: MutableMap<String, MethodType> = hashMapOf()
 
         // -- PRIMITIVES -- \\
         @JvmField
-        val VOID: MethodType = createConstant("()V")
+        public val VOID: MethodType = createConstant("()V")
 
         @JvmField
-        val BOOLEAN: MethodType = createConstant("()Z")
+        public val BOOLEAN: MethodType = createConstant("()Z")
 
         @JvmField
-        val CHAR: MethodType = createConstant("()C")
+        public val CHAR: MethodType = createConstant("()C")
 
         @JvmField
-        val BYTE: MethodType = createConstant("()B")
+        public val BYTE: MethodType = createConstant("()B")
 
         @JvmField
-        val SHORT: MethodType = createConstant("()S")
+        public val SHORT: MethodType = createConstant("()S")
 
         @JvmField
-        val INT: MethodType = createConstant("()I")
+        public val INT: MethodType = createConstant("()I")
 
         @JvmField
-        val LONG: MethodType = createConstant("()J")
+        public val LONG: MethodType = createConstant("()J")
 
         @JvmField
-        val FLOAT: MethodType = createConstant("()F")
+        public val FLOAT: MethodType = createConstant("()F")
 
         @JvmField
-        val DOUBLE: MethodType = createConstant("()D")
+        public val DOUBLE: MethodType = createConstant("()D")
 
         @JvmField
-        val VOID_WRAPPER: MethodType = createConstant("()Ljava/lang/Void;")
+        public val VOID_WRAPPER: MethodType = createConstant("()Ljava/lang/Void;")
 
         @JvmField
-        val BOOLEAN_WRAPPER: MethodType = createConstant("()Ljava/lang/Boolean;")
+        public val BOOLEAN_WRAPPER: MethodType = createConstant("()Ljava/lang/Boolean;")
 
         @JvmField
-        val CHAR_WRAPPER: MethodType = createConstant("()Ljava/lang/Character;")
+        public val CHAR_WRAPPER: MethodType = createConstant("()Ljava/lang/Character;")
 
         @JvmField
-        val BYTE_WRAPPER: MethodType = createConstant("()Ljava/lang/Byte;")
+        public val BYTE_WRAPPER: MethodType = createConstant("()Ljava/lang/Byte;")
 
         @JvmField
-        val SHORT_WRAPPER: MethodType = createConstant("()Ljava/lang/Short;")
+        public val SHORT_WRAPPER: MethodType = createConstant("()Ljava/lang/Short;")
 
         @JvmField
-        val INT_WRAPPER: MethodType = createConstant("()Ljava/lang/Integer;")
+        public val INT_WRAPPER: MethodType = createConstant("()Ljava/lang/Integer;")
 
         @JvmField
-        val LONG_WRAPPER: MethodType = createConstant("()Ljava/lang/Long;")
+        public val LONG_WRAPPER: MethodType = createConstant("()Ljava/lang/Long;")
 
         @JvmField
-        val FLOAT_WRAPPER: MethodType = createConstant("()Ljava/lang/Float;")
+        public val FLOAT_WRAPPER: MethodType = createConstant("()Ljava/lang/Float;")
 
         @JvmField
-        val DOUBLE_WRAPPER: MethodType = createConstant("()Ljava/lang/Double;")
+        public val DOUBLE_WRAPPER: MethodType = createConstant("()Ljava/lang/Double;")
 
         @JvmField
-        val OBJECT: MethodType = createConstant("()Ljava/lang/Object;")
+        public val OBJECT: MethodType = createConstant("()Ljava/lang/Object;")
 
         @JvmField
-        val STRING: MethodType = createConstant("()Ljava/lang/String;")
+        public val STRING: MethodType = createConstant("()Ljava/lang/String;")
 
         @JvmField
-        val STRING_BUILDER: MethodType = createConstant("()Ljava/lang/StringBuilder;")
+        public val STRING_BUILDER: MethodType = createConstant("()Ljava/lang/StringBuilder;")
 
         @JvmField
-        val NUMBER: MethodType = createConstant("()Ljava/lang/Number;")
+        public val NUMBER: MethodType = createConstant("()Ljava/lang/Number;")
 
-        fun ofVoid(vararg argumentTypes: FieldType): MethodType = VOID.appendArguments(argumentTypes.asIterable())
+        public fun ofVoid(vararg argumentTypes: FieldType): MethodType =
+            VOID.appendArguments(argumentTypes.asIterable())
 
-        fun ofBoolean(vararg argumentTypes: FieldType): MethodType =
+        public fun ofBoolean(vararg argumentTypes: FieldType): MethodType =
             BOOLEAN.appendArguments(argumentTypes.asIterable())
 
-        fun ofChar(vararg argumentTypes: FieldType): MethodType = CHAR.appendArguments(argumentTypes.asIterable())
+        public fun ofChar(vararg argumentTypes: FieldType): MethodType =
+            CHAR.appendArguments(argumentTypes.asIterable())
 
-        fun ofByte(vararg argumentTypes: FieldType): MethodType = BYTE.appendArguments(argumentTypes.asIterable())
+        public fun ofByte(vararg argumentTypes: FieldType): MethodType =
+            BYTE.appendArguments(argumentTypes.asIterable())
 
-        fun ofShort(vararg argumentTypes: FieldType): MethodType = SHORT.appendArguments(argumentTypes.asIterable())
+        public fun ofShort(vararg argumentTypes: FieldType): MethodType =
+            SHORT.appendArguments(argumentTypes.asIterable())
 
-        fun ofInt(vararg argumentTypes: FieldType): MethodType = INT.appendArguments(argumentTypes.asIterable())
+        public fun ofInt(vararg argumentTypes: FieldType): MethodType = INT.appendArguments(argumentTypes.asIterable())
 
-        fun ofLong(vararg argumentTypes: FieldType): MethodType = LONG.appendArguments(argumentTypes.asIterable())
+        public fun ofLong(vararg argumentTypes: FieldType): MethodType =
+            LONG.appendArguments(argumentTypes.asIterable())
 
-        fun ofFloat(vararg argumentTypes: FieldType): MethodType = FLOAT.appendArguments(argumentTypes.asIterable())
+        public fun ofFloat(vararg argumentTypes: FieldType): MethodType =
+            FLOAT.appendArguments(argumentTypes.asIterable())
 
-        fun ofDouble(vararg argumentTypes: FieldType): MethodType =
+        public fun ofDouble(vararg argumentTypes: FieldType): MethodType =
             DOUBLE.appendArguments(argumentTypes.asIterable())
 
-        fun ofVoidWrapper(vararg argumentTypes: FieldType): MethodType =
+        public fun ofVoidWrapper(vararg argumentTypes: FieldType): MethodType =
             VOID_WRAPPER.appendArguments(argumentTypes.asIterable())
 
-        fun ofBooleanWrapper(vararg argumentTypes: FieldType): MethodType =
+        public fun ofBooleanWrapper(vararg argumentTypes: FieldType): MethodType =
             BOOLEAN_WRAPPER.appendArguments(argumentTypes.asIterable())
 
-        fun ofCharWrapper(vararg argumentTypes: FieldType): MethodType =
+        public fun ofCharWrapper(vararg argumentTypes: FieldType): MethodType =
             CHAR_WRAPPER.appendArguments(argumentTypes.asIterable())
 
-        fun ofByteWrapper(vararg argumentTypes: FieldType): MethodType =
+        public fun ofByteWrapper(vararg argumentTypes: FieldType): MethodType =
             BYTE_WRAPPER.appendArguments(argumentTypes.asIterable())
 
-        fun ofShortWrapper(vararg argumentTypes: FieldType): MethodType =
+        public fun ofShortWrapper(vararg argumentTypes: FieldType): MethodType =
             SHORT_WRAPPER.appendArguments(argumentTypes.asIterable())
 
-        fun ofIntWrapper(vararg argumentTypes: FieldType): MethodType =
+        public fun ofIntWrapper(vararg argumentTypes: FieldType): MethodType =
             INT_WRAPPER.appendArguments(argumentTypes.asIterable())
 
-        fun ofLongWrapper(vararg argumentTypes: FieldType): MethodType =
+        public fun ofLongWrapper(vararg argumentTypes: FieldType): MethodType =
             LONG_WRAPPER.appendArguments(argumentTypes.asIterable())
 
-        fun ofFloatWrapper(vararg argumentTypes: FieldType): MethodType =
+        public fun ofFloatWrapper(vararg argumentTypes: FieldType): MethodType =
             FLOAT_WRAPPER.appendArguments(argumentTypes.asIterable())
 
-        fun ofDoubleWrapper(vararg argumentTypes: FieldType): MethodType =
+        public fun ofDoubleWrapper(vararg argumentTypes: FieldType): MethodType =
             DOUBLE_WRAPPER.appendArguments(argumentTypes.asIterable())
 
-        fun ofObject(vararg argumentTypes: FieldType): MethodType =
+        public fun ofObject(vararg argumentTypes: FieldType): MethodType =
             OBJECT.appendArguments(argumentTypes.asIterable())
 
-        fun ofString(vararg argumentTypes: FieldType): MethodType =
+        public fun ofString(vararg argumentTypes: FieldType): MethodType =
             STRING.appendArguments(argumentTypes.asIterable())
 
-        fun ofStringBuilder(vararg argumentTypes: FieldType): MethodType =
+        public fun ofStringBuilder(vararg argumentTypes: FieldType): MethodType =
             STRING_BUILDER.appendArguments(argumentTypes.asIterable())
 
-        fun ofNumber(vararg argumentTypes: FieldType): MethodType =
+        public fun ofNumber(vararg argumentTypes: FieldType): MethodType =
             NUMBER.appendArguments(argumentTypes.asIterable())
 
         // -- FACTORY FUNCTIONS -- \\
@@ -165,7 +171,7 @@ class MethodType private constructor(override val delegate: AsmType) : Type() {
             return type
         }
 
-        fun copyOf(type: AsmType): MethodType {
+        public fun copyOf(type: AsmType): MethodType {
             requireSort(type, AsmType.METHOD)
             return when (val descriptor = type.descriptor) {
                 in cachedTypes -> cachedTypes.getValue(descriptor)
@@ -173,22 +179,23 @@ class MethodType private constructor(override val delegate: AsmType) : Type() {
             }
         }
 
-        fun of(method: Method): MethodType = when (val descriptor = method.toDescriptorString()) {
+        public fun of(method: Method): MethodType = when (val descriptor = method.toDescriptorString()) {
             in cachedTypes -> cachedTypes.getValue(descriptor)
             else -> MethodType(AsmType.getType(method))
         }
 
-        fun of(constructor: Constructor<*>): MethodType = when (val descriptor = constructor.toDescriptorString()) {
-            in cachedTypes -> cachedTypes.getValue(descriptor)
-            else -> MethodType(AsmType.getType(constructor))
-        }
+        public fun of(constructor: Constructor<*>): MethodType =
+            when (val descriptor = constructor.toDescriptorString()) {
+                in cachedTypes -> cachedTypes.getValue(descriptor)
+                else -> MethodType(AsmType.getType(constructor))
+            }
 
-        fun of(methodType: JMethodType): MethodType = fromDescriptor(methodType.toMethodDescriptorString())
+        public fun of(methodType: JMethodType): MethodType = fromDescriptor(methodType.toMethodDescriptorString())
 
-        fun fromDescriptor(descriptor: String): MethodType = copyOf(AsmType.getMethodType(descriptor))
+        public fun fromDescriptor(descriptor: String): MethodType = copyOf(AsmType.getMethodType(descriptor))
 
         // TODO: documentation
-        fun forBootstrap(returnType: FieldType = ReferenceType<CallSite>()): MethodType = of(
+        public fun forBootstrap(returnType: FieldType = ReferenceType<CallSite>()): MethodType = of(
             returnType,
             ReferenceType.METHOD_HANDLES_LOOKUP,
             ReferenceType.STRING,
@@ -196,12 +203,12 @@ class MethodType private constructor(override val delegate: AsmType) : Type() {
             ArrayType.OBJECT,
         )
 
-        fun of(
+        public fun of(
             returnType: FieldType,
             vararg typeParameters: FieldType,
         ): MethodType = fromDescriptor(buildMethodDescriptor(returnType, typeParameters))
 
-        fun createGeneric(
+        public fun createGeneric(
             arity: Int,
             finalArray: Boolean = false,
             returnType: FieldType = ReferenceType.OBJECT,
@@ -233,15 +240,15 @@ class MethodType private constructor(override val delegate: AsmType) : Type() {
     /**
      * The return type of `this` method type.
      */
-    val returnType: FieldType = FieldType.copyOf(delegate.returnType)
+    public val returnType: FieldType = FieldType.copyOf(delegate.returnType)
 
     /**
      * An unmodifiable list of the types of the arguments of `this` method type.
      */
-    val argumentTypes: List<FieldType> =
+    public val argumentTypes: List<FieldType> =
         Collections.unmodifiableList(delegate.argumentTypes.map { FieldType.copyOf(it) })
 
-    fun prependArguments(newArgumentTypes: Iterable<FieldType>): MethodType {
+    public fun prependArguments(newArgumentTypes: Iterable<FieldType>): MethodType {
         if (newArgumentTypes.none()) {
             return this
         }
@@ -257,10 +264,10 @@ class MethodType private constructor(override val delegate: AsmType) : Type() {
         return fromDescriptor(newDescriptor)
     }
 
-    fun prependArguments(vararg newArgumentTypes: FieldType): MethodType =
+    public fun prependArguments(vararg newArgumentTypes: FieldType): MethodType =
         prependArguments(newArgumentTypes.asIterable())
 
-    fun appendArguments(newArgumentTypes: Iterable<FieldType>): MethodType {
+    public fun appendArguments(newArgumentTypes: Iterable<FieldType>): MethodType {
         if (newArgumentTypes.none()) {
             return this
         }
@@ -276,7 +283,7 @@ class MethodType private constructor(override val delegate: AsmType) : Type() {
         return fromDescriptor(newDescriptor)
     }
 
-    fun appendArguments(vararg newArgumentTypes: FieldType): MethodType =
+    public fun appendArguments(vararg newArgumentTypes: FieldType): MethodType =
         appendArguments(newArgumentTypes.asIterable())
 
     /**
@@ -287,7 +294,7 @@ class MethodType private constructor(override val delegate: AsmType) : Type() {
      * @throws [IllegalArgumentException] if `index` is negative, or if `index` is larger than the available
      * [argumentTypes]
      */
-    fun changeArgument(index: Int, newType: FieldType): MethodType {
+    public fun changeArgument(index: Int, newType: FieldType): MethodType {
         require(index >= 0) { "'index' must not be negative." }
         require(index < argumentTypes.size) { "'index' is larger than available arguments; $index > ${argumentTypes.size}." }
 
@@ -315,7 +322,7 @@ class MethodType private constructor(override val delegate: AsmType) : Type() {
      *
      * If the current `returnType` is the same as `newType` then `this` instance is returned.
      */
-    fun changeReturn(newType: FieldType): MethodType {
+    public fun changeReturn(newType: FieldType): MethodType {
         return when (returnType) {
             newType -> this
             else -> {
@@ -336,14 +343,40 @@ class MethodType private constructor(override val delegate: AsmType) : Type() {
      *
      * @see [JMethodType.fromMethodDescriptorString]
      */
-    @JvmOverloads
-    fun toMethodType(loader: ClassLoader? = null): JMethodType =
+    public fun toMethodType(loader: ClassLoader? = null): JMethodType =
         JMethodType.fromMethodDescriptorString(descriptor, loader)
 
     override fun toString(): String = "(${argumentTypes.joinToString()}) -> $returnType"
 }
 
-fun MethodType(
+public fun MethodType(
     returnType: FieldType,
     vararg typeParameters: FieldType,
 ): MethodType = MethodType.fromDescriptor(buildMethodDescriptor(returnType, typeParameters))
+
+/**
+ * Returns a type representing the method-type of `this` method.
+ */
+@Suppress("NOTHING_TO_INLINE")
+public inline fun Method.toMethodType(): MethodType = MethodType.of(this)
+
+/**
+ * Returns a type representing the method-type of `this` constructor.
+ *
+ * The `return type` of a constructor will *always* be [void][PrimitiveType.Void].
+ *
+ * @see [AsmType.getType]
+ */
+@Suppress("NOTHING_TO_INLINE")
+public inline fun Constructor<*>.toMethodType(): MethodType = MethodType.of(this)
+
+/**
+ * Returns a type based on `this` type but with the type of the argument at the given [index] changed to [T].
+ */
+public inline fun <reified T : Any> MethodType.changeArgument(index: Int): MethodType =
+    changeArgument(index, ReferenceType<T>())
+
+/**
+ * Returns a type based on `this` type but with the [return type][MethodType.returnType] changed to [T].
+ */
+public inline fun <reified T : Any> MethodType.changeReturn(): MethodType = changeReturn(ReferenceType<T>())

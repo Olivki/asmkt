@@ -16,126 +16,119 @@
 
 package net.ormr.asmkt.types
 
-import org.objectweb.asm.Type
 import java.lang.reflect.Array
+import org.objectweb.asm.Type as AsmType
 
 /**
  * Represents an array type containing a [FieldType], i.e; `java.lang.String[]`, `int[]`, `java.lang.Byte[][]`.
  */
-class ArrayType private constructor(override val delegate: Type) : FieldType(), TypeWithInternalName {
-    companion object {
+public class ArrayType private constructor(override val delegate: AsmType) : FieldType(), TypeWithInternalName {
+    public companion object {
         private val cachedTypes: MutableMap<String, ArrayType> = hashMapOf()
 
         // -- PRIMITIVE ARRAYS -- \\
         @JvmField
-        val VOID: ArrayType = createConstant("[V")
+        public val VOID: ArrayType = createConstant("[V")
 
         @JvmField
-        val BOOLEAN: ArrayType = createConstant("[Z")
+        public val BOOLEAN: ArrayType = createConstant("[Z")
 
         @JvmField
-        val CHAR: ArrayType = createConstant("[C")
+        public val CHAR: ArrayType = createConstant("[C")
 
         @JvmField
-        val BYTE: ArrayType = createConstant("[B")
+        public val BYTE: ArrayType = createConstant("[B")
 
         @JvmField
-        val SHORT: ArrayType = createConstant("[S")
+        public val SHORT: ArrayType = createConstant("[S")
 
         @JvmField
-        val INT: ArrayType = createConstant("[I")
+        public val INT: ArrayType = createConstant("[I")
 
         @JvmField
-        val LONG: ArrayType = createConstant("[J")
+        public val LONG: ArrayType = createConstant("[J")
 
         @JvmField
-        val FLOAT: ArrayType = createConstant("[F")
+        public val FLOAT: ArrayType = createConstant("[F")
 
         @JvmField
-        val DOUBLE: ArrayType = createConstant("[D")
+        public val DOUBLE: ArrayType = createConstant("[D")
 
         @JvmField
-        val VOID_WRAPPER: ArrayType = createConstant("[Ljava/lang/Void;")
+        public val VOID_WRAPPER: ArrayType = createConstant("[Ljava/lang/Void;")
 
         @JvmField
-        val BOOLEAN_WRAPPER: ArrayType = createConstant("[Ljava/lang/Boolean;")
+        public val BOOLEAN_WRAPPER: ArrayType = createConstant("[Ljava/lang/Boolean;")
 
         @JvmField
-        val CHAR_WRAPPER: ArrayType = createConstant("[Ljava/lang/Character;")
+        public val CHAR_WRAPPER: ArrayType = createConstant("[Ljava/lang/Character;")
 
         @JvmField
-        val BYTE_WRAPPER: ArrayType = createConstant("[Ljava/lang/Byte;")
+        public val BYTE_WRAPPER: ArrayType = createConstant("[Ljava/lang/Byte;")
 
         @JvmField
-        val SHORT_WRAPPER: ArrayType = createConstant("[Ljava/lang/Short;")
+        public val SHORT_WRAPPER: ArrayType = createConstant("[Ljava/lang/Short;")
 
         @JvmField
-        val INT_WRAPPER: ArrayType = createConstant("[Ljava/lang/Integer;")
+        public val INT_WRAPPER: ArrayType = createConstant("[Ljava/lang/Integer;")
 
         @JvmField
-        val LONG_WRAPPER: ArrayType = createConstant("[Ljava/lang/Long;")
+        public val LONG_WRAPPER: ArrayType = createConstant("[Ljava/lang/Long;")
 
         @JvmField
-        val FLOAT_WRAPPER: ArrayType = createConstant("[Ljava/lang/Float;")
+        public val FLOAT_WRAPPER: ArrayType = createConstant("[Ljava/lang/Float;")
 
         @JvmField
-        val DOUBLE_WRAPPER: ArrayType = createConstant("[Ljava/lang/Double;")
+        public val DOUBLE_WRAPPER: ArrayType = createConstant("[Ljava/lang/Double;")
 
         @JvmField
-        val OBJECT: ArrayType = createConstant("[Ljava/lang/Object;")
+        public val OBJECT: ArrayType = createConstant("[Ljava/lang/Object;")
 
         @JvmField
-        val STRING: ArrayType = createConstant("[Ljava/lang/String;")
+        public val STRING: ArrayType = createConstant("[Ljava/lang/String;")
 
         @JvmField
-        val NUMBER: ArrayType = createConstant("[Ljava/lang/Number;")
+        public val NUMBER: ArrayType = createConstant("[Ljava/lang/Number;")
 
         private fun createConstant(descriptor: String): ArrayType {
-            val type = ArrayType(Type.getType(descriptor))
+            val type = ArrayType(AsmType.getType(descriptor))
             cachedTypes[descriptor] = type
             return type
         }
 
-        @JvmStatic
-        fun copyOf(type: Type): ArrayType {
-            requireSort(type, Type.ARRAY)
+        public fun copyOf(type: AsmType): ArrayType {
+            requireSort(type, AsmType.ARRAY)
             return cachedTypes.getOrPut(type.descriptor) { ArrayType(type) }
         }
 
-        @JvmStatic
-        fun fromDescriptor(descriptor: String): ArrayType = when (descriptor) {
+        public fun fromDescriptor(descriptor: String): ArrayType = when (descriptor) {
             in cachedTypes -> cachedTypes.getValue(descriptor)
-            else -> copyOf(Type.getType(descriptor))
+            else -> copyOf(AsmType.getType(descriptor))
         }
 
         // TODO: do some stuff to properly cache this one too?
-        @JvmStatic
-        fun fromInternal(internalName: String): ArrayType =
-            copyOf(Type.getObjectType(internalName))
+        public fun fromInternal(internalName: String): ArrayType =
+            copyOf(AsmType.getObjectType(internalName))
 
-        @JvmStatic
-        fun of(clz: Class<*>): ArrayType = when {
-            clz.isArray -> copyOf(Type.getType(clz))
-            else -> copyOf(Type.getType("[${Type.getDescriptor(clz)}"))
+        public fun of(clz: Class<*>): ArrayType = when {
+            clz.isArray -> copyOf(AsmType.getType(clz))
+            else -> copyOf(AsmType.getType("[${AsmType.getDescriptor(clz)}"))
         }
 
-        @JvmStatic
-        fun of(clz: Class<*>, dimensions: Int): ArrayType {
+        public fun of(clz: Class<*>, dimensions: Int): ArrayType {
             require(dimensions >= 1) { "'dimensions' must be 1 or greater, was $dimensions." }
             val descriptor = buildString {
                 repeat(dimensions) { append('[') }
-                append(Type.getDescriptor(clz))
+                append(AsmType.getDescriptor(clz))
             }
 
             return fromDescriptor(descriptor)
         }
 
-        @JvmStatic
-        fun of(type: FieldType): ArrayType =
+        public fun of(type: FieldType): ArrayType =
             fromDescriptor("[${type.descriptor}")
 
-        @JvmStatic
-        fun of(type: FieldType, dimensions: Int): ArrayType {
+        public fun of(type: FieldType, dimensions: Int): ArrayType {
             require(dimensions >= 1) { "'dimensions' must be 1 or greater, was $dimensions." }
             val descriptor = buildString {
                 repeat(dimensions) { append('[') }
@@ -144,12 +137,6 @@ class ArrayType private constructor(override val delegate: Type) : FieldType(), 
 
             return fromDescriptor(descriptor)
         }
-
-        @JvmSynthetic
-        inline operator fun <reified T : Any> invoke(): ArrayType = of(T::class.java)
-
-        @JvmSynthetic
-        inline operator fun <reified T : Any> invoke(dimensions: Int): ArrayType = of(T::class.java, dimensions)
     }
 
     override val descriptor: String = delegate.descriptor
@@ -170,18 +157,18 @@ class ArrayType private constructor(override val delegate: Type) : FieldType(), 
     /**
      * The amount of dimensions `this` array type has.
      */
-    val dimensions: Int = delegate.dimensions
+    public val dimensions: Int = delegate.dimensions
 
     /**
      * Returns `true` if `this` array type only has `1` [dimension][dimensions], otherwise `false`.
      */
-    val isShallow: Boolean
+    public val isShallow: Boolean
         get() = dimensions == 1
 
     /**
      * The type of the elements of `this` array type.
      */
-    val elementType: FieldType = FieldType.copyOf(delegate.elementType)
+    public val elementType: FieldType = FieldType.copyOf(delegate.elementType)
 
     override val isValidFieldType: Boolean
         get() = true
@@ -203,7 +190,7 @@ class ArrayType private constructor(override val delegate: Type) : FieldType(), 
      * @throws [ClassNotFoundException] if the class for [elementType] could not be found
      */
     @Throws(ClassNotFoundException::class)
-    fun toClass(loader: ClassLoader): Class<*> {
+    public fun toClass(loader: ClassLoader): Class<*> {
         val clz = when (elementType) {
             is PrimitiveType -> elementType.toClass()
             is ReferenceType -> elementType.toClass(loader)
@@ -213,3 +200,7 @@ class ArrayType private constructor(override val delegate: Type) : FieldType(), 
         return Array.newInstance(clz, 0).javaClass
     }
 }
+
+public inline fun <reified T : Any> ArrayType(): ArrayType = ArrayType.of(T::class.java)
+
+public inline fun <reified T : Any> ArrayType(dimensions: Int): ArrayType = ArrayType.of(T::class.java, dimensions)

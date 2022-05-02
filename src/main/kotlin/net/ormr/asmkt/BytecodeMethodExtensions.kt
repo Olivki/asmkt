@@ -30,7 +30,7 @@ import org.objectweb.asm.Label
  * @throws [IllegalArgumentException] if the [return type][MethodType.returnType] is not [void][PrimitiveType.Void]
  */
 @AsmKtDsl
-fun BytecodeMethod.invokeConstructor(
+public fun BytecodeMethod.invokeConstructor(
     owner: ReferenceType,
     type: MethodType = MethodType.VOID,
 ): BytecodeMethod = apply {
@@ -44,13 +44,13 @@ fun BytecodeMethod.invokeConstructor(
  * @throws [IllegalStateException] if `this` block represents a static method
  */
 @AsmKtDsl
-fun BytecodeMethod.loadThis(): BytecodeMethod = apply {
+public fun BytecodeMethod.loadThis(): BytecodeMethod = apply {
     check(!isStatic) { "Can't load a 'this' pointer in a static context." }
     loadLocal(0, parentType)
 }
 
 @AsmKtDsl
-fun BytecodeMethod.throwException(
+public fun BytecodeMethod.throwException(
     exception: ReferenceType,
     message: String? = null,
 ): BytecodeMethod = apply {
@@ -71,7 +71,7 @@ fun BytecodeMethod.throwException(
 }
 
 @AsmKtDsl
-fun BytecodeMethod.box(type: PrimitiveType): BytecodeMethod = apply {
+public fun BytecodeMethod.box(type: PrimitiveType): BytecodeMethod = apply {
     if (type is PrimitiveType.Void) {
         // a boxed 'void' would actually be the 'Void' object, but we can't create instances of that
         // so 'null' is the best we'll get
@@ -96,7 +96,7 @@ fun BytecodeMethod.box(type: PrimitiveType): BytecodeMethod = apply {
 }
 
 @AsmKtDsl
-fun BytecodeMethod.unbox(type: FieldType): BytecodeMethod = apply {
+public fun BytecodeMethod.unbox(type: FieldType): BytecodeMethod = apply {
     require(type !is ArrayType) { "'type' must not be an array type." }
 
     // we can't unbox a 'void' primitive in any manner
@@ -137,7 +137,7 @@ fun BytecodeMethod.unbox(type: FieldType): BytecodeMethod = apply {
  * @throws [IllegalArgumentException] if [type] is a method-type
  */
 @AsmKtDsl
-fun BytecodeMethod.valueOf(type: PrimitiveType): BytecodeMethod = apply {
+public fun BytecodeMethod.valueOf(type: PrimitiveType): BytecodeMethod = apply {
     if (type is PrimitiveType.Void) {
         // a boxed 'void' would actually be the 'Void' object, but we can't create instances of that
         // so 'null' is the best we'll get
@@ -160,7 +160,7 @@ fun BytecodeMethod.valueOf(type: PrimitiveType): BytecodeMethod = apply {
  * @throws [IllegalArgumentException] if [keys] is not sorted in an ascending order
  */
 @AsmKtDsl
-inline fun BytecodeMethod.tableSwitch(
+public inline fun BytecodeMethod.tableSwitch(
     keys: IntArray,
     generateCase: (key: Int, end: Label) -> Unit,
     generateDefaultCase: () -> Unit,
@@ -228,7 +228,7 @@ internal fun calculateKeyDensity(keys: IntArray): Float = when {
  * @see [pushBoxedFalse]
  */
 @AsmKtDsl
-fun BytecodeMethod.pushBoxedBoolean(value: Boolean): BytecodeMethod = apply {
+public fun BytecodeMethod.pushBoxedBoolean(value: Boolean): BytecodeMethod = apply {
     if (value) {
         pushBoxedTrue()
     } else {
@@ -242,7 +242,7 @@ fun BytecodeMethod.pushBoxedBoolean(value: Boolean): BytecodeMethod = apply {
  * @see [pushBoxedBoolean]
  */
 @AsmKtDsl
-fun BytecodeMethod.pushBoxedTrue(): BytecodeMethod = apply {
+public fun BytecodeMethod.pushBoxedTrue(): BytecodeMethod = apply {
     getStatic(ReferenceType.BOOLEAN, "TRUE", ReferenceType.BOOLEAN)
 }
 
@@ -252,18 +252,18 @@ fun BytecodeMethod.pushBoxedTrue(): BytecodeMethod = apply {
  * @see [pushBoxedBoolean]
  */
 @AsmKtDsl
-fun BytecodeMethod.pushBoxedFalse(): BytecodeMethod = apply {
+public fun BytecodeMethod.pushBoxedFalse(): BytecodeMethod = apply {
     getStatic(ReferenceType.BOOLEAN, "FALSE", ReferenceType.BOOLEAN)
 }
 
 @AsmKtDsl
-fun BytecodeMethod.pushBooleanValue(): BytecodeMethod = apply {
+public fun BytecodeMethod.pushBooleanValue(): BytecodeMethod = apply {
     checkCast(ReferenceType.BOOLEAN)
     invokeVirtual(ReferenceType.BOOLEAN, "booleanValue", MethodType.BOOLEAN)
 }
 
 @AsmKtDsl
-inline fun <reified A : Annotation> BytecodeMethod.defineParameterAnnotation(
+public inline fun <reified A : Annotation> BytecodeMethod.defineParameterAnnotation(
     index: Int,
     isVisible: Boolean = true,
     allowRepeats: Boolean = false,
@@ -273,7 +273,7 @@ inline fun <reified A : Annotation> BytecodeMethod.defineParameterAnnotation(
 }
 
 @AsmKtDsl
-inline fun BytecodeMethod.defineParameterAnnotation(
+public inline fun BytecodeMethod.defineParameterAnnotation(
     index: Int,
     type: ReferenceType,
     isVisible: Boolean = true,

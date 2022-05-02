@@ -17,7 +17,7 @@ dependencies {
 }
 
 kotlin {
-    //explicitApi()
+    explicitApi()
 }
 
 mavenCentralPublish {
@@ -30,7 +30,7 @@ tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = "15"
-            freeCompilerArgs = listOf("-Xuse-experimental=kotlin.Experimental")
+            freeCompilerArgs = freeCompilerArgs + listOf("-Xuse-experimental=kotlin.Experimental")
         }
     }
 }

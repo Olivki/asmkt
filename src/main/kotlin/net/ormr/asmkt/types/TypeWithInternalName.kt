@@ -16,6 +16,6 @@
 
 package net.ormr.asmkt.types
 
-interface TypeWithInternalName {
-    val internalName: String
+public interface TypeWithInternalName {
+    public val internalName: String
 }

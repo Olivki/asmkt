@@ -32,7 +32,7 @@ import org.objectweb.asm.AnnotationVisitor
  * @see [AnnotationVisitor.visitAnnotation]
  */
 @AsmKtDsl
-inline fun <reified A : Annotation> BytecodeAnnotation.annotation(
+public inline fun <reified A : Annotation> BytecodeAnnotation.annotation(
     name: String,
     scope: BytecodeAnnotation.() -> Unit = {},
 ) {
@@ -49,7 +49,7 @@ inline fun <reified A : Annotation> BytecodeAnnotation.annotation(
  * @see [AnnotationVisitor.visitArray]
  */
 @AsmKtDsl
-inline fun BytecodeAnnotation.array(name: String, scope: ArrayBuilder.() -> Unit) {
+public inline fun BytecodeAnnotation.array(name: String, scope: ArrayBuilder.() -> Unit) {
     array(name).apply(scope)
 }
 
@@ -63,7 +63,7 @@ inline fun BytecodeAnnotation.array(name: String, scope: ArrayBuilder.() -> Unit
  * @see [AnnotationVisitor.visitAnnotation]
  */
 @AsmKtDsl
-inline fun <reified A : Annotation> ArrayBuilder.annotation(scope: BytecodeAnnotation.() -> Unit) {
+public inline fun <reified A : Annotation> ArrayBuilder.annotation(scope: BytecodeAnnotation.() -> Unit) {
     annotation(ReferenceType<A>()).apply(scope)
 }
 
@@ -78,7 +78,7 @@ inline fun <reified A : Annotation> ArrayBuilder.annotation(scope: BytecodeAnnot
  * @see [AnnotationVisitor.visitAnnotation]
  */
 @AsmKtDsl
-inline fun ArrayBuilder.annotation(type: ReferenceType, scope: BytecodeAnnotation.() -> Unit) {
+public inline fun ArrayBuilder.annotation(type: ReferenceType, scope: BytecodeAnnotation.() -> Unit) {
     annotation(type).apply(scope)
 }
 

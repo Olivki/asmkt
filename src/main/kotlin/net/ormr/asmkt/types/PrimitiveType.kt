@@ -34,15 +34,15 @@ import kotlin.Boolean as KBoolean
 /**
  * Represents a primitive type, i.e; `byte`, `void`, `double`, etc..
  */
-sealed class PrimitiveType : FieldType() {
-    companion object {
+public sealed class PrimitiveType : FieldType() {
+    public companion object {
         /**
          * Returns a list of all the known primitive types.
          */
-        val primitives: List<PrimitiveType>
+        public val primitives: List<PrimitiveType>
             get() = Collections.unmodifiableList(listOf(Void, Boolean, Char, Byte, Short, Int, Long, Float, Double))
 
-        fun copyOf(type: Type): PrimitiveType = when (type.sort) {
+        public fun copyOf(type: Type): PrimitiveType = when (type.sort) {
             Type.VOID -> Void
             Type.BOOLEAN -> Boolean
             Type.CHAR -> Char
@@ -55,7 +55,7 @@ sealed class PrimitiveType : FieldType() {
             else -> throw IllegalArgumentException("'type' must be a primitive type, was a ${sortNames[type.sort]} type.")
         }
 
-        fun fromDescriptor(descriptor: String): PrimitiveType = when (descriptor) {
+        public fun fromDescriptor(descriptor: String): PrimitiveType = when (descriptor) {
             "V" -> Void
             "Z" -> Boolean
             "C" -> Char
@@ -69,7 +69,7 @@ sealed class PrimitiveType : FieldType() {
         }
 
         // TODO: documentation
-        fun of(clz: Class<*>): PrimitiveType {
+        public fun of(clz: Class<*>): PrimitiveType {
             require(clz.isPrimitive || clz.isPrimitiveWrapper) { "'clz' must be a primitive or a primitive wrapper, was '${clz.name}'." }
             return when {
                 clz.isPrimitive -> copyOf(Type.getType(clz))
@@ -91,7 +91,7 @@ sealed class PrimitiveType : FieldType() {
     /**
      * Returns the boxed [object type][ReferenceType] of `this` primitive type.
      */
-    abstract fun toBoxed(): ReferenceType
+    public abstract fun toBoxed(): ReferenceType
 
     /**
      * Returns the value stored in the `TYPE` field of the boxed type of the primitive type that `this` type represents.
@@ -103,7 +103,7 @@ sealed class PrimitiveType : FieldType() {
     /**
      * Represents the primitive `void` type.
      */
-    object Void : PrimitiveType() {
+    public object Void : PrimitiveType() {
         override val descriptor: String
             get() = "V"
 
@@ -124,7 +124,7 @@ sealed class PrimitiveType : FieldType() {
     /**
      * Represents the primitive `boolean` type.
      */
-    object Boolean : PrimitiveType() {
+    public object Boolean : PrimitiveType() {
         override val descriptor: String
             get() = "Z"
 
@@ -145,7 +145,7 @@ sealed class PrimitiveType : FieldType() {
     /**
      * Represents the primitive `char` type.
      */
-    object Char : PrimitiveType() {
+    public object Char : PrimitiveType() {
         override val descriptor: String
             get() = "C"
 
@@ -166,7 +166,7 @@ sealed class PrimitiveType : FieldType() {
     /**
      * Represents the primitive `byte` type.
      */
-    object Byte : PrimitiveType() {
+    public object Byte : PrimitiveType() {
         override val descriptor: String
             get() = "B"
 
@@ -187,7 +187,7 @@ sealed class PrimitiveType : FieldType() {
     /**
      * Represents the primitive `short` type.
      */
-    object Short : PrimitiveType() {
+    public object Short : PrimitiveType() {
         override val descriptor: String
             get() = "S"
 
@@ -208,7 +208,7 @@ sealed class PrimitiveType : FieldType() {
     /**
      * Represents the primitive `int` type.
      */
-    object Int : PrimitiveType() {
+    public object Int : PrimitiveType() {
         override val descriptor: String
             get() = "I"
 
@@ -229,7 +229,7 @@ sealed class PrimitiveType : FieldType() {
     /**
      * Represents the primitive `long` type.
      */
-    object Long : PrimitiveType() {
+    public object Long : PrimitiveType() {
         override val descriptor: String
             get() = "J"
 
@@ -250,7 +250,7 @@ sealed class PrimitiveType : FieldType() {
     /**
      * Represents the primitive `float` type.
      */
-    object Float : PrimitiveType() {
+    public object Float : PrimitiveType() {
         override val descriptor: String
             get() = "F"
 
@@ -271,7 +271,7 @@ sealed class PrimitiveType : FieldType() {
     /**
      * Represents the primitive `double` type.
      */
-    object Double : PrimitiveType() {
+    public object Double : PrimitiveType() {
         override val descriptor: String
             get() = "F"
 
@@ -290,4 +290,4 @@ sealed class PrimitiveType : FieldType() {
     }
 }
 
-inline fun <reified T : Any> PrimitiveType(): PrimitiveType = PrimitiveType.of(T::class.java)
+public inline fun <reified T : Any> PrimitiveType(): PrimitiveType = PrimitiveType.of(T::class.java)

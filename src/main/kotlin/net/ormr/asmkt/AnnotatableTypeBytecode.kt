@@ -20,12 +20,12 @@ import net.ormr.asmkt.types.ReferenceType
 import org.objectweb.asm.TypePath
 
 // TODO: documentation
-interface AnnotatableTypeBytecode {
-    fun defineTypeAnnotation(
+public sealed interface AnnotatableTypeBytecode {
+    public fun defineTypeAnnotation(
         typeRef: Int,
         typePath: TypePath?,
         annotationType: ReferenceType,
         isVisible: Boolean = true,
-        allowRepeats: Boolean = false
+        allowRepeats: Boolean = false,
     ): BytecodeAnnotation
 }

@@ -23,66 +23,66 @@ import org.objectweb.asm.Type
 /**
  * Represents a type of an `Object` child, i.e; `java.lang.String`, `java.lang.Byte`, `java.lang.Double`, etc..
  */
-class ReferenceType private constructor(override val delegate: Type) : FieldType(), TypeWithInternalName {
-    companion object {
+public class ReferenceType private constructor(override val delegate: Type) : FieldType(), TypeWithInternalName {
+    public companion object {
         private val cachedTypes: MutableMap<String, ReferenceType> = hashMapOf()
 
         @JvmField
-        val VOID: ReferenceType = createConstant("Ljava/lang/Void;")
+        public val VOID: ReferenceType = createConstant("Ljava/lang/Void;")
 
         @JvmField
-        val BOOLEAN: ReferenceType = createConstant("Ljava/lang/Boolean;")
+        public val BOOLEAN: ReferenceType = createConstant("Ljava/lang/Boolean;")
 
         @JvmField
-        val CHAR: ReferenceType = createConstant("Ljava/lang/Character;")
+        public val CHAR: ReferenceType = createConstant("Ljava/lang/Character;")
 
         @JvmField
-        val BYTE: ReferenceType = createConstant("Ljava/lang/Byte;")
+        public val BYTE: ReferenceType = createConstant("Ljava/lang/Byte;")
 
         @JvmField
-        val SHORT: ReferenceType = createConstant("Ljava/lang/Short;")
+        public val SHORT: ReferenceType = createConstant("Ljava/lang/Short;")
 
         @JvmField
-        val INT: ReferenceType = createConstant("Ljava/lang/Integer;")
+        public val INT: ReferenceType = createConstant("Ljava/lang/Integer;")
 
         @JvmField
-        val LONG: ReferenceType = createConstant("Ljava/lang/Long;")
+        public val LONG: ReferenceType = createConstant("Ljava/lang/Long;")
 
         @JvmField
-        val FLOAT: ReferenceType = createConstant("Ljava/lang/Float;")
+        public val FLOAT: ReferenceType = createConstant("Ljava/lang/Float;")
 
         @JvmField
-        val DOUBLE: ReferenceType = createConstant("Ljava/lang/Double;")
+        public val DOUBLE: ReferenceType = createConstant("Ljava/lang/Double;")
 
         @JvmField
-        val OBJECT: ReferenceType = createConstant("Ljava/lang/Object;")
+        public val OBJECT: ReferenceType = createConstant("Ljava/lang/Object;")
 
         @JvmField
-        val CLASS: ReferenceType = createConstant("Ljava/lang/Class;")
+        public val CLASS: ReferenceType = createConstant("Ljava/lang/Class;")
 
         @JvmField
-        val STRING: ReferenceType = createConstant("Ljava/lang/String;")
+        public val STRING: ReferenceType = createConstant("Ljava/lang/String;")
 
         @JvmField
-        val STRING_BUILDER: ReferenceType = createConstant("Ljava/lang/StringBuilder;")
+        public val STRING_BUILDER: ReferenceType = createConstant("Ljava/lang/StringBuilder;")
 
         @JvmField
-        val OBJECTS: ReferenceType = createConstant("Ljava/util/Objects;")
+        public val OBJECTS: ReferenceType = createConstant("Ljava/util/Objects;")
 
         @JvmField
-        val NUMBER: ReferenceType = createConstant("Ljava/lang/Number;")
+        public val NUMBER: ReferenceType = createConstant("Ljava/lang/Number;")
 
         @JvmField
-        val CONSTANT_BOOTSTRAPS: ReferenceType = createConstant("Ljava/lang/invoke/ConstantBootstraps;")
+        public val CONSTANT_BOOTSTRAPS: ReferenceType = createConstant("Ljava/lang/invoke/ConstantBootstraps;")
 
         @JvmField
-        val STRING_CONCAT_FACTORY: ReferenceType = createConstant("Ljava/lang/invoke/StringConcatFactory;")
+        public val STRING_CONCAT_FACTORY: ReferenceType = createConstant("Ljava/lang/invoke/StringConcatFactory;")
 
         @JvmField
-        val METHOD_TYPE: ReferenceType = createConstant("Ljava/lang/invoke/MethodType;")
+        public val METHOD_TYPE: ReferenceType = createConstant("Ljava/lang/invoke/MethodType;")
 
         @JvmField
-        val METHOD_HANDLES_LOOKUP: ReferenceType = createConstant("Ljava/lang/invoke/MethodHandles\$Lookup;")
+        public val METHOD_HANDLES_LOOKUP: ReferenceType = createConstant("Ljava/lang/invoke/MethodHandles\$Lookup;")
 
         private fun createConstant(descriptor: String): ReferenceType {
             val type = ReferenceType(Type.getType(descriptor))
@@ -90,19 +90,19 @@ class ReferenceType private constructor(override val delegate: Type) : FieldType
             return type
         }
 
-        fun copyOf(type: Type): ReferenceType {
+        public fun copyOf(type: Type): ReferenceType {
             requireSort(type, Type.OBJECT)
             return cachedTypes.getOrPut(type.descriptor) { ReferenceType(type) }
         }
 
-        fun fromDescriptor(descriptor: String): ReferenceType = when (descriptor) {
+        public fun fromDescriptor(descriptor: String): ReferenceType = when (descriptor) {
             in cachedTypes -> cachedTypes.getValue(descriptor)
             else -> copyOf(Type.getType(descriptor))
         }
 
-        fun fromInternal(internalName: String): ReferenceType = fromDescriptor("L$internalName;")
+        public fun fromInternal(internalName: String): ReferenceType = fromDescriptor("L$internalName;")
 
-        fun of(clz: Class<*>): ReferenceType = fromDescriptor(Type.getDescriptor(clz))
+        public fun of(clz: Class<*>): ReferenceType = fromDescriptor(Type.getDescriptor(clz))
     }
 
     override val descriptor: String = delegate.descriptor
@@ -127,14 +127,14 @@ class ReferenceType private constructor(override val delegate: Type) : FieldType
      * Returns `true` if `this` object type is the boxed variant of a [primitive type][PrimitiveType], otherwise
      * `false`.
      */
-    val isBoxedPrimitive: Boolean
+    public val isBoxedPrimitive: Boolean
         get() = toPrimitive() != null
 
     /**
      * Returns the primitive type of `this` type if it's a boxed type, or itself if it's already a primitive, or
      * `null` if there exists no primitive type for `this` type.
      */
-    fun toPrimitive(): PrimitiveType? = when (this) {
+    public fun toPrimitive(): PrimitiveType? = when (this) {
         VOID -> PrimitiveType.Void
         BOOLEAN -> PrimitiveType.Boolean
         CHAR -> PrimitiveType.Char
@@ -165,7 +165,13 @@ class ReferenceType private constructor(override val delegate: Type) : FieldType
      * @see [Class.forName]
      */
     @Throws(ClassNotFoundException::class)
-    fun toClass(loader: ClassLoader): Class<*> = Class.forName(className, false, loader)
+    public fun toClass(loader: ClassLoader): Class<*> = Class.forName(className, false, loader)
 }
 
-inline fun <reified T : Any> ReferenceType(): ReferenceType = ReferenceType.of(T::class.java)
+public inline fun <reified T : Any> ReferenceType(): ReferenceType = ReferenceType.of(T::class.java)
+
+/**
+ * Returns a type representing the type of `this` class.
+ */
+@Suppress("NOTHING_TO_INLINE")
+public inline fun Class<*>.toReferenceType(): ReferenceType = ReferenceType.of(this)

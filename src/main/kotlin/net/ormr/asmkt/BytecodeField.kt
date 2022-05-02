@@ -23,7 +23,7 @@ import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.TypeAnnotationNode
 
 @AsmKtDsl
-data class BytecodeField internal constructor(
+public data class BytecodeField internal constructor(
     val name: String,
     override val access: Int,
     val type: FieldType,

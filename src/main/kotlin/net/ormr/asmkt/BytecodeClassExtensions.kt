@@ -20,13 +20,12 @@ import net.ormr.asmkt.Modifiers.STATIC
 import net.ormr.asmkt.types.MethodType
 import net.ormr.asmkt.types.ReferenceType
 import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
-import org.objectweb.asm.Opcodes
 
 // -- BYTECODE CLASS -- \\
 @AsmKtDsl
-inline fun defineClass(
+public inline fun defineClass(
     type: ReferenceType,
-    access: Int = Opcodes.ACC_PUBLIC,
+    access: Int = Modifiers.PUBLIC,
     superType: ReferenceType = OBJECT,
     interfaces: List<ReferenceType> = emptyList(),
     sourceFile: String? = null,
@@ -37,7 +36,7 @@ inline fun defineClass(
 // -- MODULES -- \\
 // TODO: document the throws
 @AsmKtDsl
-inline fun BytecodeClass.defineModule(
+public inline fun BytecodeClass.defineModule(
     name: String,
     access: Int,
     version: String? = null,
@@ -46,7 +45,7 @@ inline fun BytecodeClass.defineModule(
 
 // -- FIELDS -- \\
 @AsmKtDsl
-fun BytecodeClass.defineField(
+public fun BytecodeClass.defineField(
     name: String,
     access: Int,
     type: ReferenceType,
@@ -58,7 +57,7 @@ fun BytecodeClass.defineField(
 // -- METHODS -- \\
 // TODO: document the throws
 @AsmKtDsl
-inline fun BytecodeClass.defineMethod(
+public inline fun BytecodeClass.defineMethod(
     name: String,
     access: Int,
     type: MethodType,
@@ -68,33 +67,42 @@ inline fun BytecodeClass.defineMethod(
 ): BytecodeMethod = defineMethod(name, access, type, signature, exceptions).apply(scope)
 
 @AsmKtDsl
-inline fun BytecodeClass.defineConstructor(
+public inline fun BytecodeClass.defineConstructor(
     access: Int = Modifiers.PUBLIC,
     descriptor: MethodType = MethodType.VOID,
     body: BytecodeMethod.() -> Unit,
 ): BytecodeMethod = defineConstructor(access, descriptor).apply(body)
 
 @AsmKtDsl
-inline fun BytecodeClass.defineStaticInit(body: BytecodeMethod.() -> Unit = {}): BytecodeMethod =
+public inline fun BytecodeClass.defineStaticInit(body: BytecodeMethod.() -> Unit = {}): BytecodeMethod =
     defineMethod("<clinit>", STATIC, MethodType.VOID).apply(body)
 
 /**
  * Defines a skeleton implementation of the `equals` method for `this` class.
  */
 @AsmKtDsl
-inline fun BytecodeClass.defineEquals(isFinal: Boolean = false, body: BytecodeMethod.() -> Unit): BytecodeMethod =
+public inline fun BytecodeClass.defineEquals(
+    isFinal: Boolean = false,
+    body: BytecodeMethod.() -> Unit,
+): BytecodeMethod =
     defineEquals(isFinal).apply(body)
 
 /**
  * Defines a skeleton implementation of the `hashCode` method for `this` class.
  */
 @AsmKtDsl
-inline fun BytecodeClass.defineHashCode(isFinal: Boolean = false, body: BytecodeMethod.() -> Unit): BytecodeMethod =
+public inline fun BytecodeClass.defineHashCode(
+    isFinal: Boolean = false,
+    body: BytecodeMethod.() -> Unit,
+): BytecodeMethod =
     defineHashCode(isFinal).apply(body)
 
 /**
  * Defines a skeleton implementation of the `toString` method for `this` class.
  */
 @AsmKtDsl
-inline fun BytecodeClass.defineToString(isFinal: Boolean = false, body: BytecodeMethod.() -> Unit): BytecodeMethod =
+public inline fun BytecodeClass.defineToString(
+    isFinal: Boolean = false,
+    body: BytecodeMethod.() -> Unit,
+): BytecodeMethod =
     defineToString(isFinal).apply(body)

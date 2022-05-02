@@ -22,7 +22,7 @@ import net.ormr.asmkt.types.ReferenceType
 /**
  * Represents a type that can be annotated with basic annotations.
  */
-interface AnnotatableBytecode {
+public sealed interface AnnotatableBytecode {
     /**
      * Annotates `this` with an annotation of the given [type].
      *
@@ -41,5 +41,9 @@ interface AnnotatableBytecode {
      * @return a new [BytecodeAnnotation] instance used to build an annotation of type [type]
      */
     @AsmKtDsl
-    fun defineAnnotation(type: ReferenceType, isVisible: Boolean = true, allowRepeats: Boolean = false): BytecodeAnnotation
+    public fun defineAnnotation(
+        type: ReferenceType,
+        isVisible: Boolean = true,
+        allowRepeats: Boolean = false,
+    ): BytecodeAnnotation
 }

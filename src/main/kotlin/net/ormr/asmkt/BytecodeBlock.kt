@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-@file:Suppress("FunctionName", "unused")
+@file:Suppress("FunctionName", "unused", "SpellCheckingInspection")
 
 package net.ormr.asmkt
 
@@ -34,195 +34,195 @@ import org.objectweb.asm.tree.*
  *
  * @see [BytecodeMethod]
  */
-class BytecodeBlock : Iterable<AbstractInsnNode> {
-    val instructions = InsnList()
+public class BytecodeBlock : Iterable<AbstractInsnNode> {
+    public val instructions: InsnList = InsnList()
 
-    var returns: Boolean = false
+    public var returns: Boolean = false
         private set
 
     /**
      * Returns `true` if no instructions have been added to `this` block, otherwise `false`.
      */
-    fun isEmpty(): Boolean = instructions.size() == 0
+    public fun isEmpty(): Boolean = instructions.size() == 0
 
     /**
      * Returns `true` if any instructions have been added to `this` block, otherwise `false`.
      */
-    fun isNotEmpty(): Boolean = !(isEmpty())
+    public fun isNotEmpty(): Boolean = !(isEmpty())
 
     // see https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html for documentation on all the different instructions
 
     @AsmKtDsl
-    fun ldc(value: Any): BytecodeBlock = addLdcInstruction(if (value is Type) value.toAsmType() else value)
+    public fun ldc(value: Any): BytecodeBlock = addLdcInstruction(if (value is Type) value.toAsmType() else value)
 
     @AsmKtDsl
-    fun aconst_null(): BytecodeBlock = addInstruction(Opcodes.ACONST_NULL)
+    public fun aconst_null(): BytecodeBlock = addInstruction(Opcodes.ACONST_NULL)
 
     @AsmKtDsl
-    fun iconst_m1(): BytecodeBlock = addInstruction(Opcodes.ICONST_M1)
+    public fun iconst_m1(): BytecodeBlock = addInstruction(Opcodes.ICONST_M1)
 
     @AsmKtDsl
-    fun iconst_0(): BytecodeBlock = addInstruction(Opcodes.ICONST_0)
+    public fun iconst_0(): BytecodeBlock = addInstruction(Opcodes.ICONST_0)
 
     @AsmKtDsl
-    fun iconst_1(): BytecodeBlock = addInstruction(Opcodes.ICONST_1)
+    public fun iconst_1(): BytecodeBlock = addInstruction(Opcodes.ICONST_1)
 
     @AsmKtDsl
-    fun iconst_2(): BytecodeBlock = addInstruction(Opcodes.ICONST_2)
+    public fun iconst_2(): BytecodeBlock = addInstruction(Opcodes.ICONST_2)
 
     @AsmKtDsl
-    fun iconst_3(): BytecodeBlock = addInstruction(Opcodes.ICONST_3)
+    public fun iconst_3(): BytecodeBlock = addInstruction(Opcodes.ICONST_3)
 
     @AsmKtDsl
-    fun iconst_4(): BytecodeBlock = addInstruction(Opcodes.ICONST_4)
+    public fun iconst_4(): BytecodeBlock = addInstruction(Opcodes.ICONST_4)
 
     @AsmKtDsl
-    fun iconst_5(): BytecodeBlock = addInstruction(Opcodes.ICONST_5)
+    public fun iconst_5(): BytecodeBlock = addInstruction(Opcodes.ICONST_5)
 
     @AsmKtDsl
-    fun lconst_0(): BytecodeBlock = addInstruction(Opcodes.LCONST_0)
+    public fun lconst_0(): BytecodeBlock = addInstruction(Opcodes.LCONST_0)
 
     @AsmKtDsl
-    fun lconst_1(): BytecodeBlock = addInstruction(Opcodes.LCONST_1)
+    public fun lconst_1(): BytecodeBlock = addInstruction(Opcodes.LCONST_1)
 
     @AsmKtDsl
-    fun fconst_0(): BytecodeBlock = addInstruction(Opcodes.FCONST_0)
+    public fun fconst_0(): BytecodeBlock = addInstruction(Opcodes.FCONST_0)
 
     @AsmKtDsl
-    fun fconst_1(): BytecodeBlock = addInstruction(Opcodes.FCONST_1)
+    public fun fconst_1(): BytecodeBlock = addInstruction(Opcodes.FCONST_1)
 
     @AsmKtDsl
-    fun fconst_2(): BytecodeBlock = addInstruction(Opcodes.FCONST_2)
+    public fun fconst_2(): BytecodeBlock = addInstruction(Opcodes.FCONST_2)
 
     @AsmKtDsl
-    fun dconst_0(): BytecodeBlock = addInstruction(Opcodes.DCONST_0)
+    public fun dconst_0(): BytecodeBlock = addInstruction(Opcodes.DCONST_0)
 
     @AsmKtDsl
-    fun dconst_1(): BytecodeBlock = addInstruction(Opcodes.DCONST_1)
+    public fun dconst_1(): BytecodeBlock = addInstruction(Opcodes.DCONST_1)
 
     // -- LOAD INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun aload(index: Int): BytecodeBlock = addVarInstruction(Opcodes.ALOAD, index)
+    public fun aload(index: Int): BytecodeBlock = addVarInstruction(Opcodes.ALOAD, index)
 
     @AsmKtDsl
-    fun iload(index: Int): BytecodeBlock = addVarInstruction(Opcodes.ILOAD, index)
+    public fun iload(index: Int): BytecodeBlock = addVarInstruction(Opcodes.ILOAD, index)
 
     @AsmKtDsl
-    fun lload(index: Int): BytecodeBlock = addVarInstruction(Opcodes.LLOAD, index)
+    public fun lload(index: Int): BytecodeBlock = addVarInstruction(Opcodes.LLOAD, index)
 
     @AsmKtDsl
-    fun fload(index: Int): BytecodeBlock = addVarInstruction(Opcodes.FLOAD, index)
+    public fun fload(index: Int): BytecodeBlock = addVarInstruction(Opcodes.FLOAD, index)
 
     @AsmKtDsl
-    fun dload(index: Int): BytecodeBlock = addVarInstruction(Opcodes.DLOAD, index)
+    public fun dload(index: Int): BytecodeBlock = addVarInstruction(Opcodes.DLOAD, index)
 
     // -- STORE INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun astore(index: Int): BytecodeBlock = addVarInstruction(Opcodes.ASTORE, index)
+    public fun astore(index: Int): BytecodeBlock = addVarInstruction(Opcodes.ASTORE, index)
 
     @AsmKtDsl
-    fun istore(index: Int): BytecodeBlock = addVarInstruction(Opcodes.ISTORE, index)
+    public fun istore(index: Int): BytecodeBlock = addVarInstruction(Opcodes.ISTORE, index)
 
     @AsmKtDsl
-    fun lstore(index: Int): BytecodeBlock = addVarInstruction(Opcodes.LSTORE, index)
+    public fun lstore(index: Int): BytecodeBlock = addVarInstruction(Opcodes.LSTORE, index)
 
     @AsmKtDsl
-    fun fstore(index: Int): BytecodeBlock = addVarInstruction(Opcodes.FSTORE, index)
+    public fun fstore(index: Int): BytecodeBlock = addVarInstruction(Opcodes.FSTORE, index)
 
     @AsmKtDsl
-    fun dstore(index: Int): BytecodeBlock = addVarInstruction(Opcodes.DSTORE, index)
+    public fun dstore(index: Int): BytecodeBlock = addVarInstruction(Opcodes.DSTORE, index)
 
     @AsmKtDsl
-    fun aaload(): BytecodeBlock = addInstruction(Opcodes.AALOAD)
+    public fun aaload(): BytecodeBlock = addInstruction(Opcodes.AALOAD)
 
     @AsmKtDsl
-    fun aastore(): BytecodeBlock = addInstruction(Opcodes.AASTORE)
+    public fun aastore(): BytecodeBlock = addInstruction(Opcodes.AASTORE)
 
     @AsmKtDsl
-    fun iaload(): BytecodeBlock = addInstruction(Opcodes.IALOAD)
+    public fun iaload(): BytecodeBlock = addInstruction(Opcodes.IALOAD)
 
     @AsmKtDsl
-    fun iastore(): BytecodeBlock = addInstruction(Opcodes.IASTORE)
+    public fun iastore(): BytecodeBlock = addInstruction(Opcodes.IASTORE)
 
     @AsmKtDsl
-    fun laload(): BytecodeBlock = addInstruction(Opcodes.LALOAD)
+    public fun laload(): BytecodeBlock = addInstruction(Opcodes.LALOAD)
 
     @AsmKtDsl
-    fun lastore(): BytecodeBlock = addInstruction(Opcodes.LASTORE)
+    public fun lastore(): BytecodeBlock = addInstruction(Opcodes.LASTORE)
 
     @AsmKtDsl
-    fun baload(): BytecodeBlock = addInstruction(Opcodes.BALOAD)
+    public fun baload(): BytecodeBlock = addInstruction(Opcodes.BALOAD)
 
     @AsmKtDsl
-    fun bastore(): BytecodeBlock = addInstruction(Opcodes.BASTORE)
+    public fun bastore(): BytecodeBlock = addInstruction(Opcodes.BASTORE)
 
     @AsmKtDsl
-    fun saload(): BytecodeBlock = addInstruction(Opcodes.SALOAD)
+    public fun saload(): BytecodeBlock = addInstruction(Opcodes.SALOAD)
 
     @AsmKtDsl
-    fun sastore(): BytecodeBlock = addInstruction(Opcodes.SASTORE)
+    public fun sastore(): BytecodeBlock = addInstruction(Opcodes.SASTORE)
 
     @AsmKtDsl
-    fun caload(): BytecodeBlock = addInstruction(Opcodes.CALOAD)
+    public fun caload(): BytecodeBlock = addInstruction(Opcodes.CALOAD)
 
     @AsmKtDsl
-    fun castore(): BytecodeBlock = addInstruction(Opcodes.CASTORE)
+    public fun castore(): BytecodeBlock = addInstruction(Opcodes.CASTORE)
 
     @AsmKtDsl
-    fun faload(): BytecodeBlock = addInstruction(Opcodes.FALOAD)
+    public fun faload(): BytecodeBlock = addInstruction(Opcodes.FALOAD)
 
     @AsmKtDsl
-    fun fastore(): BytecodeBlock = addInstruction(Opcodes.FASTORE)
+    public fun fastore(): BytecodeBlock = addInstruction(Opcodes.FASTORE)
 
     @AsmKtDsl
-    fun daload(): BytecodeBlock = addInstruction(Opcodes.DALOAD)
+    public fun daload(): BytecodeBlock = addInstruction(Opcodes.DALOAD)
 
     @AsmKtDsl
-    fun dastore(): BytecodeBlock = addInstruction(Opcodes.DASTORE)
+    public fun dastore(): BytecodeBlock = addInstruction(Opcodes.DASTORE)
 
     // -- INT INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun bipush(operand: Int): BytecodeBlock = addIntInstruction(Opcodes.BIPUSH, operand)
+    public fun bipush(operand: Int): BytecodeBlock = addIntInstruction(Opcodes.BIPUSH, operand)
 
     @AsmKtDsl
-    fun sipush(operand: Int): BytecodeBlock = addIntInstruction(Opcodes.SIPUSH, operand)
+    public fun sipush(operand: Int): BytecodeBlock = addIntInstruction(Opcodes.SIPUSH, operand)
 
     @AsmKtDsl
-    fun ret(operand: Int): BytecodeBlock = addIntInstruction(Opcodes.RET, operand)
+    public fun ret(operand: Int): BytecodeBlock = addIntInstruction(Opcodes.RET, operand)
 
     // -- ARRAY INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun anewarray(descriptor: String): BytecodeBlock = addTypeInstruction(Opcodes.ANEWARRAY, descriptor)
+    public fun anewarray(descriptor: String): BytecodeBlock = addTypeInstruction(Opcodes.ANEWARRAY, descriptor)
 
     @AsmKtDsl
-    fun newarray(operand: Int): BytecodeBlock = addIntInstruction(Opcodes.NEWARRAY, operand)
+    public fun newarray(operand: Int): BytecodeBlock = addIntInstruction(Opcodes.NEWARRAY, operand)
 
     @AsmKtDsl
-    fun multianewarray(descriptor: String, numDimensions: Int): BytecodeBlock =
+    public fun multianewarray(descriptor: String, numDimensions: Int): BytecodeBlock =
         addMultiANewArrayInstruction(descriptor, numDimensions)
 
     @AsmKtDsl
-    fun arraylength(): BytecodeBlock = addInstruction(Opcodes.ARRAYLENGTH)
+    public fun arraylength(): BytecodeBlock = addInstruction(Opcodes.ARRAYLENGTH)
 
     // -- INVOKE/METHOD INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun invokestatic(owner: String, name: String, descriptor: String): BytecodeBlock =
+    public fun invokestatic(owner: String, name: String, descriptor: String): BytecodeBlock =
         addMethodInstruction(Opcodes.INVOKESTATIC, owner, name, descriptor, false)
 
     @AsmKtDsl
-    fun invokespecial(owner: String, name: String, descriptor: String): BytecodeBlock =
+    public fun invokespecial(owner: String, name: String, descriptor: String): BytecodeBlock =
         addMethodInstruction(Opcodes.INVOKESPECIAL, owner, name, descriptor, false)
 
     @AsmKtDsl
-    fun invokevirtual(owner: String, name: String, descriptor: String): BytecodeBlock =
+    public fun invokevirtual(owner: String, name: String, descriptor: String): BytecodeBlock =
         addMethodInstruction(Opcodes.INVOKEVIRTUAL, owner, name, descriptor, false)
 
     @AsmKtDsl
-    fun invokeinterface(owner: String, name: String, descriptor: String): BytecodeBlock =
+    public fun invokeinterface(owner: String, name: String, descriptor: String): BytecodeBlock =
         addMethodInstruction(Opcodes.INVOKEINTERFACE, owner, name, descriptor, true)
 
     @AsmKtDsl
-    fun invokedynamic(
+    public fun invokedynamic(
         name: String,
         descriptor: String,
         bootstrapMethodHandle: Handle,
@@ -240,297 +240,297 @@ class BytecodeBlock : Iterable<AbstractInsnNode> {
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun areturn(type: FieldType): BytecodeBlock = apply {
+    public fun areturn(type: FieldType): BytecodeBlock = apply {
         addInstruction(type.getOpcode(Opcodes.IRETURN))
     }
 
     @AsmKtDsl
-    fun voidreturn(): BytecodeBlock = addInstruction(Opcodes.RETURN)
+    public fun voidreturn(): BytecodeBlock = addInstruction(Opcodes.RETURN)
 
     @AsmKtDsl
-    fun areturn(): BytecodeBlock = addInstruction(Opcodes.ARETURN)
+    public fun areturn(): BytecodeBlock = addInstruction(Opcodes.ARETURN)
 
     @AsmKtDsl
-    fun ireturn(): BytecodeBlock = addInstruction(Opcodes.IRETURN)
+    public fun ireturn(): BytecodeBlock = addInstruction(Opcodes.IRETURN)
 
     @AsmKtDsl
-    fun freturn(): BytecodeBlock = addInstruction(Opcodes.FRETURN)
+    public fun freturn(): BytecodeBlock = addInstruction(Opcodes.FRETURN)
 
     @AsmKtDsl
-    fun lreturn(): BytecodeBlock = addInstruction(Opcodes.LRETURN)
+    public fun lreturn(): BytecodeBlock = addInstruction(Opcodes.LRETURN)
 
     @AsmKtDsl
-    fun dreturn(): BytecodeBlock = addInstruction(Opcodes.DRETURN)
+    public fun dreturn(): BytecodeBlock = addInstruction(Opcodes.DRETURN)
 
     // -- FIELD INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun getstatic(owner: String, name: String, descriptor: String): BytecodeBlock =
+    public fun getstatic(owner: String, name: String, descriptor: String): BytecodeBlock =
         addFieldInstruction(Opcodes.GETSTATIC, owner, name, descriptor)
 
     @AsmKtDsl
-    fun putstatic(owner: String, name: String, descriptor: String): BytecodeBlock =
+    public fun putstatic(owner: String, name: String, descriptor: String): BytecodeBlock =
         addFieldInstruction(Opcodes.PUTSTATIC, owner, name, descriptor)
 
     @AsmKtDsl
-    fun getfield(owner: String, name: String, descriptor: String): BytecodeBlock =
+    public fun getfield(owner: String, name: String, descriptor: String): BytecodeBlock =
         addFieldInstruction(Opcodes.GETFIELD, owner, name, descriptor)
 
     @AsmKtDsl
-    fun putfield(owner: String, name: String, descriptor: String): BytecodeBlock =
+    public fun putfield(owner: String, name: String, descriptor: String): BytecodeBlock =
         addFieldInstruction(Opcodes.PUTFIELD, owner, name, descriptor)
 
     // -- TYPE INSTRUCTIONS -- \\
     @AsmKtDsl
     @JvmName("anew")
-    fun new(type: String): BytecodeBlock = addTypeInstruction(Opcodes.NEW, type)
+    public fun new(type: String): BytecodeBlock = addTypeInstruction(Opcodes.NEW, type)
 
     @AsmKtDsl
     @JvmName("instance_of")
-    fun instanceof(type: String): BytecodeBlock = addTypeInstruction(Opcodes.INSTANCEOF, type)
+    public fun instanceof(type: String): BytecodeBlock = addTypeInstruction(Opcodes.INSTANCEOF, type)
 
     @AsmKtDsl
-    fun checkcast(type: String): BytecodeBlock = addTypeInstruction(Opcodes.CHECKCAST, type)
+    public fun checkcast(type: String): BytecodeBlock = addTypeInstruction(Opcodes.CHECKCAST, type)
 
     // -- JUMP INSTRUCTIONS -- \\
     @AsmKtDsl
     @JvmName("go_to")
-    fun goto(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.GOTO, label)
+    public fun goto(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.GOTO, label)
 
     @AsmKtDsl
-    fun ifeq(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFEQ, label)
+    public fun ifeq(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFEQ, label)
 
     @AsmKtDsl
-    fun ifne(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFNE, label)
+    public fun ifne(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFNE, label)
 
     @AsmKtDsl
-    fun if_acmpne(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ACMPNE, label)
+    public fun if_acmpne(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ACMPNE, label)
 
     @AsmKtDsl
-    fun if_acmpeq(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ACMPEQ, label)
+    public fun if_acmpeq(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ACMPEQ, label)
 
     @AsmKtDsl
-    fun if_icmple(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ICMPLE, label)
+    public fun if_icmple(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ICMPLE, label)
 
     @AsmKtDsl
-    fun if_icmpgt(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ICMPGT, label)
+    public fun if_icmpgt(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ICMPGT, label)
 
     @AsmKtDsl
-    fun if_icmplt(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ICMPLT, label)
+    public fun if_icmplt(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ICMPLT, label)
 
     @AsmKtDsl
-    fun if_icmpne(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ICMPNE, label)
+    public fun if_icmpne(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ICMPNE, label)
 
     @AsmKtDsl
-    fun if_icmpeq(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ICMPEQ, label)
+    public fun if_icmpeq(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ICMPEQ, label)
 
     @AsmKtDsl
-    fun if_icmpge(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ICMPGE, label)
+    public fun if_icmpge(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IF_ICMPGE, label)
 
     @AsmKtDsl
-    fun ifnonnull(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFNONNULL, label)
+    public fun ifnonnull(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFNONNULL, label)
 
     @AsmKtDsl
-    fun ifnull(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFNULL, label)
+    public fun ifnull(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFNULL, label)
 
     @AsmKtDsl
-    fun iflt(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFLT, label)
+    public fun iflt(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFLT, label)
 
     @AsmKtDsl
-    fun ifle(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFLE, label)
+    public fun ifle(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFLE, label)
 
     @AsmKtDsl
-    fun ifgt(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFGT, label)
+    public fun ifgt(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFGT, label)
 
     @AsmKtDsl
-    fun ifge(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFGE, label)
+    public fun ifge(label: Label): BytecodeBlock = addJumpInstruction(Opcodes.IFGE, label)
 
     @AsmKtDsl
-    fun jsr(branch: Label): BytecodeBlock = addJumpInstruction(Opcodes.JSR, branch)
+    public fun jsr(branch: Label): BytecodeBlock = addJumpInstruction(Opcodes.JSR, branch)
 
     // -- PRIMITIVE NUMBER OPERATOR INSTRUCTIONS -- \\
     // int
     @AsmKtDsl
-    fun ishr(): BytecodeBlock = addInstruction(Opcodes.ISHR)
+    public fun ishr(): BytecodeBlock = addInstruction(Opcodes.ISHR)
 
     @AsmKtDsl
-    fun ishl(): BytecodeBlock = addInstruction(Opcodes.ISHL)
+    public fun ishl(): BytecodeBlock = addInstruction(Opcodes.ISHL)
 
     @AsmKtDsl
-    fun iushr(): BytecodeBlock = addInstruction(Opcodes.IUSHR)
+    public fun iushr(): BytecodeBlock = addInstruction(Opcodes.IUSHR)
 
     @AsmKtDsl
-    fun iand(): BytecodeBlock = addInstruction(Opcodes.IAND)
+    public fun iand(): BytecodeBlock = addInstruction(Opcodes.IAND)
 
     @AsmKtDsl
-    fun ior(): BytecodeBlock = addInstruction(Opcodes.IOR)
+    public fun ior(): BytecodeBlock = addInstruction(Opcodes.IOR)
 
     @AsmKtDsl
-    fun ixor(): BytecodeBlock = addInstruction(Opcodes.IXOR)
+    public fun ixor(): BytecodeBlock = addInstruction(Opcodes.IXOR)
 
     @AsmKtDsl
-    fun iadd(): BytecodeBlock = addInstruction(Opcodes.IADD)
+    public fun iadd(): BytecodeBlock = addInstruction(Opcodes.IADD)
 
     @AsmKtDsl
-    fun isub(): BytecodeBlock = addInstruction(Opcodes.ISUB)
+    public fun isub(): BytecodeBlock = addInstruction(Opcodes.ISUB)
 
     @AsmKtDsl
-    fun idiv(): BytecodeBlock = addInstruction(Opcodes.IDIV)
+    public fun idiv(): BytecodeBlock = addInstruction(Opcodes.IDIV)
 
     @AsmKtDsl
-    fun imul(): BytecodeBlock = addInstruction(Opcodes.IMUL)
+    public fun imul(): BytecodeBlock = addInstruction(Opcodes.IMUL)
 
     @AsmKtDsl
-    fun irem(): BytecodeBlock = addInstruction(Opcodes.IREM)
+    public fun irem(): BytecodeBlock = addInstruction(Opcodes.IREM)
 
     @AsmKtDsl
-    fun ineg(): BytecodeBlock = addInstruction(Opcodes.INEG)
+    public fun ineg(): BytecodeBlock = addInstruction(Opcodes.INEG)
 
     @AsmKtDsl
-    fun iinc(index: Int, increment: Int): BytecodeBlock = addIincInstruction(index, increment)
+    public fun iinc(index: Int, increment: Int): BytecodeBlock = addIincInstruction(index, increment)
 
     // long
     @AsmKtDsl
-    fun lshr(): BytecodeBlock = addInstruction(Opcodes.LSHR)
+    public fun lshr(): BytecodeBlock = addInstruction(Opcodes.LSHR)
 
     @AsmKtDsl
-    fun lshl(): BytecodeBlock = addInstruction(Opcodes.LSHL)
+    public fun lshl(): BytecodeBlock = addInstruction(Opcodes.LSHL)
 
     @AsmKtDsl
-    fun lushr(): BytecodeBlock = addInstruction(Opcodes.LUSHR)
+    public fun lushr(): BytecodeBlock = addInstruction(Opcodes.LUSHR)
 
     @AsmKtDsl
-    fun lcmp(): BytecodeBlock = addInstruction(Opcodes.LCMP)
+    public fun lcmp(): BytecodeBlock = addInstruction(Opcodes.LCMP)
 
     @AsmKtDsl
-    fun land(): BytecodeBlock = addInstruction(Opcodes.LAND)
+    public fun land(): BytecodeBlock = addInstruction(Opcodes.LAND)
 
     @AsmKtDsl
-    fun lor(): BytecodeBlock = addInstruction(Opcodes.LOR)
+    public fun lor(): BytecodeBlock = addInstruction(Opcodes.LOR)
 
     @AsmKtDsl
-    fun lxor(): BytecodeBlock = addInstruction(Opcodes.LXOR)
+    public fun lxor(): BytecodeBlock = addInstruction(Opcodes.LXOR)
 
     @AsmKtDsl
-    fun ladd(): BytecodeBlock = addInstruction(Opcodes.LADD)
+    public fun ladd(): BytecodeBlock = addInstruction(Opcodes.LADD)
 
     @AsmKtDsl
-    fun lsub(): BytecodeBlock = addInstruction(Opcodes.LSUB)
+    public fun lsub(): BytecodeBlock = addInstruction(Opcodes.LSUB)
 
     @AsmKtDsl
-    fun ldiv(): BytecodeBlock = addInstruction(Opcodes.LDIV)
+    public fun ldiv(): BytecodeBlock = addInstruction(Opcodes.LDIV)
 
     @AsmKtDsl
-    fun lmul(): BytecodeBlock = addInstruction(Opcodes.LMUL)
+    public fun lmul(): BytecodeBlock = addInstruction(Opcodes.LMUL)
 
     @AsmKtDsl
-    fun lrem(): BytecodeBlock = addInstruction(Opcodes.LREM)
+    public fun lrem(): BytecodeBlock = addInstruction(Opcodes.LREM)
 
     @AsmKtDsl
-    fun lneg(): BytecodeBlock = addInstruction(Opcodes.LNEG)
+    public fun lneg(): BytecodeBlock = addInstruction(Opcodes.LNEG)
 
     // float
     @AsmKtDsl
-    fun fadd(): BytecodeBlock = addInstruction(Opcodes.FADD)
+    public fun fadd(): BytecodeBlock = addInstruction(Opcodes.FADD)
 
     @AsmKtDsl
-    fun fsub(): BytecodeBlock = addInstruction(Opcodes.FSUB)
+    public fun fsub(): BytecodeBlock = addInstruction(Opcodes.FSUB)
 
     @AsmKtDsl
-    fun fdiv(): BytecodeBlock = addInstruction(Opcodes.FDIV)
+    public fun fdiv(): BytecodeBlock = addInstruction(Opcodes.FDIV)
 
     @AsmKtDsl
-    fun fmul(): BytecodeBlock = addInstruction(Opcodes.FMUL)
+    public fun fmul(): BytecodeBlock = addInstruction(Opcodes.FMUL)
 
     @AsmKtDsl
-    fun frem(): BytecodeBlock = addInstruction(Opcodes.FREM)
+    public fun frem(): BytecodeBlock = addInstruction(Opcodes.FREM)
 
     @AsmKtDsl
-    fun fneg(): BytecodeBlock = addInstruction(Opcodes.FNEG)
+    public fun fneg(): BytecodeBlock = addInstruction(Opcodes.FNEG)
 
     @AsmKtDsl
-    fun fcmpl(): BytecodeBlock = addInstruction(Opcodes.FCMPL)
+    public fun fcmpl(): BytecodeBlock = addInstruction(Opcodes.FCMPL)
 
     @AsmKtDsl
-    fun fcmpg(): BytecodeBlock = addInstruction(Opcodes.FCMPG)
+    public fun fcmpg(): BytecodeBlock = addInstruction(Opcodes.FCMPG)
 
     // double
     @AsmKtDsl
-    fun ddiv(): BytecodeBlock = addInstruction(Opcodes.DDIV)
+    public fun ddiv(): BytecodeBlock = addInstruction(Opcodes.DDIV)
 
     @AsmKtDsl
-    fun dmul(): BytecodeBlock = addInstruction(Opcodes.DMUL)
+    public fun dmul(): BytecodeBlock = addInstruction(Opcodes.DMUL)
 
     @AsmKtDsl
-    fun drem(): BytecodeBlock = addInstruction(Opcodes.DREM)
+    public fun drem(): BytecodeBlock = addInstruction(Opcodes.DREM)
 
     @AsmKtDsl
-    fun dneg(): BytecodeBlock = addInstruction(Opcodes.DNEG)
+    public fun dneg(): BytecodeBlock = addInstruction(Opcodes.DNEG)
 
     @AsmKtDsl
-    fun dadd(): BytecodeBlock = addInstruction(Opcodes.DADD)
+    public fun dadd(): BytecodeBlock = addInstruction(Opcodes.DADD)
 
     @AsmKtDsl
-    fun dsub(): BytecodeBlock = addInstruction(Opcodes.DSUB)
+    public fun dsub(): BytecodeBlock = addInstruction(Opcodes.DSUB)
 
     @AsmKtDsl
-    fun dcmpl(): BytecodeBlock = addInstruction(Opcodes.DCMPL)
+    public fun dcmpl(): BytecodeBlock = addInstruction(Opcodes.DCMPL)
 
     @AsmKtDsl
-    fun dcmpg(): BytecodeBlock = addInstruction(Opcodes.DCMPG)
+    public fun dcmpg(): BytecodeBlock = addInstruction(Opcodes.DCMPG)
 
     // -- PRIMITIVE NUMBER CONVERSION INSTRUCTIONS -- \\
     // int to ...
     @AsmKtDsl
-    fun i2d(): BytecodeBlock = addInstruction(Opcodes.I2D)
+    public fun i2d(): BytecodeBlock = addInstruction(Opcodes.I2D)
 
     @AsmKtDsl
-    fun i2l(): BytecodeBlock = addInstruction(Opcodes.I2L)
+    public fun i2l(): BytecodeBlock = addInstruction(Opcodes.I2L)
 
     @AsmKtDsl
-    fun i2f(): BytecodeBlock = addInstruction(Opcodes.I2F)
+    public fun i2f(): BytecodeBlock = addInstruction(Opcodes.I2F)
 
     @AsmKtDsl
-    fun i2s(): BytecodeBlock = addInstruction(Opcodes.I2S)
+    public fun i2s(): BytecodeBlock = addInstruction(Opcodes.I2S)
 
     @AsmKtDsl
-    fun i2c(): BytecodeBlock = addInstruction(Opcodes.I2C)
+    public fun i2c(): BytecodeBlock = addInstruction(Opcodes.I2C)
 
     @AsmKtDsl
-    fun i2b(): BytecodeBlock = addInstruction(Opcodes.I2B)
+    public fun i2b(): BytecodeBlock = addInstruction(Opcodes.I2B)
 
     // long to ...
     @AsmKtDsl
-    fun l2d(): BytecodeBlock = addInstruction(Opcodes.L2D)
+    public fun l2d(): BytecodeBlock = addInstruction(Opcodes.L2D)
 
     @AsmKtDsl
-    fun l2i(): BytecodeBlock = addInstruction(Opcodes.L2I)
+    public fun l2i(): BytecodeBlock = addInstruction(Opcodes.L2I)
 
     @AsmKtDsl
-    fun l2f(): BytecodeBlock = addInstruction(Opcodes.L2F)
+    public fun l2f(): BytecodeBlock = addInstruction(Opcodes.L2F)
 
     // float to ...
     @AsmKtDsl
-    fun f2d(): BytecodeBlock = addInstruction(Opcodes.F2D)
+    public fun f2d(): BytecodeBlock = addInstruction(Opcodes.F2D)
 
     @AsmKtDsl
-    fun f2i(): BytecodeBlock = addInstruction(Opcodes.F2D)
+    public fun f2i(): BytecodeBlock = addInstruction(Opcodes.F2D)
 
     @AsmKtDsl
-    fun f2l(): BytecodeBlock = addInstruction(Opcodes.F2L)
+    public fun f2l(): BytecodeBlock = addInstruction(Opcodes.F2L)
 
     // double to ...
     @AsmKtDsl
-    fun d2f(): BytecodeBlock = addInstruction(Opcodes.D2F)
+    public fun d2f(): BytecodeBlock = addInstruction(Opcodes.D2F)
 
     @AsmKtDsl
-    fun d2i(): BytecodeBlock = addInstruction(Opcodes.D2I)
+    public fun d2i(): BytecodeBlock = addInstruction(Opcodes.D2I)
 
     @AsmKtDsl
-    fun d2l(): BytecodeBlock = addInstruction(Opcodes.D2L)
+    public fun d2l(): BytecodeBlock = addInstruction(Opcodes.D2L)
 
     // -- TRY CATCH INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun athrow(): BytecodeBlock = addInstruction(Opcodes.ATHROW)
+    public fun athrow(): BytecodeBlock = addInstruction(Opcodes.ATHROW)
 
     // -- LABEL INSTRUCTIONS -- \\
     /**
@@ -539,7 +539,7 @@ class BytecodeBlock : Iterable<AbstractInsnNode> {
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun mark(label: Label): BytecodeBlock = addLabel(label)
+    public fun mark(label: Label): BytecodeBlock = addLabel(label)
 
     /**
      * Marks the given [line] with the given [label].
@@ -547,67 +547,67 @@ class BytecodeBlock : Iterable<AbstractInsnNode> {
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun line(line: Int, label: Label): BytecodeBlock = addLineNumber(line, label)
+    public fun line(line: Int, label: Label): BytecodeBlock = addLineNumber(line, label)
 
     // -- SWITCH INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun lookupswitch(
+    public fun lookupswitch(
         defaultLabel: Label,
         keys: IntArray,
         labels: Array<out Label>,
     ): BytecodeBlock = addLookupSwitchInstruction(defaultLabel, keys, labels)
 
     @AsmKtDsl
-    fun tableswitch(min: Int, max: Int, defaultLabel: Label, cases: Array<out Label>): BytecodeBlock =
+    public fun tableswitch(min: Int, max: Int, defaultLabel: Label, cases: Array<out Label>): BytecodeBlock =
         addTableSwitchInstruction(min, max, defaultLabel, cases)
 
     // -- MONITOR INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun monitorenter(): BytecodeBlock = addInstruction(Opcodes.MONITORENTER)
+    public fun monitorenter(): BytecodeBlock = addInstruction(Opcodes.MONITORENTER)
 
     @AsmKtDsl
-    fun monitorexit(): BytecodeBlock = addInstruction(Opcodes.MONITOREXIT)
+    public fun monitorexit(): BytecodeBlock = addInstruction(Opcodes.MONITOREXIT)
 
     // -- DUP INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun dup(): BytecodeBlock = addInstruction(Opcodes.DUP)
+    public fun dup(): BytecodeBlock = addInstruction(Opcodes.DUP)
 
     @AsmKtDsl
-    fun dup_x2(): BytecodeBlock = addInstruction(Opcodes.DUP_X2)
+    public fun dup_x2(): BytecodeBlock = addInstruction(Opcodes.DUP_X2)
 
     @AsmKtDsl
-    fun dup_x1(): BytecodeBlock = addInstruction(Opcodes.DUP_X1)
+    public fun dup_x1(): BytecodeBlock = addInstruction(Opcodes.DUP_X1)
 
     @AsmKtDsl
-    fun dup2_x2(): BytecodeBlock = addInstruction(Opcodes.DUP2_X2)
+    public fun dup2_x2(): BytecodeBlock = addInstruction(Opcodes.DUP2_X2)
 
     @AsmKtDsl
-    fun dup2_x1(): BytecodeBlock = addInstruction(Opcodes.DUP2_X1)
+    public fun dup2_x1(): BytecodeBlock = addInstruction(Opcodes.DUP2_X1)
 
     @AsmKtDsl
-    fun dup2(): BytecodeBlock = addInstruction(Opcodes.DUP2)
+    public fun dup2(): BytecodeBlock = addInstruction(Opcodes.DUP2)
 
     // -- SWAP INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun swap(): BytecodeBlock = addInstruction(Opcodes.SWAP)
+    public fun swap(): BytecodeBlock = addInstruction(Opcodes.SWAP)
 
     // -- NOP INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun nop(): BytecodeBlock = addInstruction(Opcodes.NOP)
+    public fun nop(): BytecodeBlock = addInstruction(Opcodes.NOP)
 
     // -- POP INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun pop(): BytecodeBlock = addInstruction(Opcodes.POP)
+    public fun pop(): BytecodeBlock = addInstruction(Opcodes.POP)
 
     @AsmKtDsl
-    fun pop2(): BytecodeBlock = addInstruction(Opcodes.POP2)
+    public fun pop2(): BytecodeBlock = addInstruction(Opcodes.POP2)
 
     // -- FRAME INSTRUCTIONS -- \\
     /**
      * @see [MethodVisitor.visitFrame]
      */
     @AsmKtDsl
-    fun frame(
+    public fun frame(
         type: Int,
         numLocal: Int,
         local: Array<out Any>,
@@ -623,11 +623,11 @@ class BytecodeBlock : Iterable<AbstractInsnNode> {
      * @see [MethodVisitor.visitFrame]
      */
     @AsmKtDsl
-    fun frame(type: Int, local: Array<out Any>, stack: Array<out Any>): BytecodeBlock =
+    public fun frame(type: Int, local: Array<out Any>, stack: Array<out Any>): BytecodeBlock =
         frame(type, local.size, local, stack.size, stack)
 
     // -- INSTRUCTION FUNCTIONS -- \\
-    fun addInstruction(opcode: Int): BytecodeBlock = apply {
+    public fun addInstruction(opcode: Int): BytecodeBlock = apply {
         when (opcode) {
             Opcodes.RETURN, Opcodes.ARETURN, Opcodes.IRETURN, Opcodes.FRETURN, Opcodes.LRETURN, Opcodes.DRETURN -> returns =
                 true
@@ -636,19 +636,19 @@ class BytecodeBlock : Iterable<AbstractInsnNode> {
         instructions.add(InsnNode(opcode))
     }
 
-    fun addVarInstruction(opcode: Int, index: Int): BytecodeBlock = apply {
+    public fun addVarInstruction(opcode: Int, index: Int): BytecodeBlock = apply {
         instructions.add(VarInsnNode(opcode, index))
     }
 
-    fun addIntInstruction(opcode: Int, operand: Int): BytecodeBlock = apply {
+    public fun addIntInstruction(opcode: Int, operand: Int): BytecodeBlock = apply {
         instructions.add(IntInsnNode(opcode, operand))
     }
 
-    fun addTypeInstruction(opcode: Int, descriptor: String): BytecodeBlock = apply {
+    public fun addTypeInstruction(opcode: Int, descriptor: String): BytecodeBlock = apply {
         instructions.add(TypeInsnNode(opcode, descriptor))
     }
 
-    fun addFieldInstruction(
+    public fun addFieldInstruction(
         opcode: Int,
         owner: String,
         name: String,
@@ -657,7 +657,7 @@ class BytecodeBlock : Iterable<AbstractInsnNode> {
         instructions.add(FieldInsnNode(opcode, owner, name, descriptor))
     }
 
-    fun addMethodInstruction(
+    public fun addMethodInstruction(
         opcode: Int,
         owner: String,
         name: String,
@@ -667,11 +667,11 @@ class BytecodeBlock : Iterable<AbstractInsnNode> {
         instructions.add(MethodInsnNode(opcode, owner, name, descriptor, isInterface))
     }
 
-    fun addJumpInstruction(opcode: Int, label: Label): BytecodeBlock = apply {
+    public fun addJumpInstruction(opcode: Int, label: Label): BytecodeBlock = apply {
         instructions.add(JumpInsnNode(opcode, label.toNode()))
     }
 
-    fun addLabel(label: Label): BytecodeBlock = apply {
+    public fun addLabel(label: Label): BytecodeBlock = apply {
         instructions.add(LabelNode(label))
     }
 
@@ -679,11 +679,11 @@ class BytecodeBlock : Iterable<AbstractInsnNode> {
         instructions.add(LdcInsnNode(value))
     }
 
-    fun addIincInstruction(index: Int, increment: Int): BytecodeBlock = apply {
+    public fun addIincInstruction(index: Int, increment: Int): BytecodeBlock = apply {
         instructions.add(IincInsnNode(index, increment))
     }
 
-    fun addTableSwitchInstruction(
+    public fun addTableSwitchInstruction(
         min: Int,
         max: Int,
         defaultLabel: Label,
@@ -692,7 +692,7 @@ class BytecodeBlock : Iterable<AbstractInsnNode> {
         instructions.add(TableSwitchInsnNode(min, max, defaultLabel.toNode(), *labels.toNodeArray()))
     }
 
-    fun addLookupSwitchInstruction(
+    public fun addLookupSwitchInstruction(
         defaultLabel: Label,
         keys: IntArray,
         labels: Array<out Label>,
@@ -700,15 +700,15 @@ class BytecodeBlock : Iterable<AbstractInsnNode> {
         instructions.add(LookupSwitchInsnNode(defaultLabel.toNode(), keys, labels.toNodeArray()))
     }
 
-    fun addMultiANewArrayInstruction(descriptor: String, numDimensions: Int): BytecodeBlock = apply {
+    public fun addMultiANewArrayInstruction(descriptor: String, numDimensions: Int): BytecodeBlock = apply {
         instructions.add(MultiANewArrayInsnNode(descriptor, numDimensions))
     }
 
-    fun addLineNumber(line: Int, start: Label): BytecodeBlock = apply {
+    public fun addLineNumber(line: Int, start: Label): BytecodeBlock = apply {
         instructions.add(LineNumberNode(line, start.toNode()))
     }
 
-    fun toBytecodeMethod(
+    public fun toBytecodeMethod(
         name: String,
         access: Int,
         type: MethodType,
@@ -718,19 +718,19 @@ class BytecodeBlock : Iterable<AbstractInsnNode> {
     ): BytecodeMethod = BytecodeMethod(name, access, type, signature, exceptions, parent, this)
 
     // -- ADDS -- \\
-    fun prepend(instructions: InsnList): BytecodeBlock = apply {
+    public fun prepend(instructions: InsnList): BytecodeBlock = apply {
         this.instructions.insert(instructions)
     }
 
-    fun prepend(other: BytecodeBlock): BytecodeBlock = apply {
+    public fun prepend(other: BytecodeBlock): BytecodeBlock = apply {
         this.instructions.insert(other.instructions)
     }
 
-    fun append(instructions: InsnList): BytecodeBlock = apply {
+    public fun append(instructions: InsnList): BytecodeBlock = apply {
         this.instructions.add(instructions)
     }
 
-    fun append(other: BytecodeBlock): BytecodeBlock = apply {
+    public fun append(other: BytecodeBlock): BytecodeBlock = apply {
         this.instructions.add(other.instructions)
     }
 

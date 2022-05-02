@@ -16,7 +16,10 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.types.*
+import net.ormr.asmkt.types.FieldType
+import net.ormr.asmkt.types.MethodType
+import net.ormr.asmkt.types.PrimitiveType
+import net.ormr.asmkt.types.ReferenceType
 import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
@@ -36,43 +39,43 @@ import org.objectweb.asm.tree.TypeAnnotationNode
  * @property [sourceDebug] TODO
  */
 @AsmKtDsl
-class BytecodeClass(
-    val type: ReferenceType,
+public class BytecodeClass(
+    public val type: ReferenceType,
     override val access: Int = Modifiers.PUBLIC,
-    val superType: ReferenceType = OBJECT,
-    val interfaces: List<ReferenceType> = emptyList(),
-    val sourceFile: String? = null,
-    val sourceDebug: String? = null,
+    public val superType: ReferenceType = OBJECT,
+    public val interfaces: List<ReferenceType> = emptyList(),
+    public val sourceFile: String? = null,
+    public val sourceDebug: String? = null,
 ) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode {
     /**
      * Returns `true` if `this` class is [super][Modifiers.SUPER], otherwise `false`.
      */
-    val isSuper: Boolean
+    public val isSuper: Boolean
         // TODO: we automatically slap on 'super' to all class instances, should we maybe not do that?
         get() = true // Modifiers.contains(access, Modifiers.SUPER)
 
     /**
      * Returns `true` if `this` class is [interface][Modifiers.INTERFACE], otherwise `false`.
      */
-    val isInterface: Boolean
+    public val isInterface: Boolean
         get() = Modifiers.contains(access, Modifiers.INTERFACE)
 
     /**
      * Returns `true` if `this` class is [annotation][Modifiers.ANNOTATION], otherwise `false`.
      */
-    val isAnnotation: Boolean
+    public val isAnnotation: Boolean
         get() = Modifiers.contains(access, Modifiers.ANNOTATION)
 
     /**
      * Returns `true` if `this` class is [module][Modifiers.MODULE], otherwise `false`.
      */
-    val isModule: Boolean
+    public val isModule: Boolean
         get() = Modifiers.contains(access, Modifiers.MODULE)
 
     /**
      * Returns `true` if `this` class is [record][Modifiers.RECORD], otherwise `false`.
      */
-    val isRecord: Boolean
+    public val isRecord: Boolean
         get() = Modifiers.contains(access, Modifiers.RECORD)
 
     /**
@@ -80,7 +83,7 @@ class BytecodeClass(
      *
      * @see [defineModule]
      */
-    var module: BytecodeModule? = null
+    public var module: BytecodeModule? = null
         private set
 
     /**
@@ -88,13 +91,13 @@ class BytecodeClass(
      *
      * @see [defineInnerClass]
      */
-    var enclosingClass: BytecodeClass? = null
+    public var enclosingClass: BytecodeClass? = null
         private set
 
     /**
      * The method that this class belongs to, or `null` if this class does not belong to a method.
      */
-    var enclosingMethod: BytecodeMethod? = null
+    public var enclosingMethod: BytecodeMethod? = null
         internal set
 
     private val innerClasses: MutableMap<String, BytecodeClass> = mutableMapOf()
@@ -112,25 +115,25 @@ class BytecodeClass(
     /**
      * The [internal name][ReferenceType.internalName] of this class.
      */
-    val internalName: String
+    public val internalName: String
         get() = type.internalName
 
     /**
      * The [class name][ReferenceType.className] of this class.
      */
-    val className: String
+    public val className: String
         get() = type.className
 
     /**
      * The [simple name][ReferenceType.simpleName] of this class.
      */
-    val simpleName: String
+    public val simpleName: String
         get() = type.simpleName
 
     /**
      * Returns `true` if the [superType] of this class is [OBJECT][ReferenceType.OBJECT], otherwise `false`.
      */
-    val isDefaultSuperType: Boolean
+    public val isDefaultSuperType: Boolean
         get() = superType == OBJECT
 
     @AsmKtDsl
@@ -160,14 +163,14 @@ class BytecodeClass(
 
     @JvmOverloads
     @AsmKtDsl
-    fun defineModule(name: String, access: Int, version: String? = null): BytecodeModule {
+    public fun defineModule(name: String, access: Int, version: String? = null): BytecodeModule {
         val module = BytecodeModule(name, access, version, this)
         this.module = module
         return module
     }
 
     @AsmKtDsl
-    fun defineInnerClass(child: BytecodeClass) {
+    public fun defineInnerClass(child: BytecodeClass) {
         var childName = child.internalName
         childName = when {
             '$' in childName -> childName.substringAfterLast('$')
@@ -178,14 +181,14 @@ class BytecodeClass(
     }
 
     @AsmKtDsl
-    fun defineInnerClass(innerName: String, child: BytecodeClass) {
+    public fun defineInnerClass(innerName: String, child: BytecodeClass) {
         child.enclosingClass = this
         innerClasses[innerName] = child
     }
 
     @JvmOverloads
     @AsmKtDsl
-    fun defineField(
+    public fun defineField(
         name: String,
         access: Int,
         type: FieldType,
@@ -199,7 +202,7 @@ class BytecodeClass(
     }
 
     @AsmKtDsl
-    fun defineMethod(
+    public fun defineMethod(
         name: String,
         access: Int,
         type: MethodType,
@@ -215,7 +218,7 @@ class BytecodeClass(
      * Defines a skeleton implementation of a constructor for `this` class.
      */
     @AsmKtDsl
-    fun defineConstructor(access: Int = Modifiers.PUBLIC, type: MethodType = MethodType.VOID): BytecodeMethod {
+    public fun defineConstructor(access: Int = Modifiers.PUBLIC, type: MethodType = MethodType.VOID): BytecodeMethod {
         require(type.returnType is PrimitiveType.Void) { "return type of a constructor must be 'void', was '$type'." }
         return defineMethod("<init>", access, type)
     }
@@ -225,7 +228,7 @@ class BytecodeClass(
      * if its [superType].
      */
     @AsmKtDsl
-    fun defineDefaultConstructor(
+    public fun defineDefaultConstructor(
         access: Int = Modifiers.PUBLIC,
     ): BytecodeMethod = defineConstructor(access) {
         loadThis()
@@ -238,7 +241,7 @@ class BytecodeClass(
      * [message] when its invoked.
      */
     @AsmKtDsl
-    fun defineInaccessibleConstructor(
+    public fun defineInaccessibleConstructor(
         access: Int = Modifiers.PRIVATE,
         message: String = "No $simpleName instances for you!",
     ): BytecodeMethod = defineConstructor(access) {
@@ -252,7 +255,7 @@ class BytecodeClass(
      * Defines a skeleton implementation of the `equals` method for `this` class.
      */
     @AsmKtDsl
-    fun defineEquals(isFinal: Boolean = false): BytecodeMethod {
+    public fun defineEquals(isFinal: Boolean = false): BytecodeMethod {
         val flags = if (isFinal) Modifiers.PUBLIC_FINAL else Modifiers.PUBLIC
         return defineMethod("equals", flags, MethodType.ofBoolean(OBJECT))
     }
@@ -261,7 +264,7 @@ class BytecodeClass(
      * Defines a skeleton implementation of the `hashCode` method for `this` class.
      */
     @AsmKtDsl
-    fun defineHashCode(isFinal: Boolean = false): BytecodeMethod {
+    public fun defineHashCode(isFinal: Boolean = false): BytecodeMethod {
         val flags = if (isFinal) Modifiers.PUBLIC_FINAL else Modifiers.PUBLIC
         return defineMethod("hashCode", flags, MethodType.INT)
     }
@@ -270,12 +273,12 @@ class BytecodeClass(
      * Defines a skeleton implementation of the `toString` method for `this` class.
      */
     @AsmKtDsl
-    fun defineToString(isFinal: Boolean = false): BytecodeMethod {
+    public fun defineToString(isFinal: Boolean = false): BytecodeMethod {
         val flags = if (isFinal) Modifiers.PUBLIC_FINAL else Modifiers.PUBLIC
         return defineMethod("toString", flags, MethodType.STRING)
     }
 
-    fun toByteArray(version: BytecodeVersion): ByteArray {
+    public fun toByteArray(version: BytecodeVersion): ByteArray {
         check()
         val writer = ClassWriter(ClassWriter.COMPUTE_FRAMES)
         val node = toNode(version)

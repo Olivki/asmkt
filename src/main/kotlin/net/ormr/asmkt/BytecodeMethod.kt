@@ -35,7 +35,7 @@ import org.objectweb.asm.Type as AsmType
  * for documentation regarding all the instructions available in this class.
  */
 @AsmKtDsl
-data class BytecodeMethod internal constructor(
+public data class BytecodeMethod internal constructor(
     val name: String,
     override val access: Int,
     val type: MethodType,
@@ -45,11 +45,20 @@ data class BytecodeMethod internal constructor(
     val block: BytecodeBlock = BytecodeBlock(),
 ) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode {
     private companion object {
-        // +0.0
-        private const val POSITIVE_ZERO = 0L
+        // +0.0F
+        private const val POSITIVE_ZERO_FLOAT = 0
 
-        // 1.0
-        private const val ONE = 0x3FF0000000000000L
+        // 1.0F
+        private const val ONE_FLOAT = 0x3F800000
+
+        // 2.0F
+        private const val TWO_FLOAT = 0x40000000
+
+        // +0.0D
+        private const val POSITIVE_ZERO_DOUBLE = 0L
+
+        // 1.0D
+        private const val ONE_DOUBLE = 0x3FF0000000000000L
 
         private val primitiveClassHandle: Handle by lazy {
             constantBootstrapsHandleOf(
@@ -67,60 +76,60 @@ data class BytecodeMethod internal constructor(
     /**
      * Returns `true` if `this` method is [synchronized][Modifiers.SYNCHRONIZED], otherwise `false`.
      */
-    val isSynchronized: Boolean
+    public val isSynchronized: Boolean
         get() = Modifiers.contains(access, Modifiers.SYNCHRONIZED)
 
     /**
      * Returns `true` if `this` method is [bridge][Modifiers.BRIDGE], otherwise `false`.
      */
-    val isBridge: Boolean
+    public val isBridge: Boolean
         get() = Modifiers.contains(access, Modifiers.BRIDGE)
 
     /**
      * Returns `true` if `this` method is [varargs][Modifiers.VARARGS], otherwise `false`.
      */
-    val isVarargs: Boolean
+    public val isVarargs: Boolean
         get() = Modifiers.contains(access, Modifiers.VARARGS)
 
     /**
      * Returns `true` if `this` method is [native][Modifiers.NATIVE], otherwise `false`.
      */
-    val isNative: Boolean
+    public val isNative: Boolean
         get() = Modifiers.contains(access, Modifiers.NATIVE)
 
     /**
      * Returns `true` if `this` method is [strict][Modifiers.STRICT], otherwise `false`.
      */
-    val isStrict: Boolean
+    public val isStrict: Boolean
         get() = Modifiers.contains(access, Modifiers.STRICT)
 
     /**
      * Returns the return type of `this` method.
      */
-    val returnType: FieldType
+    public val returnType: FieldType
         get() = type.returnType
 
     /**
      * Returns a list containing the types of the parameters of `this` method.
      */
-    val parameterTypes: List<FieldType>
+    public val parameterTypes: List<FieldType>
         get() = type.argumentTypes
 
     /**
      * Returns how many parameters `this` method has.
      */
-    val arity: Int
+    public val arity: Int
         get() = parameterTypes.size
 
     /**
      * Returns the [type][BytecodeClass.type] of `this` methods [parent].
      */
-    val parentType: ReferenceType
+    public val parentType: ReferenceType
         get() = parent.type
 
 
     // TODO: document valid types
-    var defaultAnnotationValue: Any? = null
+    public var defaultAnnotationValue: Any? = null
         set(value) {
             require(isValidAnnotationValue(value)) { "Value '$value' is not a valid annotation value (${value?.javaClass?.name})" }
             field = value
@@ -164,15 +173,14 @@ data class BytecodeMethod internal constructor(
     /**
      * Returns `true` if no instructions have been added to `this` block, otherwise `false`.
      */
-    fun isEmpty(): Boolean = tryCatchBlocks.isEmpty() && localVariableNodes.isEmpty() && parameterNodes.isEmpty()
+    public fun isEmpty(): Boolean = tryCatchBlocks.isEmpty() && localVariableNodes.isEmpty() && parameterNodes.isEmpty()
             && visibleAnnotations.isEmpty() && block.isEmpty()
 
     /**
      * Returns `true` if any instructions have been added to `this` block, otherwise `false`.
      */
-    fun isNotEmpty(): Boolean = !(isEmpty())
+    public fun isNotEmpty(): Boolean = !(isEmpty())
 
-    @JvmSynthetic
     internal fun toComponentString(): String = buildString {
         append(name)
         parameterTypes.joinTo(this, prefix = "(", postfix = ")")
@@ -203,7 +211,7 @@ data class BytecodeMethod internal constructor(
      * @see [push]
      */
     @AsmKtDsl
-    fun ldc(value: Any): BytecodeMethod = apply {
+    public fun ldc(value: Any): BytecodeMethod = apply {
         require(isValidLdcValue(value)) { "Can't push value '$value' (${value.javaClass.name}) onto the stack." }
         block.ldc(value)
     }
@@ -237,7 +245,7 @@ data class BytecodeMethod internal constructor(
      * @see [pushConstantDynamic]
      */
     @AsmKtDsl
-    fun push(value: Any?): BytecodeMethod = apply {
+    public fun push(value: Any?): BytecodeMethod = apply {
         when (value) {
             null -> block.aconst_null()
             is Boolean -> pushBoolean(value)
@@ -263,7 +271,7 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun pushBoolean(value: Boolean): BytecodeMethod = apply {
+    public fun pushBoolean(value: Boolean): BytecodeMethod = apply {
         if (value) {
             block.iconst_1()
         } else {
@@ -277,7 +285,7 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun pushString(value: String): BytecodeMethod = apply {
+    public fun pushString(value: String): BytecodeMethod = apply {
         block.ldc(value)
     }
 
@@ -292,7 +300,7 @@ data class BytecodeMethod internal constructor(
      * @see [pushInt]
      */
     @AsmKtDsl
-    fun pushByte(value: Byte): BytecodeMethod = pushInt(value.toInt())
+    public fun pushByte(value: Byte): BytecodeMethod = pushInt(value.toInt())
 
     /**
      * Pushes an appropriate instruction for the given [value] onto the stack.
@@ -302,7 +310,7 @@ data class BytecodeMethod internal constructor(
      * @see [pushInt]
      */
     @AsmKtDsl
-    fun pushChar(value: Char): BytecodeMethod = pushInt(value.code)
+    public fun pushChar(value: Char): BytecodeMethod = pushInt(value.code)
 
     /**
      * Pushes an appropriate instruction for the given [value] onto the stack.
@@ -312,7 +320,7 @@ data class BytecodeMethod internal constructor(
      * @see [pushInt]
      */
     @AsmKtDsl
-    fun pushShort(value: Short): BytecodeMethod = pushInt(value.toInt())
+    public fun pushShort(value: Short): BytecodeMethod = pushInt(value.toInt())
 
     /**
      * Pushes an appropriate instruction for the given [value] onto the stack.
@@ -335,7 +343,7 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun pushInt(value: Int): BytecodeMethod = apply {
+    public fun pushInt(value: Int): BytecodeMethod = apply {
         when {
             value >= -1 && value <= 5 -> block.addInstruction(ICONST_0 + value)
             value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE -> block.bipush(value)
@@ -353,7 +361,7 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun pushLong(value: Long): BytecodeMethod = apply {
+    public fun pushLong(value: Long): BytecodeMethod = apply {
         when (value) {
             0L -> block.lconst_0()
             1L -> block.lconst_1()
@@ -371,9 +379,9 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun pushFloat(value: Float): BytecodeMethod = apply {
+    public fun pushFloat(value: Float): BytecodeMethod = apply {
         val bits = value.toBits()
-        if (bits == 0 || bits == 0x3F800000 || bits == 0x40000000) { // 0..2
+        if (bits == POSITIVE_ZERO_FLOAT || bits == ONE_FLOAT || bits == TWO_FLOAT) { // 0..2
             block.addInstruction(FCONST_0 + value.toInt())
         } else {
             block.ldc(value)
@@ -389,10 +397,10 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun pushDouble(value: Double): BytecodeMethod = apply {
+    public fun pushDouble(value: Double): BytecodeMethod = apply {
         val bits = value.toBits()
 
-        if (bits == POSITIVE_ZERO || bits == ONE) {
+        if (bits == POSITIVE_ZERO_DOUBLE || bits == ONE_DOUBLE) {
             block.addInstruction(DCONST_0 + value.toInt())
         } else {
             block.ldc(value)
@@ -408,7 +416,7 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun pushType(value: FieldType): BytecodeMethod = apply {
+    public fun pushType(value: FieldType): BytecodeMethod = apply {
         if (value is PrimitiveType) {
             // TODO: this will only work for Java 15(?) and above, as it doesn't exist on the lower ones
             //       we need to handle this properly in some manner so that we don't generate faulty bytecode
@@ -424,7 +432,7 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun pushHandle(value: Handle): BytecodeMethod = apply {
+    public fun pushHandle(value: Handle): BytecodeMethod = apply {
         ldc(value)
     }
 
@@ -434,13 +442,13 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun pushConstantDynamic(value: ConstantDynamic): BytecodeMethod = apply {
+    public fun pushConstantDynamic(value: ConstantDynamic): BytecodeMethod = apply {
         ldc(value)
     }
 
     // TODO: documentation
     @AsmKtDsl
-    fun pushConstantDynamic(
+    public fun pushConstantDynamic(
         name: String,
         type: FieldType,
         bootStrapMethod: Handle,
@@ -453,26 +461,26 @@ data class BytecodeMethod internal constructor(
 
     // -- LOAD INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun loadLocal(index: Int, type: FieldType): BytecodeMethod = apply {
+    public fun loadLocal(index: Int, type: FieldType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addVarInstruction(type.getOpcode(ILOAD), index)
     }
 
     @AsmKtDsl
-    fun arrayLoad(type: FieldType): BytecodeMethod = apply {
+    public fun arrayLoad(type: FieldType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(IALOAD))
     }
 
     // -- STORE INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun storeLocal(index: Int, type: FieldType): BytecodeMethod = apply {
+    public fun storeLocal(index: Int, type: FieldType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addVarInstruction(type.getOpcode(ISTORE), index)
     }
 
     @AsmKtDsl
-    fun arrayStore(type: FieldType): BytecodeMethod = apply {
+    public fun arrayStore(type: FieldType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(IASTORE))
     }
@@ -480,7 +488,7 @@ data class BytecodeMethod internal constructor(
     // -- INT INSTRUCTIONS -- \\
     // TODO: find a better name?
     @AsmKtDsl
-    fun ret(operand: Int): BytecodeMethod = apply {
+    public fun ret(operand: Int): BytecodeMethod = apply {
         block.ret(operand)
     }
 
@@ -496,7 +504,7 @@ data class BytecodeMethod internal constructor(
      * type
      */
     @AsmKtDsl
-    fun newArray(type: FieldType): BytecodeMethod = apply {
+    public fun newArray(type: FieldType): BytecodeMethod = apply {
         requireNotVoid(type)
 
         if (type is TypeWithInternalName) {
@@ -520,39 +528,39 @@ data class BytecodeMethod internal constructor(
     }
 
     @AsmKtDsl
-    fun newMultiArray(type: FieldType, dimensions: Int): BytecodeMethod = apply {
+    public fun newMultiArray(type: FieldType, dimensions: Int): BytecodeMethod = apply {
         requireNotVoid(type)
         block.multianewarray(type.descriptor, dimensions)
     }
 
     @AsmKtDsl
-    fun arrayLength(): BytecodeMethod = apply {
+    public fun arrayLength(): BytecodeMethod = apply {
         block.arraylength()
     }
 
     // -- INVOKE/METHOD INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun invokeStatic(owner: ReferenceType, name: String, type: MethodType): BytecodeMethod = apply {
+    public fun invokeStatic(owner: ReferenceType, name: String, type: MethodType): BytecodeMethod = apply {
         block.invokestatic(owner.internalName, name, type.descriptor)
     }
 
     @AsmKtDsl
-    fun invokeSpecial(owner: ReferenceType, name: String, type: MethodType): BytecodeMethod = apply {
+    public fun invokeSpecial(owner: ReferenceType, name: String, type: MethodType): BytecodeMethod = apply {
         block.invokespecial(owner.internalName, name, type.descriptor)
     }
 
     @AsmKtDsl
-    fun invokeVirtual(owner: ReferenceType, name: String, type: MethodType): BytecodeMethod = apply {
+    public fun invokeVirtual(owner: ReferenceType, name: String, type: MethodType): BytecodeMethod = apply {
         block.invokevirtual(owner.internalName, name, type.descriptor)
     }
 
     @AsmKtDsl
-    fun invokeInterface(owner: ReferenceType, name: String, type: MethodType): BytecodeMethod = apply {
+    public fun invokeInterface(owner: ReferenceType, name: String, type: MethodType): BytecodeMethod = apply {
         block.invokeinterface(owner.internalName, name, type.descriptor)
     }
 
     @AsmKtDsl
-    fun invokeDynamic(
+    public fun invokeDynamic(
         name: String,
         descriptor: MethodType,
         bootstrapMethod: Handle,
@@ -564,22 +572,22 @@ data class BytecodeMethod internal constructor(
 
     // local invokes
     @AsmKtDsl
-    fun invokeLocalStatic(name: String, type: MethodType): BytecodeMethod = apply {
+    public fun invokeLocalStatic(name: String, type: MethodType): BytecodeMethod = apply {
         invokeStatic(parentType, name, type)
     }
 
     @AsmKtDsl
-    fun invokeLocalSpecial(name: String, type: MethodType): BytecodeMethod = apply {
+    public fun invokeLocalSpecial(name: String, type: MethodType): BytecodeMethod = apply {
         invokeSpecial(parentType, name, type)
     }
 
     @AsmKtDsl
-    fun invokeLocalVirtual(name: String, type: MethodType): BytecodeMethod = apply {
+    public fun invokeLocalVirtual(name: String, type: MethodType): BytecodeMethod = apply {
         invokeVirtual(parentType, name, type)
     }
 
     @AsmKtDsl
-    fun invokeLocalInterface(name: String, type: MethodType): BytecodeMethod = apply {
+    public fun invokeLocalInterface(name: String, type: MethodType): BytecodeMethod = apply {
         invokeInterface(parentType, name, type)
     }
 
@@ -590,72 +598,72 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun returnValue(): BytecodeMethod = apply {
+    public fun returnValue(): BytecodeMethod = apply {
         block.addInstruction(returnType.getOpcode(IRETURN))
     }
 
     // -- FIELD INSTRUCTIONS -- \\
     // TODO: 'getStaticField'?
     @AsmKtDsl
-    fun getStatic(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
+    public fun getStatic(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
         requireNotVoid(type, name = "descriptor")
         block.getstatic(owner.internalName, name, type.descriptor)
     }
 
     // TODO: 'putStaticField'?
     @AsmKtDsl
-    fun putStatic(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
+    public fun putStatic(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
         requireNotVoid(type, name = "descriptor")
         block.putstatic(owner.internalName, name, type.descriptor)
     }
 
     @AsmKtDsl
-    fun getField(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
+    public fun getField(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
         requireNotVoid(type, name = "descriptor")
         block.getfield(owner.internalName, name, type.descriptor)
     }
 
     @AsmKtDsl
-    fun putField(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
+    public fun putField(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
         requireNotVoid(type, name = "descriptor")
         block.putfield(owner.internalName, name, type.descriptor)
     }
 
     // local fields
     @AsmKtDsl
-    fun getLocalStatic(name: String, type: FieldType): BytecodeMethod = apply {
+    public fun getLocalStatic(name: String, type: FieldType): BytecodeMethod = apply {
         getStatic(parentType, name, type)
     }
 
     @AsmKtDsl
-    fun putLocalStatic(name: String, type: FieldType): BytecodeMethod = apply {
+    public fun putLocalStatic(name: String, type: FieldType): BytecodeMethod = apply {
         putStatic(parentType, name, type)
     }
 
     @AsmKtDsl
-    fun getLocalField(name: String, type: FieldType): BytecodeMethod = apply {
+    public fun getLocalField(name: String, type: FieldType): BytecodeMethod = apply {
         getField(parentType, name, type)
     }
 
     @AsmKtDsl
-    fun putLocalField(name: String, type: FieldType): BytecodeMethod = apply {
+    public fun putLocalField(name: String, type: FieldType): BytecodeMethod = apply {
         putField(parentType, name, type)
     }
 
     // -- TYPE INSTRUCTIONS -- \\
     @AsmKtDsl
     @JvmName("newInstance")
-    fun new(type: ReferenceType): BytecodeMethod = apply {
+    public fun new(type: ReferenceType): BytecodeMethod = apply {
         block.new(type.internalName)
     }
 
     @AsmKtDsl
-    fun instanceOf(type: ReferenceType): BytecodeMethod = apply {
+    public fun instanceOf(type: ReferenceType): BytecodeMethod = apply {
         block.instanceof(type.internalName)
     }
 
     @AsmKtDsl
-    fun checkCast(type: ReferenceType): BytecodeMethod = apply {
+    public fun checkCast(type: ReferenceType): BytecodeMethod = apply {
         // there is no point in casting something to 'Object' as everything that isn't a primitive will be extending
         // 'Object' anyway, and we only accept 'ReferenceType' values here anyways, so 'type' can't be a primitive
         if (type != OBJECT) {
@@ -666,17 +674,17 @@ data class BytecodeMethod internal constructor(
     // -- JUMP INSTRUCTIONS -- \\
     @AsmKtDsl
     @JvmName("goTo")
-    fun goto(label: Label): BytecodeMethod = apply {
+    public fun goto(label: Label): BytecodeMethod = apply {
         block.goto(label)
     }
 
     @AsmKtDsl
-    fun ifNonNull(label: Label): BytecodeMethod = apply {
+    public fun ifNonNull(label: Label): BytecodeMethod = apply {
         block.ifnonnull(label)
     }
 
     @AsmKtDsl
-    fun ifNull(label: Label): BytecodeMethod = apply {
+    public fun ifNull(label: Label): BytecodeMethod = apply {
         block.ifnull(label)
     }
 
@@ -684,47 +692,48 @@ data class BytecodeMethod internal constructor(
     //       'ifne' functions as 'ifFalse' and 'ifTrue' uses those instead
 
     @AsmKtDsl
-    fun ifFalse(label: Label): BytecodeMethod = apply {
+    public fun ifFalse(label: Label): BytecodeMethod = apply {
         block.ifeq(label)
     }
 
     @AsmKtDsl
-    fun ifTrue(label: Label): BytecodeMethod = apply {
+    public fun ifTrue(label: Label): BytecodeMethod = apply {
         block.ifne(label)
     }
 
     @AsmKtDsl
-    fun ifEqual(type: FieldType, label: Label): BytecodeMethod = apply {
+    public fun ifEqual(type: FieldType, label: Label): BytecodeMethod = apply {
         ifCmp(type, EQUAL, label)
     }
 
     @AsmKtDsl
-    fun ifNotEqual(type: FieldType, label: Label): BytecodeMethod = apply {
+    public fun ifNotEqual(type: FieldType, label: Label): BytecodeMethod = apply {
         ifCmp(type, NOT_EQUAL, label)
     }
 
     @AsmKtDsl
-    fun ifGreater(type: PrimitiveType, label: Label): BytecodeMethod = apply {
+    public fun ifGreater(type: PrimitiveType, label: Label): BytecodeMethod = apply {
         ifCmp(type, GREATER, label)
     }
 
     @AsmKtDsl
-    fun ifGreaterOrEqual(type: PrimitiveType, label: Label): BytecodeMethod = apply {
+    public fun ifGreaterOrEqual(type: PrimitiveType, label: Label): BytecodeMethod = apply {
         ifCmp(type, GREATER_OR_EQUAL, label)
     }
 
     @AsmKtDsl
-    fun ifLess(type: PrimitiveType, label: Label): BytecodeMethod = apply {
+    public fun ifLess(type: PrimitiveType, label: Label): BytecodeMethod = apply {
         ifCmp(type, LESS, label)
     }
 
     @AsmKtDsl
-    fun ifLessOrEqual(type: PrimitiveType, label: Label): BytecodeMethod = apply {
+    public fun ifLessOrEqual(type: PrimitiveType, label: Label): BytecodeMethod = apply {
         ifCmp(type, LESS_OR_EQUAL, label)
     }
 
     @AsmKtDsl
-    fun ifObjectsEqual(type: FieldType, label: Label): BytecodeMethod = apply {
+    // TODO: remove
+    public fun ifObjectsEqual(type: FieldType, label: Label): BytecodeMethod = apply {
         requireNotVoid(type)
 
         invokeStatic(ReferenceType.OBJECTS, "equals", MethodType.ofBoolean(OBJECT, OBJECT))
@@ -732,7 +741,8 @@ data class BytecodeMethod internal constructor(
     }
 
     @AsmKtDsl
-    fun ifObjectsNotEqual(type: FieldType, label: Label): BytecodeMethod = apply {
+    // TODO: remove
+    public fun ifObjectsNotEqual(type: FieldType, label: Label): BytecodeMethod = apply {
         ifObjectsEqual(type, label)
         not()
     }
@@ -742,19 +752,23 @@ data class BytecodeMethod internal constructor(
 
     // a.compareTo(b) > 0
     @AsmKtDsl
-    fun ifObjectGreater(label: Label): BytecodeMethod = TODO("ifObjectGreater function")
+    // TODO: remove
+    public fun ifObjectGreater(label: Label): BytecodeMethod = TODO("ifObjectGreater function")
 
     // a.compareTo(b) >= 0
     @AsmKtDsl
-    fun ifObjectGreaterOrEqual(label: Label): BytecodeMethod = TODO("ifObjectGreaterOrEqual function")
+    // TODO: remove
+    public fun ifObjectGreaterOrEqual(label: Label): BytecodeMethod = TODO("ifObjectGreaterOrEqual function")
 
     // a.compareTo(b) < 0
     @AsmKtDsl
-    fun ifObjectLess(label: Label): BytecodeMethod = TODO("ifObjectLess function")
+    // TODO: remove
+    public fun ifObjectLess(label: Label): BytecodeMethod = TODO("ifObjectLess function")
 
     // a.compareTo(b) <= 0
     @AsmKtDsl
-    fun ifObjectLessOrEqual(label: Label): BytecodeMethod = TODO("ifObjectLessOrEqual functions")
+    // TODO: remove
+    public fun ifObjectLessOrEqual(label: Label): BytecodeMethod = TODO("ifObjectLessOrEqual functions")
 
     private enum class ComparisonMode(val code: Int, val intCode: Int) {
         EQUAL(IFEQ, IF_ICMPEQ),
@@ -794,7 +808,7 @@ data class BytecodeMethod internal constructor(
     }
 
     @AsmKtDsl
-    fun jsr(branch: Label): BytecodeMethod = apply {
+    public fun jsr(branch: Label): BytecodeMethod = apply {
         block.jsr(branch)
     }
 
@@ -804,85 +818,85 @@ data class BytecodeMethod internal constructor(
      * Creates the instructions needed to compute the bitwise negation of the value currently at the top of the stack.
      */
     @AsmKtDsl
-    fun not(): BytecodeMethod = apply {
+    public fun not(): BytecodeMethod = apply {
         pushBoolean(true)
         xor(PrimitiveType.Int)
     }
 
     @AsmKtDsl
-    fun add(type: PrimitiveType): BytecodeMethod = apply {
+    public fun add(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(IADD))
     }
 
     @AsmKtDsl
-    fun subtract(type: PrimitiveType): BytecodeMethod = apply {
+    public fun subtract(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(ISUB))
     }
 
     @AsmKtDsl
-    fun multiply(type: PrimitiveType): BytecodeMethod = apply {
+    public fun multiply(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(IMUL))
     }
 
     @AsmKtDsl
-    fun divide(type: PrimitiveType): BytecodeMethod = apply {
+    public fun divide(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(IDIV))
     }
 
     @AsmKtDsl
-    fun remainder(type: PrimitiveType): BytecodeMethod = apply {
+    public fun remainder(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(IREM))
     }
 
     @AsmKtDsl
-    fun negate(type: PrimitiveType): BytecodeMethod = apply {
+    public fun negate(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(INEG))
     }
 
     @AsmKtDsl
-    fun shiftLeft(type: PrimitiveType): BytecodeMethod = apply {
+    public fun shiftLeft(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(ISHL))
     }
 
     @AsmKtDsl
-    fun shiftRight(type: PrimitiveType): BytecodeMethod = apply {
+    public fun shiftRight(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(ISHR))
     }
 
     @AsmKtDsl
-    fun unsignedShiftRight(type: PrimitiveType): BytecodeMethod = apply {
+    public fun unsignedShiftRight(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(IUSHR))
     }
 
     @AsmKtDsl
-    fun and(type: PrimitiveType): BytecodeMethod = apply {
+    public fun and(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(IAND))
     }
 
     @AsmKtDsl
-    fun or(type: PrimitiveType): BytecodeMethod = apply {
+    public fun or(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(IOR))
     }
 
     @AsmKtDsl
-    fun xor(type: PrimitiveType): BytecodeMethod = apply {
+    public fun xor(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
         block.addInstruction(type.getOpcode(IXOR))
     }
 
     @AsmKtDsl
-    fun cmpl(type: PrimitiveType): BytecodeMethod = apply {
+    public fun cmpl(type: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(type)
 
         if (type is PrimitiveType.Float) {
@@ -893,7 +907,7 @@ data class BytecodeMethod internal constructor(
     }
 
     @AsmKtDsl
-    fun cmpg(type: PrimitiveType) {
+    public fun cmpg(type: PrimitiveType) {
         requireNotVoid(type)
 
         if (type is PrimitiveType.Float) {
@@ -912,7 +926,7 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun incrementInt(index: Int, amount: Int): BytecodeMethod = apply {
+    public fun incrementInt(index: Int, amount: Int): BytecodeMethod = apply {
         block.iinc(index, amount)
     }
 
@@ -924,7 +938,7 @@ data class BytecodeMethod internal constructor(
      * @param [to] the primitive type to cast to
      */
     @AsmKtDsl
-    fun cast(from: PrimitiveType, to: PrimitiveType): BytecodeMethod = apply {
+    public fun cast(from: PrimitiveType, to: PrimitiveType): BytecodeMethod = apply {
         requireNotVoid(from, "from")
         requireNotVoid(to, "from")
         if (from != to) {
@@ -967,31 +981,27 @@ data class BytecodeMethod internal constructor(
     }
 
     @AsmKtDsl
-    @JvmSynthetic
-    infix fun PrimitiveType.castTo(target: PrimitiveType): BytecodeMethod = cast(this, target)
+    public infix fun PrimitiveType.castTo(target: PrimitiveType): BytecodeMethod = cast(this, target)
 
     @AsmKtDsl
-    @JvmSynthetic
-    inline fun <reified From : Any, reified To : Any> cast(): BytecodeMethod =
+    public inline fun <reified From : Any, reified To : Any> cast(): BytecodeMethod =
         cast(PrimitiveType<From>(), PrimitiveType<To>())
 
     // -- TRY CATCH INSTRUCTIONS -- \\
     @AsmKtDsl
-    @JvmOverloads
-    fun tryCatch(start: Label, end: Label, handler: Label, exception: ReferenceType? = null): BytecodeMethod =
+    public fun tryCatch(start: Label, end: Label, handler: Label, exception: ReferenceType? = null): BytecodeMethod =
         addTryCatchBlock(start, end, handler, exception?.internalName)
 
     // TODO: documentation
     @AsmKtDsl
-    @JvmOverloads
-    fun catchException(start: Label, end: Label, type: ReferenceType? = null): BytecodeMethod = apply {
+    public fun catchException(start: Label, end: Label, type: ReferenceType? = null): BytecodeMethod = apply {
         val catchLabel = Label()
         tryCatch(start, end, catchLabel, type)
         mark(catchLabel)
     }
 
     @AsmKtDsl
-    fun throwException(): BytecodeMethod = apply {
+    public fun throwException(): BytecodeMethod = apply {
         block.addInstruction(ATHROW)
     }
 
@@ -1002,7 +1012,7 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun mark(label: Label): BytecodeMethod = apply {
+    public fun mark(label: Label): BytecodeMethod = apply {
         block.mark(label)
     }
 
@@ -1012,7 +1022,7 @@ data class BytecodeMethod internal constructor(
      * @return the created label
      */
     @AsmKtDsl
-    fun mark(): Label {
+    public fun mark(): Label {
         val label = Label()
         mark(label)
         return label
@@ -1026,7 +1036,7 @@ data class BytecodeMethod internal constructor(
      * @return the label created to mark the given [line]
      */
     @AsmKtDsl
-    fun markLine(line: Int): Label {
+    public fun markLine(line: Int): Label {
         val label = Label()
         markLine(line, label)
         return label
@@ -1038,13 +1048,13 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun markLine(line: Int, label: Label): BytecodeMethod = apply {
+    public fun markLine(line: Int, label: Label): BytecodeMethod = apply {
         block.addLineNumber(line, label)
     }
 
     // -- SWITCH INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun lookUpSwitch(
+    public fun lookUpSwitch(
         defaultLabel: Label,
         keys: IntArray,
         labels: Array<out Label>,
@@ -1053,55 +1063,55 @@ data class BytecodeMethod internal constructor(
     }
 
     @AsmKtDsl
-    fun tableSwitch(min: Int, max: Int, defaultLabel: Label, cases: Array<out Label>): BytecodeMethod = apply {
+    public fun tableSwitch(min: Int, max: Int, defaultLabel: Label, cases: Array<out Label>): BytecodeMethod = apply {
         block.tableswitch(min, max, defaultLabel, cases)
     }
 
     // -- MONITOR INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun monitorEnter(): BytecodeMethod = apply {
+    public fun monitorEnter(): BytecodeMethod = apply {
         block.monitorenter()
     }
 
     @AsmKtDsl
-    fun monitorExit(): BytecodeMethod = apply {
+    public fun monitorExit(): BytecodeMethod = apply {
         block.monitorexit()
     }
 
     // -- DUP INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun dup(): BytecodeMethod = apply {
+    public fun dup(): BytecodeMethod = apply {
         block.dup()
     }
 
     @AsmKtDsl
-    fun dupx2(): BytecodeMethod = apply {
+    public fun dupx2(): BytecodeMethod = apply {
         block.dup_x2()
     }
 
     @AsmKtDsl
-    fun dupx1(): BytecodeMethod = apply {
+    public fun dupx1(): BytecodeMethod = apply {
         block.dup_x1()
     }
 
     @AsmKtDsl
-    fun dup2x2(): BytecodeMethod = apply {
+    public fun dup2x2(): BytecodeMethod = apply {
         block.dup2_x2()
     }
 
     @AsmKtDsl
-    fun dup2x1(): BytecodeMethod = apply {
+    public fun dup2x1(): BytecodeMethod = apply {
         block.dup2_x1()
     }
 
     @AsmKtDsl
-    fun dup2(): BytecodeMethod = apply {
+    public fun dup2(): BytecodeMethod = apply {
         block.dup2()
     }
 
     // -- SWAP INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun swap(): BytecodeMethod = apply {
+    public fun swap(): BytecodeMethod = apply {
         block.swap()
     }
 
@@ -1109,7 +1119,7 @@ data class BytecodeMethod internal constructor(
      * Creates an instruction to swap the two top values currently on the stack.
      */
     @AsmKtDsl
-    fun swap(type: Type, prev: Type): BytecodeMethod = apply {
+    public fun swap(type: Type, prev: Type): BytecodeMethod = apply {
         if (type.size == 1) {
             if (prev.size == 1) {
                 swap()
@@ -1128,30 +1138,29 @@ data class BytecodeMethod internal constructor(
         }
     }
 
-    @JvmSynthetic
     @AsmKtDsl
-    infix fun Type.swapWith(type: Type): BytecodeMethod = swap(type, this)
+    public infix fun Type.swapWith(type: Type): BytecodeMethod = swap(type, this)
 
     @AsmKtDsl
-    fun swap2(): BytecodeMethod = apply {
+    public fun swap2(): BytecodeMethod = apply {
         dup2x2()
         pop2()
     }
 
     // -- NOP INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun nop(): BytecodeMethod = apply {
+    public fun nop(): BytecodeMethod = apply {
         block.nop()
     }
 
     // -- POP INSTRUCTIONS -- \\
     @AsmKtDsl
-    fun pop(): BytecodeMethod = apply {
+    public fun pop(): BytecodeMethod = apply {
         block.pop()
     }
 
     @AsmKtDsl
-    fun pop2(): BytecodeMethod = apply {
+    public fun pop2(): BytecodeMethod = apply {
         block.pop2()
     }
 
@@ -1160,7 +1169,7 @@ data class BytecodeMethod internal constructor(
      * @see [MethodVisitor.visitFrame]
      */
     @AsmKtDsl
-    fun frame(
+    public fun frame(
         type: Int,
         numLocal: Int,
         local: Array<out Any>,
@@ -1176,7 +1185,7 @@ data class BytecodeMethod internal constructor(
      * @see [MethodVisitor.visitFrame]
      */
     @AsmKtDsl
-    fun frame(
+    public fun frame(
         type: Int,
         local: Array<out Any>,
         stack: Array<out Any>,
@@ -1191,7 +1200,7 @@ data class BytecodeMethod internal constructor(
      * `java/lang/RuntimeException`
      */
     @AsmKtDsl
-    fun frameSame(vararg stackArguments: Any): BytecodeMethod = apply {
+    public fun frameSame(vararg stackArguments: Any): BytecodeMethod = apply {
         val type: Int = when {
             stackArguments.isEmpty() -> F_SAME
             stackArguments.size == 1 -> F_SAME1
@@ -1201,7 +1210,7 @@ data class BytecodeMethod internal constructor(
     }
 
     // -- LOCAL CLASSES -- \\
-    fun defineLocalClass(clz: BytecodeClass): BytecodeMethod = apply {
+    public fun defineLocalClass(clz: BytecodeClass): BytecodeMethod = apply {
         clz.enclosingMethod = this@BytecodeMethod
     }
 
@@ -1219,7 +1228,7 @@ data class BytecodeMethod internal constructor(
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
-    fun defineLocalVariable(
+    public fun defineLocalVariable(
         name: String,
         descriptor: String,
         signature: String? = null,
@@ -1245,7 +1254,7 @@ data class BytecodeMethod internal constructor(
      * @throws [IllegalArgumentException] if `this` [is static][isStatic] and [index] is `0`
      */
     @AsmKtDsl
-    fun defineLocalVariable(
+    public fun defineLocalVariable(
         name: String,
         type: Type,
         signature: String? = null,
@@ -1265,14 +1274,13 @@ data class BytecodeMethod internal constructor(
      * [SYNTHETIC][Modifiers.SYNTHETIC] and [MANDATED][Modifiers.MANDATED], or any combination of the three.
      */
     @AsmKtDsl
-    fun defineParameterAccess(name: String, access: Int): BytecodeMethod = apply {
+    public fun defineParameterAccess(name: String, access: Int): BytecodeMethod = apply {
         parameterNodes += ParameterNode(name, access)
     }
 
     // TODO: documentation and document throws
     @AsmKtDsl
-    @JvmOverloads
-    fun defineParameterAnnotation(
+    public fun defineParameterAnnotation(
         index: Int,
         type: ReferenceType,
         isVisible: Boolean = true,
@@ -1291,8 +1299,7 @@ data class BytecodeMethod internal constructor(
 
     // TODO: documentation
     @AsmKtDsl
-    @JvmOverloads
-    fun defineTypeParameterAnnotation(
+    public fun defineTypeParameterAnnotation(
         typeRef: Int,
         typePath: TypePath,
         type: ReferenceType,
@@ -1378,7 +1385,7 @@ data class BytecodeMethod internal constructor(
     /**
      * Returns a new [MethodNode] based on the contents of `this` bytecode method.
      */
-    fun toMethodNode(): MethodNode {
+    public fun toMethodNode(): MethodNode {
         val node = MethodNode(access, name, type.descriptor, signature, null)
 
         node.annotationDefault = fixAnnotationValue(defaultAnnotationValue)

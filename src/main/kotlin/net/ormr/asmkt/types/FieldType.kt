@@ -25,9 +25,9 @@ import org.objectweb.asm.Type as AsmType
  * @see [ReferenceType]
  * @see [ArrayType]
  */
-sealed class FieldType : Type() {
-    companion object {
-        fun copyOf(type: AsmType): FieldType = when (type.sort) {
+public sealed class FieldType : Type() {
+    public companion object {
+        public fun copyOf(type: AsmType): FieldType = when (type.sort) {
             AsmType.VOID, AsmType.BOOLEAN, AsmType.CHAR, AsmType.BYTE, AsmType.SHORT, AsmType.INT, AsmType.LONG,
             AsmType.FLOAT, AsmType.DOUBLE,
             -> PrimitiveType.copyOf(type)
@@ -37,7 +37,7 @@ sealed class FieldType : Type() {
             else -> throw UnsupportedOperationException("Unknown 'sort' value ${type.sort}.")
         }
 
-        fun of(clz: Class<*>): FieldType = when {
+        public fun of(clz: Class<*>): FieldType = when {
             clz.isPrimitive -> PrimitiveType.of(clz)
             clz.isArray -> ArrayType.of(clz)
             else -> ReferenceType.of(clz)
@@ -47,19 +47,19 @@ sealed class FieldType : Type() {
     final override val size: Int
         get() = delegate.size
 
-    abstract val className: String
+    public abstract val className: String
 
     /**
      * Returns the simple name of `this` type, as it would have been given in the source code.
      *
      * The simple name of an array is the simple name of the [element type][ArrayType.elementType] with `[]` appended.
      */
-    abstract val simpleName: String
+    public abstract val simpleName: String
 
     /**
-     * Returns `true` if `this` type can be used as the type of a variable, otherwise `false`.
+     * Returns `true` if `this` type can be used as the type of variable, otherwise `false`.
      */
-    abstract val isValidFieldType: Boolean
+    public abstract val isValidFieldType: Boolean
 
     // TODO: use MethodHandle.Lookup instead of a classloader for this?
     /**
@@ -68,7 +68,7 @@ sealed class FieldType : Type() {
      * @throws [ClassNotFoundException] if no class could be found representing `this` type
      */
     @Throws(ClassNotFoundException::class)
-    abstract fun toClass(): Class<*>
+    public abstract fun toClass(): Class<*>
 
     final override fun toString(): String = className
 }

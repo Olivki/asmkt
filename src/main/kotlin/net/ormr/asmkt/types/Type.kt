@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-@file:JvmName("TypeUtils")
 @file:Suppress("unused")
 
 package net.ormr.asmkt.types
 
-import java.lang.reflect.Constructor
-import java.lang.reflect.Method
 import org.objectweb.asm.Type as AsmType
 
-sealed class Type {
-    companion object {
-        fun copyOf(type: AsmType): Type = when (type.sort) {
+public sealed class Type {
+    public companion object {
+        public fun copyOf(type: AsmType): Type = when (type.sort) {
             AsmType.VOID, AsmType.BOOLEAN, AsmType.CHAR, AsmType.BYTE, AsmType.SHORT,
             AsmType.INT, AsmType.LONG, AsmType.FLOAT, AsmType.DOUBLE,
             -> PrimitiveType.copyOf(type)
@@ -40,13 +37,13 @@ sealed class Type {
 
     // TODO: documentation
 
-    abstract val size: Int
+    public abstract val size: Int
 
-    abstract val descriptor: String
+    public abstract val descriptor: String
 
-    fun getOpcode(opcode: Int): Int = delegate.getOpcode(opcode)
+    public fun getOpcode(opcode: Int): Int = delegate.getOpcode(opcode)
 
-    fun toAsmType(): AsmType = delegate
+    public fun toAsmType(): AsmType = delegate
 
     final override fun equals(other: Any?): Boolean = delegate == other
 
@@ -56,36 +53,3 @@ sealed class Type {
 
     abstract override fun toString(): String
 }
-
-/**
- * Returns a type representing the type of `this` class.
- */
-@Suppress("NOTHING_TO_INLINE")
-inline fun Class<*>.toReferenceType(): ReferenceType = ReferenceType.of(this)
-
-/**
- * Returns a type representing the method-type of `this` method.
- */
-@Suppress("NOTHING_TO_INLINE")
-inline fun Method.toMethodType(): MethodType = MethodType.of(this)
-
-/**
- * Returns a type representing the method-type of `this` constructor.
- *
- * The `return type` of a constructor will *always* be [void][PrimitiveType.Void].
- *
- * @see [AsmType.getType]
- */
-@Suppress("NOTHING_TO_INLINE")
-inline fun Constructor<*>.toMethodType(): MethodType = MethodType.of(this)
-
-/**
- * Returns a type based on `this` type but with the type of the argument at the given [index] changed to [T].
- */
-inline fun <reified T : Any> MethodType.changeArgument(index: Int): MethodType =
-    this.changeArgument(index, ReferenceType<T>())
-
-/**
- * Returns a type based on `this` type but with the [return type][MethodType.returnType] changed to [T].
- */
-inline fun <reified T : Any> MethodType.changeReturn(): MethodType = changeReturn(ReferenceType<T>())

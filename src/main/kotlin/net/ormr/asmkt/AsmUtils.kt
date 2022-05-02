@@ -16,12 +16,20 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.types.*
+import net.ormr.asmkt.types.MethodType
+import net.ormr.asmkt.types.ReferenceType
+import net.ormr.asmkt.types.Type
+import net.ormr.asmkt.types.requireNotVoid
 import org.objectweb.asm.Handle
 import org.objectweb.asm.Opcodes
 import java.lang.invoke.ConstantBootstraps
 
-fun handleOf(
+/**
+ * Returns a new [Handle] based on the given arguments.
+ *
+ * This function is more type-safe than creating a [Handle] directly.
+ */
+public fun handleOf(
     tag: Int,
     owner: ReferenceType,
     name: String,
@@ -36,7 +44,7 @@ fun handleOf(
  * Returns a new [Handle] that points to a bootstrap method with the given [name] and [type] located in the
  * [ConstantBootstraps] class.
  */
-fun constantBootstrapsHandleOf(
+public fun constantBootstrapsHandleOf(
     name: String,
     type: MethodType,
 ): Handle = handleOf(Opcodes.H_INVOKESTATIC, ReferenceType.CONSTANT_BOOTSTRAPS, name, type, false)

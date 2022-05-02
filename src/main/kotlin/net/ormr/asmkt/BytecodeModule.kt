@@ -21,11 +21,11 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
 
 @AsmKtDsl
-data class BytecodeModule internal constructor(
-    val name: String,
+public data class BytecodeModule internal constructor(
+    public val name: String,
     override val access: Int,
-    val version: String?,
-    val mainClass: BytecodeClass,
+    public val version: String?,
+    public val mainClass: BytecodeClass,
 ) : AccessibleBytecode {
     private val packages: MutableList<String> = mutableListOf()
     private val requires: MutableList<ModuleRequireNode> = mutableListOf()
@@ -38,34 +38,34 @@ data class BytecodeModule internal constructor(
     //       'internalName' from 'Type.getInternalName' or they mean 'className' from 'Type.getClassName'
 
     @AsmKtDsl
-    fun `package`(pack: String): BytecodeModule = apply {
+    public fun `package`(pack: String): BytecodeModule = apply {
         packages += pack
     }
 
     @AsmKtDsl
-    fun require(module: String, access: Int, version: String? = null): BytecodeModule = apply {
+    public fun require(module: String, access: Int, version: String? = null): BytecodeModule = apply {
         requires += ModuleRequireNode(module, access, version)
     }
 
     // TODO: document the throws
     @AsmKtDsl
-    fun export(pack: String, access: Int, vararg modules: String): BytecodeModule = apply {
+    public fun export(pack: String, access: Int, vararg modules: String): BytecodeModule = apply {
         exports += ModuleExportNode(pack, access, modules.toMutableList())
     }
 
     // TODO: document the throws
     @AsmKtDsl
-    fun open(pack: String, access: Int, vararg modules: String): BytecodeModule = apply {
+    public fun open(pack: String, access: Int, vararg modules: String): BytecodeModule = apply {
         opens += ModuleOpenNode(pack, access, modules.toMutableList())
     }
 
     @AsmKtDsl
-    fun use(service: ReferenceType): BytecodeModule = apply {
+    public fun use(service: ReferenceType): BytecodeModule = apply {
         uses += service.internalName
     }
 
     @AsmKtDsl
-    fun provide(service: ReferenceType, vararg providers: ReferenceType): BytecodeModule = apply {
+    public fun provide(service: ReferenceType, vararg providers: ReferenceType): BytecodeModule = apply {
         provides += ModuleProvideNode(service.internalName, providers.mapTo(mutableListOf()) { it.internalName })
     }
 
@@ -76,5 +76,5 @@ data class BytecodeModule internal constructor(
 /**
  * Returns `true` if `this` module is [open][Modifiers.OPEN], otherwise `false`.
  */
-val BytecodeModule.isOpen: Boolean
+public val BytecodeModule.isOpen: Boolean
     get() = Modifiers.contains(access, Modifiers.OPEN)

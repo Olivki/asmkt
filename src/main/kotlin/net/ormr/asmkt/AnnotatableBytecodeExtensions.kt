@@ -36,7 +36,7 @@ import org.objectweb.asm.TypePath
  * @return a new [BytecodeAnnotation] instance used to build an annotation of type [type]
  */
 @AsmKtDsl
-inline fun <reified A : Annotation> AnnotatableBytecode.defineAnnotation(
+public inline fun <reified A : Annotation> AnnotatableBytecode.defineAnnotation(
     isVisible: Boolean = true,
     allowRepeats: Boolean = false,
     scope: BytecodeAnnotation.() -> Unit = {},
@@ -60,7 +60,7 @@ inline fun <reified A : Annotation> AnnotatableBytecode.defineAnnotation(
  * @return a new [BytecodeAnnotation] instance used to build an annotation of type [type]
  */
 @AsmKtDsl
-inline fun AnnotatableBytecode.defineAnnotation(
+public inline fun AnnotatableBytecode.defineAnnotation(
     type: ReferenceType,
     isVisible: Boolean = true,
     allowRepeats: Boolean = false,
@@ -69,7 +69,7 @@ inline fun AnnotatableBytecode.defineAnnotation(
 
 // TODO: documentation
 @AsmKtDsl
-inline fun <reified A : Annotation> AnnotatableTypeBytecode.defineTypeAnnotation(
+public inline fun <reified A : Annotation> AnnotatableTypeBytecode.defineTypeAnnotation(
     typeRef: Int,
     typePath: TypePath?,
     isVisible: Boolean = true,
