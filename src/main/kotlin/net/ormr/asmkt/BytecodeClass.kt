@@ -16,11 +16,9 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.types.FieldType
-import net.ormr.asmkt.types.MethodType
-import net.ormr.asmkt.types.PrimitiveType
-import net.ormr.asmkt.types.ReferenceType
+import net.ormr.asmkt.types.*
 import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
+import net.ormr.asmkt.types.requireNotVoid
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.TypePath
@@ -195,7 +193,7 @@ public data class BytecodeClass(
         signature: String? = null,
         value: Any? = null,
     ): BytecodeField {
-        require(type.isValidFieldType) { "'type' must not be 'void'." }
+        requireNotVoid(type)
         val field = BytecodeField(name, access, type, signature, value)
         fields[name] = field
         return field

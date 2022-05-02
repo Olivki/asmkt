@@ -25,6 +25,7 @@ import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
 import org.objectweb.asm.*
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.tree.*
+import java.lang.invoke.ConstantBootstraps
 import java.lang.invoke.MethodHandles
 import org.objectweb.asm.Type as AsmType
 
@@ -421,17 +422,23 @@ public data class BytecodeMethod internal constructor(
     /**
      * Pushes a `LDC` instruction to retrieve the `class` instance for the given [value] onto the stack.
      *
-     * If `value` is [a primitive][PrimitiveType] then a `GETSTATIC` instruction pointing to the `TYPE` field located
-     * in the [wrapper][PrimitiveType.toBoxed] class for `value` is pushed onto the stack instead.
+     * If `value` is [a primitive][PrimitiveType] then depending on the [version][BytecodeClass.version] a different
+     * behavior will happen:
+     * - If `version` >= [BytecodeVersion.JAVA_11] then a [constant dynamic][pushConstantDynamic] pointing to the
+     * [ConstantBootstraps.primitiveClass] function is pushed onto the stack.
+     * - If `version` < [BytecodeVersion.JAVA_11] then a [GETSTATIC][getStatic] instruction pointing to the `TYPE` field
+     * located in the [wrapper][PrimitiveType.toBoxed] class for `value` is pushed onto the stack.
      *
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
     public fun pushType(value: FieldType): BytecodeMethod = apply {
         if (value is PrimitiveType) {
-            // TODO: this will only work for Java 15(?) and above, as it doesn't exist on the lower ones
-            //       we need to handle this properly in some manner so that we don't generate faulty bytecode
-            pushConstantDynamic(value.descriptor, ReferenceType.CLASS, primitiveClassHandle)
+            if (parent.version >= BytecodeVersion.JAVA_11) {
+                pushConstantDynamic(value.descriptor, ReferenceType.CLASS, primitiveClassHandle)
+            } else {
+                getStatic(value.toBoxed(), "TYPE", ReferenceType.CLASS)
+            }
         } else {
             ldc(value.toAsmType())
         }
@@ -465,6 +472,7 @@ public data class BytecodeMethod internal constructor(
         bootStrapMethod: Handle,
         vararg bootStrapMethodArguments: Any,
     ): BytecodeMethod = apply {
+        requireVersion(BytecodeVersion.JAVA_11, "Constant Dynamic")
         requireNotVoid(type)
         val arguments = bootStrapMethodArguments.replaceTypes()
         pushConstantDynamic(ConstantDynamic(name, type.descriptor, bootStrapMethod, *arguments))
@@ -577,6 +585,7 @@ public data class BytecodeMethod internal constructor(
         bootstrapMethod: Handle,
         vararg bootstrapMethodArguments: Any,
     ): BytecodeMethod = apply {
+        requireVersion(BytecodeVersion.JAVA_11, "Invoke Dynamic")
         val arguments = bootstrapMethodArguments.replaceTypes()
         block.invokedynamic(name, descriptor.descriptor, bootstrapMethod, arguments)
     }
@@ -1439,5 +1448,9 @@ public data class BytecodeMethod internal constructor(
                 action(i, annotation)
             }
         }
+    }
+
+    private fun requireVersion(version: BytecodeVersion, feature: String) {
+        require(parent.version >= version) { "$feature requires version $version, but class version is set to ${parent.version}." }
     }
 }
