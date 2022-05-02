@@ -39,6 +39,13 @@ public fun handleOf(
     return Handle(tag, owner.internalName, name, type.descriptor, isInterface)
 }
 
+public fun invokeStaticHandleOf(
+    owner: ReferenceType,
+    name: String,
+    type: MethodType,
+    isInterface: Boolean = false,
+): Handle = handleOf(Opcodes.H_INVOKESTATIC, owner, name, type, isInterface)
+
 /**
  * Returns a new [Handle] that points to a bootstrap method with the given [name] and [type] located in the
  * [ConstantBootstraps] class.
@@ -46,4 +53,4 @@ public fun handleOf(
 public fun constantBootstrapsHandleOf(
     name: String,
     type: MethodType,
-): Handle = handleOf(Opcodes.H_INVOKESTATIC, ReferenceType.CONSTANT_BOOTSTRAPS, name, type, false)
+): Handle = invokeStaticHandleOf(ReferenceType.CONSTANT_BOOTSTRAPS, name, type, false)
