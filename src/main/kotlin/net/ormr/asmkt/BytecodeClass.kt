@@ -32,6 +32,7 @@ import org.objectweb.asm.tree.TypeAnnotationNode
  * TODO
  *
  * @property [type] TODO
+ * @property [version] TODO
  * @property [access] TODO
  * @property [superType] TODO
  * @property [interfaces] TODO
@@ -41,6 +42,7 @@ import org.objectweb.asm.tree.TypeAnnotationNode
 @AsmKtDsl
 public class BytecodeClass(
     public val type: ReferenceType,
+    public val version: BytecodeVersion,
     override val access: Int = Modifiers.PUBLIC,
     public val superType: ReferenceType = OBJECT,
     public val interfaces: List<ReferenceType> = emptyList(),
@@ -278,10 +280,10 @@ public class BytecodeClass(
         return defineMethod("toString", flags, MethodType.STRING)
     }
 
-    public fun toByteArray(version: BytecodeVersion): ByteArray {
+    public fun toByteArray(): ByteArray {
         check()
         val writer = ClassWriter(ClassWriter.COMPUTE_FRAMES)
-        val node = toNode(version)
+        val node = toNode()
         node.accept(writer)
         return writer.toByteArray()
     }
@@ -294,7 +296,7 @@ public class BytecodeClass(
         }
     }
 
-    private fun toNode(version: BytecodeVersion): ClassNode {
+    private fun toNode(): ClassNode {
         val node = ClassNode()
 
         node.version = version.opcode
