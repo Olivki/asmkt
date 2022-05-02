@@ -26,7 +26,7 @@ import org.objectweb.asm.Opcodes
 
 // -- BYTECODE CLASS -- \\
 @JvmSynthetic
-@AsmKt
+@AsmKtDsl
 inline fun defineClass(
     type: ReferenceType,
     access: Int = Opcodes.ACC_PUBLIC,
@@ -40,7 +40,7 @@ inline fun defineClass(
 // -- MODULES -- \\
 // TODO: document the throws
 @JvmSynthetic
-@AsmKt
+@AsmKtDsl
 inline fun BytecodeClass.defineModule(
     name: String,
     access: Int,
@@ -50,7 +50,7 @@ inline fun BytecodeClass.defineModule(
 
 // -- FIELDS -- \\
 @JvmSynthetic
-@AsmKt
+@AsmKtDsl
 fun BytecodeClass.defineField(
     name: String,
     access: Int,
@@ -63,7 +63,7 @@ fun BytecodeClass.defineField(
 // -- METHODS -- \\
 // TODO: document the throws
 @JvmSynthetic
-@AsmKt
+@AsmKtDsl
 inline fun BytecodeClass.defineMethod(
     name: String,
     access: Int,
@@ -74,7 +74,7 @@ inline fun BytecodeClass.defineMethod(
 ): BytecodeMethod = defineMethod(name, access, type, signature, exceptions).apply(scope)
 
 @JvmSynthetic
-@AsmKt
+@AsmKtDsl
 inline fun BytecodeClass.defineConstructor(
     access: Int = Modifiers.PUBLIC,
     descriptor: MethodType = MethodType.VOID,
@@ -82,7 +82,7 @@ inline fun BytecodeClass.defineConstructor(
 ): BytecodeMethod = defineConstructor(access, descriptor).apply(body)
 
 @JvmSynthetic
-@AsmKt
+@AsmKtDsl
 inline fun BytecodeClass.defineStaticInit(body: BytecodeMethod.() -> Unit = {}): BytecodeMethod =
     defineMethod("<clinit>", STATIC, MethodType.VOID).apply(body)
 
@@ -90,7 +90,7 @@ inline fun BytecodeClass.defineStaticInit(body: BytecodeMethod.() -> Unit = {}):
  * Defines a skeleton implementation of the `equals` method for `this` class.
  */
 @JvmSynthetic
-@AsmKt
+@AsmKtDsl
 inline fun BytecodeClass.defineEquals(isFinal: Boolean = false, body: BytecodeMethod.() -> Unit): BytecodeMethod =
     defineEquals(isFinal).apply(body)
 
@@ -98,7 +98,7 @@ inline fun BytecodeClass.defineEquals(isFinal: Boolean = false, body: BytecodeMe
  * Defines a skeleton implementation of the `hashCode` method for `this` class.
  */
 @JvmSynthetic
-@AsmKt
+@AsmKtDsl
 inline fun BytecodeClass.defineHashCode(isFinal: Boolean = false, body: BytecodeMethod.() -> Unit): BytecodeMethod =
     defineHashCode(isFinal).apply(body)
 
@@ -106,6 +106,6 @@ inline fun BytecodeClass.defineHashCode(isFinal: Boolean = false, body: Bytecode
  * Defines a skeleton implementation of the `toString` method for `this` class.
  */
 @JvmSynthetic
-@AsmKt
+@AsmKtDsl
 inline fun BytecodeClass.defineToString(isFinal: Boolean = false, body: BytecodeMethod.() -> Unit): BytecodeMethod =
     defineToString(isFinal).apply(body)

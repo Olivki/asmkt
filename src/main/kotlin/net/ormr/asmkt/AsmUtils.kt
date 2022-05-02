@@ -19,8 +19,8 @@
 package net.ormr.asmkt
 
 import net.ormr.asmkt.types.MethodType
-import net.ormr.asmkt.types.ReferenceType
 import net.ormr.asmkt.types.PrimitiveVoid
+import net.ormr.asmkt.types.ReferenceType
 import net.ormr.asmkt.types.Type
 import org.objectweb.asm.Handle
 import org.objectweb.asm.Opcodes
@@ -31,7 +31,7 @@ fun handleOf(
     owner: ReferenceType,
     name: String,
     type: Type,
-    isInterface: Boolean = false
+    isInterface: Boolean = false,
 ): Handle {
     require(type !is PrimitiveVoid) { "'type' must not be 'void'" }
     return Handle(tag, owner.internalName, name, type.descriptor, isInterface)
@@ -43,5 +43,5 @@ fun handleOf(
  */
 fun constantBootstrapsHandleOf(
     name: String,
-    type: MethodType
+    type: MethodType,
 ): Handle = handleOf(Opcodes.H_INVOKESTATIC, ReferenceType.CONSTANT_BOOTSTRAPS, name, type, false)

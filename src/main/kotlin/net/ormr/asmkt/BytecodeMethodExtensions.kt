@@ -37,7 +37,7 @@ import org.objectweb.asm.Label
  * @throws [IllegalArgumentException] if the [return type][MethodType.returnType] is not [void][PrimitiveVoid]
  */
 @JvmOverloads
-@AsmKt
+@AsmKtDsl
 fun BytecodeMethod.invokeConstructor(
     owner: ReferenceType,
     type: MethodType = MethodType.VOID
@@ -51,14 +51,14 @@ fun BytecodeMethod.invokeConstructor(
  *
  * @throws [IllegalStateException] if `this` block represents a static method
  */
-@AsmKt
+@AsmKtDsl
 fun BytecodeMethod.loadThis(): BytecodeMethod = apply {
     check(!isStatic) { "Can't load a 'this' pointer in a static context." }
     loadLocal(0, parentType)
 }
 
 @JvmOverloads
-@AsmKt
+@AsmKtDsl
 fun BytecodeMethod.throwException(
     exception: ReferenceType,
     message: String? = null
@@ -79,7 +79,7 @@ fun BytecodeMethod.throwException(
     throwException()
 }
 
-@AsmKt
+@AsmKtDsl
 fun BytecodeMethod.box(type: PrimitiveType): BytecodeMethod = apply {
     if (type is PrimitiveVoid) {
         // a boxed 'void' would actually be the 'Void' object, but we can't create instances of that
@@ -104,7 +104,7 @@ fun BytecodeMethod.box(type: PrimitiveType): BytecodeMethod = apply {
     }
 }
 
-@AsmKt
+@AsmKtDsl
 fun BytecodeMethod.unbox(type: FieldType): BytecodeMethod = apply {
     require(type !is ArrayType) { "'type' must not be an array type." }
 
@@ -145,7 +145,7 @@ fun BytecodeMethod.unbox(type: FieldType): BytecodeMethod = apply {
  *
  * @throws [IllegalArgumentException] if [type] is a method-type
  */
-@AsmKt
+@AsmKtDsl
 fun BytecodeMethod.valueOf(type: PrimitiveType): BytecodeMethod = apply {
     if (type is PrimitiveVoid) {
         // a boxed 'void' would actually be the 'Void' object, but we can't create instances of that
@@ -169,7 +169,7 @@ fun BytecodeMethod.valueOf(type: PrimitiveType): BytecodeMethod = apply {
  * @throws [IllegalArgumentException] if [keys] is not sorted in an ascending order
  */
 @JvmOverloads
-@AsmKt
+@AsmKtDsl
 inline fun BytecodeMethod.tableSwitch(
     keys: IntArray,
     generateCase: (key: Int, end: Label) -> Unit,
@@ -238,7 +238,7 @@ internal fun calculateKeyDensity(keys: IntArray): Float = when {
  * @see [pushBoxedTrue]
  * @see [pushBoxedFalse]
  */
-@AsmKt
+@AsmKtDsl
 fun BytecodeMethod.pushBoxedBoolean(value: Boolean): BytecodeMethod = apply {
     if (value) {
         pushBoxedTrue()
@@ -252,7 +252,7 @@ fun BytecodeMethod.pushBoxedBoolean(value: Boolean): BytecodeMethod = apply {
  *
  * @see [pushBoxedBoolean]
  */
-@AsmKt
+@AsmKtDsl
 fun BytecodeMethod.pushBoxedTrue(): BytecodeMethod = apply {
     getStatic(ReferenceType.BOOLEAN, "TRUE", ReferenceType.BOOLEAN)
 }
@@ -262,19 +262,19 @@ fun BytecodeMethod.pushBoxedTrue(): BytecodeMethod = apply {
  *
  * @see [pushBoxedBoolean]
  */
-@AsmKt
+@AsmKtDsl
 fun BytecodeMethod.pushBoxedFalse(): BytecodeMethod = apply {
     getStatic(ReferenceType.BOOLEAN, "FALSE", ReferenceType.BOOLEAN)
 }
 
-@AsmKt
+@AsmKtDsl
 fun BytecodeMethod.pushBooleanValue(): BytecodeMethod = apply {
     checkCast(ReferenceType.BOOLEAN)
     invokeVirtual(ReferenceType.BOOLEAN, "booleanValue", MethodType.BOOLEAN)
 }
 
 @JvmSynthetic
-@AsmKt
+@AsmKtDsl
 inline fun <reified A : Annotation> BytecodeMethod.defineParameterAnnotation(
     index: Int,
     isVisible: Boolean = true,
@@ -285,7 +285,7 @@ inline fun <reified A : Annotation> BytecodeMethod.defineParameterAnnotation(
 }
 
 @JvmSynthetic
-@AsmKt
+@AsmKtDsl
 inline fun BytecodeMethod.defineParameterAnnotation(
     index: Int,
     type: ReferenceType,

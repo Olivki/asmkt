@@ -33,7 +33,7 @@ import org.objectweb.asm.AnnotationVisitor
  *
  * @see [AnnotationVisitor.visitAnnotation]
  */
-@AsmKt
+@AsmKtDsl
 @JvmSynthetic
 inline fun <reified A : Annotation> BytecodeAnnotation.annotation(
     name: String,
@@ -51,7 +51,7 @@ inline fun <reified A : Annotation> BytecodeAnnotation.annotation(
  *
  * @see [AnnotationVisitor.visitArray]
  */
-@AsmKt
+@AsmKtDsl
 @JvmSynthetic
 inline fun BytecodeAnnotation.array(name: String, scope: ArrayBuilder.() -> Unit) {
     array(name).apply(scope)
@@ -66,7 +66,7 @@ inline fun BytecodeAnnotation.array(name: String, scope: ArrayBuilder.() -> Unit
  *
  * @see [AnnotationVisitor.visitAnnotation]
  */
-@AsmKt
+@AsmKtDsl
 @JvmSynthetic
 inline fun <reified A : Annotation> ArrayBuilder.annotation(scope: BytecodeAnnotation.() -> Unit) {
     annotation(ReferenceType<A>()).apply(scope)
@@ -82,7 +82,7 @@ inline fun <reified A : Annotation> ArrayBuilder.annotation(scope: BytecodeAnnot
  *
  * @see [AnnotationVisitor.visitAnnotation]
  */
-@AsmKt
+@AsmKtDsl
 @JvmSynthetic
 inline fun ArrayBuilder.annotation(type: ReferenceType, scope: BytecodeAnnotation.() -> Unit) {
     annotation(type).apply(scope)

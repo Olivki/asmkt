@@ -24,7 +24,7 @@ import org.objectweb.asm.tree.ModuleOpenNode
 import org.objectweb.asm.tree.ModuleProvideNode
 import org.objectweb.asm.tree.ModuleRequireNode
 
-@AsmKt
+@AsmKtDsl
 data class BytecodeModule internal constructor(
     val name: String,
     override val access: Int,
@@ -41,40 +41,40 @@ data class BytecodeModule internal constructor(
     // TODO: unsure if when the documentation for the lists in 'ModuleNode' says 'internalName' they mean
     //       'internalName' from 'Type.getInternalName' or they mean 'className' from 'Type.getClassName'
 
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addPackage")
     fun `package`(pack: String): BytecodeModule = apply {
         packages += pack
     }
 
     @JvmOverloads
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addRequire")
     fun require(module: String, access: Int, version: String? = null): BytecodeModule = apply {
         requires += ModuleRequireNode(module, access, version)
     }
 
     // TODO: document the throws
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addExport")
     fun export(pack: String, access: Int, vararg modules: String): BytecodeModule = apply {
         exports += ModuleExportNode(pack, access, modules.toMutableList())
     }
 
     // TODO: document the throws
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addOpen")
     fun open(pack: String, access: Int, vararg modules: String): BytecodeModule = apply {
         opens += ModuleOpenNode(pack, access, modules.toMutableList())
     }
 
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addUse")
     fun use(service: ReferenceType): BytecodeModule = apply {
         uses += service.internalName
     }
 
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addProvide")
     fun provide(service: ReferenceType, vararg providers: ReferenceType): BytecodeModule = apply {
         provides += ModuleProvideNode(service.internalName, providers.mapTo(mutableListOf()) { it.internalName })

@@ -5,7 +5,7 @@ plugins {
 
 group = "net.ormr.asmkt"
 description = "Kotlin DSL wrapper for ASM"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.1"
 
 repositories {
     mavenCentral()
@@ -30,10 +30,7 @@ tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = "15"
-            freeCompilerArgs = listOf(
-                "-Xuse-experimental=kotlin.Experimental",
-                "-Xjvm-default=all"
-            )
+            freeCompilerArgs = listOf("-Xuse-experimental=kotlin.Experimental")
         }
     }
 }

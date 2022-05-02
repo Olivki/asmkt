@@ -38,7 +38,7 @@ import org.objectweb.asm.tree.TypeAnnotationNode
  * @property [sourceFile] TODO
  * @property [sourceDebug] TODO
  */
-@AsmKt
+@AsmKtDsl
 class BytecodeClass @JvmOverloads constructor(
     val type: ReferenceType,
     override val access: Int = Modifiers.PUBLIC,
@@ -137,7 +137,7 @@ class BytecodeClass @JvmOverloads constructor(
     val isDefaultSuperType: Boolean
         get() = superType == OBJECT
 
-    @AsmKt
+    @AsmKtDsl
     override fun defineAnnotation(type: ReferenceType, isVisible: Boolean, allowRepeats: Boolean): BytecodeAnnotation {
         val annotation = BytecodeAnnotation(type)
         return handleAnnotations(this, annotation, visibleAnnotations, invisibleAnnotations, isVisible, allowRepeats)
@@ -163,14 +163,14 @@ class BytecodeClass @JvmOverloads constructor(
     }
 
     @JvmOverloads
-    @AsmKt
+    @AsmKtDsl
     fun defineModule(name: String, access: Int, version: String? = null): BytecodeModule {
         val module = BytecodeModule(name, access, version, this)
         this.module = module
         return module
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun defineInnerClass(child: BytecodeClass) {
         var childName = child.internalName
         childName = when {
@@ -181,14 +181,14 @@ class BytecodeClass @JvmOverloads constructor(
         defineInnerClass(childName.substringAfterLast('$'), child)
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun defineInnerClass(innerName: String, child: BytecodeClass) {
         child.enclosingClass = this
         innerClasses[innerName] = child
     }
 
     @JvmOverloads
-    @AsmKt
+    @AsmKtDsl
     fun defineField(
         name: String,
         access: Int,
@@ -204,7 +204,7 @@ class BytecodeClass @JvmOverloads constructor(
 
     // TODO: document the throws
     @JvmOverloads
-    @AsmKt
+    @AsmKtDsl
     fun defineMethod(
         name: String,
         access: Int,
@@ -221,7 +221,7 @@ class BytecodeClass @JvmOverloads constructor(
      * Defines a skeleton implementation of a constructor for `this` class.
      */
     @JvmOverloads
-    @AsmKt
+    @AsmKtDsl
     fun defineConstructor(access: Int = Modifiers.PUBLIC, type: MethodType = MethodType.VOID): BytecodeMethod {
         require(type.returnType is PrimitiveVoid) { "return type of a constructor must be 'void', was '$type'." }
         return defineMethod("<init>", access, type)
@@ -232,7 +232,7 @@ class BytecodeClass @JvmOverloads constructor(
      * if its [superType].
      */
     @JvmOverloads
-    @AsmKt
+    @AsmKtDsl
     fun defineDefaultConstructor(
         access: Int = Modifiers.PUBLIC,
     ): BytecodeMethod = defineConstructor(access) {
@@ -246,7 +246,7 @@ class BytecodeClass @JvmOverloads constructor(
      * [message] when its invoked.
      */
     @JvmOverloads
-    @AsmKt
+    @AsmKtDsl
     fun defineInaccessibleConstructor(
         access: Int = Modifiers.PRIVATE,
         message: String = "No $simpleName instances for you!",
@@ -261,7 +261,7 @@ class BytecodeClass @JvmOverloads constructor(
      * Defines a skeleton implementation of the `equals` method for `this` class.
      */
     @JvmOverloads
-    @AsmKt
+    @AsmKtDsl
     fun defineEquals(isFinal: Boolean = false): BytecodeMethod {
         val flags = if (isFinal) Modifiers.PUBLIC_FINAL else Modifiers.PUBLIC
         return defineMethod("equals", flags, MethodType.ofBoolean(OBJECT))
@@ -271,7 +271,7 @@ class BytecodeClass @JvmOverloads constructor(
      * Defines a skeleton implementation of the `hashCode` method for `this` class.
      */
     @JvmOverloads
-    @AsmKt
+    @AsmKtDsl
     fun defineHashCode(isFinal: Boolean = false): BytecodeMethod {
         val flags = if (isFinal) Modifiers.PUBLIC_FINAL else Modifiers.PUBLIC
         return defineMethod("hashCode", flags, MethodType.INT)
@@ -281,7 +281,7 @@ class BytecodeClass @JvmOverloads constructor(
      * Defines a skeleton implementation of the `toString` method for `this` class.
      */
     @JvmOverloads
-    @AsmKt
+    @AsmKtDsl
     fun defineToString(isFinal: Boolean = false): BytecodeMethod {
         val flags = if (isFinal) Modifiers.PUBLIC_FINAL else Modifiers.PUBLIC
         return defineMethod("toString", flags, MethodType.STRING)

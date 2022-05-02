@@ -30,7 +30,7 @@ import org.objectweb.asm.tree.TypeAnnotationNode
  *
  * @property [type] The type of `this` annotation.
  */
-@AsmKt
+@AsmKtDsl
 class BytecodeAnnotation internal constructor(
     val type: ReferenceType,
     @get:JvmSynthetic
@@ -53,7 +53,7 @@ class BytecodeAnnotation internal constructor(
      *
      * @see [AnnotationVisitor.visit]
      */
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addValue")
     fun value(name: String, value: Any): BytecodeAnnotation = apply {
         require(isValidAnnotationValue(value) || isPrimitiveArray(value)) { "'value' is not a valid annotation value, '$value' (${value.javaClass.name})." }
@@ -70,7 +70,7 @@ class BytecodeAnnotation internal constructor(
      *
      * @see [AnnotationVisitor.visitEnum]
      */
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addEnum")
     fun enum(name: String, value: Enum<*>): BytecodeAnnotation = enum(name, value.javaClass.toReferenceType(), value.name)
 
@@ -85,7 +85,7 @@ class BytecodeAnnotation internal constructor(
      *
      * @see [AnnotationVisitor.visitEnum]
      */
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addEnum")
     fun enum(name: String, type: Type, entryName: String): BytecodeAnnotation = apply {
         node.visitEnum(name, type.descriptor, entryName)
@@ -102,7 +102,7 @@ class BytecodeAnnotation internal constructor(
      *
      * @see [AnnotationVisitor.visitAnnotation]
      */
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addAnnotation")
     fun annotation(name: String, type: ReferenceType): BytecodeAnnotation =
         BytecodeAnnotation(type, node.visitAnnotation(name, type.descriptor) as AnnotationNode)
@@ -119,7 +119,7 @@ class BytecodeAnnotation internal constructor(
      *
      * @see [AnnotationVisitor.visitArray]
      */
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addArray")
     fun array(name: String): ArrayBuilder = ArrayBuilder(name, node.visitArray(name) as AnnotationNode)
 
@@ -141,7 +141,7 @@ class BytecodeAnnotation internal constructor(
      *
      * @see [AnnotationVisitor.visitArray]
      */
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addArray")
     fun array(name: String, values: Iterable<Any>): ArrayBuilder {
         val builder = array(name)
@@ -175,7 +175,7 @@ class BytecodeAnnotation internal constructor(
      *
      * @see [AnnotationVisitor.visitArray]
      */
-    @AsmKt
+    @AsmKtDsl
     @JvmName("addArray")
     fun array(name: String, vararg values: Any): ArrayBuilder = array(name, values.asIterable())
 
@@ -196,7 +196,7 @@ class BytecodeAnnotation internal constructor(
     /**
      * A builder used to construct arrays of values for a [BytecodeAnnotation].
      */
-    @AsmKt
+    @AsmKtDsl
     class ArrayBuilder internal constructor(val name: String, private val node: AnnotationNode) {
         /**
          * Adds the given [value] to `this` array.
@@ -210,7 +210,7 @@ class BytecodeAnnotation internal constructor(
          *
          * @see [AnnotationVisitor.visit]
          */
-        @AsmKt
+        @AsmKtDsl
         @JvmName("addValue")
         fun value(value: Any): ArrayBuilder = apply {
             require(isValidAnnotationValue(value)) { "'value' is not a valid annotation value, '$value' (${value.javaClass.name})." }
@@ -226,7 +226,7 @@ class BytecodeAnnotation internal constructor(
          *
          * @see [AnnotationVisitor.visitEnum]
          */
-        @AsmKt
+        @AsmKtDsl
         @JvmName("addEnum")
         fun enum(value: Enum<*>): ArrayBuilder = apply {
             node.visitEnum(name, value.javaClass.toReferenceType().descriptor, value.name)
@@ -242,7 +242,7 @@ class BytecodeAnnotation internal constructor(
          *
          * @see [AnnotationVisitor.visitEnum]
          */
-        @AsmKt
+        @AsmKtDsl
         @JvmName("addEnum")
         fun enum(name: String, type: Type, entryName: String): ArrayBuilder = apply {
             node.visitEnum(name, type.descriptor, entryName)
@@ -258,7 +258,7 @@ class BytecodeAnnotation internal constructor(
          *
          * @see [AnnotationVisitor.visitAnnotation]
          */
-        @AsmKt
+        @AsmKtDsl
         @JvmName("addAnnotation")
         fun annotation(type: ReferenceType): BytecodeAnnotation =
             BytecodeAnnotation(type, node.visitAnnotation(name, type.descriptor) as AnnotationNode)

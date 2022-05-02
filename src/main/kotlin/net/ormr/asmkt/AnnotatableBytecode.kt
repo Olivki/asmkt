@@ -40,6 +40,6 @@ interface AnnotatableBytecode {
      *
      * @return a new [BytecodeAnnotation] instance used to build an annotation of type [type]
      */
-    @AsmKt
+    @AsmKtDsl
     fun defineAnnotation(type: ReferenceType, isVisible: Boolean = true, allowRepeats: Boolean = false): BytecodeAnnotation
 }

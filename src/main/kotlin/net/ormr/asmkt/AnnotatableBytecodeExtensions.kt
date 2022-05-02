@@ -37,7 +37,7 @@ import org.objectweb.asm.TypePath
  *
  * @return a new [BytecodeAnnotation] instance used to build an annotation of type [type]
  */
-@AsmKt
+@AsmKtDsl
 @JvmSynthetic
 inline fun <reified A : Annotation> AnnotatableBytecode.defineAnnotation(
     isVisible: Boolean = true,
@@ -62,7 +62,7 @@ inline fun <reified A : Annotation> AnnotatableBytecode.defineAnnotation(
  *
  * @return a new [BytecodeAnnotation] instance used to build an annotation of type [type]
  */
-@AsmKt
+@AsmKtDsl
 @JvmSynthetic
 inline fun AnnotatableBytecode.defineAnnotation(
     type: ReferenceType,
@@ -72,7 +72,7 @@ inline fun AnnotatableBytecode.defineAnnotation(
 ): BytecodeAnnotation = defineAnnotation(type, isVisible, allowRepeats).apply(scope)
 
 // TODO: documentation
-@AsmKt
+@AsmKtDsl
 @JvmSynthetic
 inline fun <reified A : Annotation> AnnotatableTypeBytecode.defineTypeAnnotation(
     typeRef: Int,

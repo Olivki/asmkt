@@ -34,13 +34,13 @@ import org.objectweb.asm.Type as AsmType
  * See  [Chapter 6. The Java Virtual Machine Instruction Set](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html)
  * for documentation regarding all the instructions available in this class.
  */
-@AsmKt
+@AsmKtDsl
 data class BytecodeMethod internal constructor(
     val name: String,
     override val access: Int,
-    val type: net.ormr.asmkt.types.MethodType,
+    val type: MethodType,
     val signature: String?,
-    val exceptions: List<net.ormr.asmkt.types.ReferenceType>,
+    val exceptions: List<ReferenceType>,
     val parent: BytecodeClass,
     val block: BytecodeBlock = BytecodeBlock(),
 ) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode {
@@ -48,11 +48,11 @@ data class BytecodeMethod internal constructor(
         private val primitiveClassHandle: Handle by lazy {
             constantBootstrapsHandleOf(
                 "primitiveClass",
-                net.ormr.asmkt.types.MethodType.of(
-                    net.ormr.asmkt.types.ReferenceType.CLASS,
-                    net.ormr.asmkt.types.ReferenceType<MethodHandles.Lookup>(),
-                    net.ormr.asmkt.types.ReferenceType.STRING,
-                    net.ormr.asmkt.types.ReferenceType.CLASS
+                MethodType.of(
+                    ReferenceType.CLASS,
+                    ReferenceType<MethodHandles.Lookup>(),
+                    ReferenceType.STRING,
+                    ReferenceType.CLASS
                 )
             )
         }
@@ -91,13 +91,13 @@ data class BytecodeMethod internal constructor(
     /**
      * Returns the return type of `this` method.
      */
-    val returnType: net.ormr.asmkt.types.FieldType
+    val returnType: FieldType
         get() = type.returnType
 
     /**
      * Returns a list containing the types of the parameters of `this` method.
      */
-    val parameterTypes: List<net.ormr.asmkt.types.FieldType>
+    val parameterTypes: List<FieldType>
         get() = type.argumentTypes
 
     /**
@@ -109,7 +109,7 @@ data class BytecodeMethod internal constructor(
     /**
      * Returns the [type][BytecodeClass.type] of `this` methods [parent].
      */
-    val parentType: net.ormr.asmkt.types.ReferenceType
+    val parentType: ReferenceType
         get() = parent.type
 
 
@@ -122,7 +122,7 @@ data class BytecodeMethod internal constructor(
 
     private fun isValidAnnotationValue(value: Any?): Boolean = when (value) {
         null -> true
-        is Boolean, is Byte, is Short, is Int, is Long, is Float, is Double, is String, is AsmType, is net.ormr.asmkt.types.FieldType -> true
+        is Boolean, is Byte, is Short, is Int, is Long, is Float, is Double, is String, is AsmType, is FieldType -> true
         is AnnotationNode, is BytecodeAnnotation -> true
         is List<*> -> value.all(this::isValidAnnotationValue)
         is Array<*> -> TODO("or an two elements String array (for enumeration values)")
@@ -197,7 +197,7 @@ data class BytecodeMethod internal constructor(
      *
      * @see [push]
      */
-    @AsmKt
+    @AsmKtDsl
     fun ldc(value: Any): BytecodeMethod = apply {
         require(isValidLdcValue(value)) { "Can't push value '$value' (${value.javaClass.name}) onto the stack." }
         block.ldc(value)
@@ -231,14 +231,14 @@ data class BytecodeMethod internal constructor(
      * @see [pushHandle]
      * @see [pushConstantDynamic]
      */
-    @AsmKt
+    @AsmKtDsl
     fun push(value: Any?): BytecodeMethod = apply {
         when (value) {
             null -> block.aconst_null()
             is Boolean -> pushBoolean(value)
-            is Char -> pushInt(value.toInt())
+            is Char -> pushInt(value.code)
             is String -> pushString(value)
-            is net.ormr.asmkt.types.FieldType -> pushType(value)
+            is FieldType -> pushType(value)
             is Handle -> pushHandle(value)
             is ConstantDynamic -> pushConstantDynamic(value)
             is Byte -> pushByte(value)
@@ -257,7 +257,7 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun pushBoolean(value: Boolean): BytecodeMethod = apply {
         if (value) {
             block.iconst_1()
@@ -271,7 +271,7 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun pushString(value: String): BytecodeMethod = apply {
         block.ldc(value)
     }
@@ -286,7 +286,7 @@ data class BytecodeMethod internal constructor(
      *
      * @see [pushInt]
      */
-    @AsmKt
+    @AsmKtDsl
     fun pushByte(value: Byte): BytecodeMethod = pushInt(value.toInt())
 
     /**
@@ -296,8 +296,8 @@ data class BytecodeMethod internal constructor(
      *
      * @see [pushInt]
      */
-    @AsmKt
-    fun pushChar(value: Char): BytecodeMethod = pushInt(value.toInt())
+    @AsmKtDsl
+    fun pushChar(value: Char): BytecodeMethod = pushInt(value.code)
 
     /**
      * Pushes an appropriate instruction for the given [value] onto the stack.
@@ -306,7 +306,7 @@ data class BytecodeMethod internal constructor(
      *
      * @see [pushInt]
      */
-    @AsmKt
+    @AsmKtDsl
     fun pushShort(value: Short): BytecodeMethod = pushInt(value.toInt())
 
     /**
@@ -329,7 +329,7 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun pushInt(value: Int): BytecodeMethod = apply {
         when {
             value >= -1 && value <= 5 -> block.addInstruction(ICONST_0 + value)
@@ -347,7 +347,7 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun pushLong(value: Long): BytecodeMethod = apply {
         when (value) {
             0L -> block.lconst_0()
@@ -365,7 +365,7 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun pushFloat(value: Float): BytecodeMethod = apply {
         val bits = value.toBits()
         if (bits == 0 || bits == 0x3F800000 || bits == 0x40000000) { // 0..2
@@ -383,7 +383,7 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun pushDouble(value: Double): BytecodeMethod = apply {
         val bits = value.toBits()
 
@@ -402,10 +402,10 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
-    fun pushType(value: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
-        if (value is net.ormr.asmkt.types.PrimitiveType) {
-            pushConstantDynamic(value.descriptor, net.ormr.asmkt.types.ReferenceType.CLASS, primitiveClassHandle)
+    @AsmKtDsl
+    fun pushType(value: FieldType): BytecodeMethod = apply {
+        if (value is PrimitiveType) {
+            pushConstantDynamic(value.descriptor, ReferenceType.CLASS, primitiveClassHandle)
         } else {
             ldc(value.toAsmType())
         }
@@ -416,7 +416,7 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun pushHandle(value: Handle): BytecodeMethod = apply {
         ldc(value)
     }
@@ -426,53 +426,53 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun pushConstantDynamic(value: ConstantDynamic): BytecodeMethod = apply {
         ldc(value)
     }
 
     // TODO: documentation
-    @AsmKt
+    @AsmKtDsl
     fun pushConstantDynamic(
         name: String,
-        type: net.ormr.asmkt.types.FieldType,
+        type: FieldType,
         bootStrapMethod: Handle,
         vararg bootStrapMethodArguments: Any,
     ): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'" }
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'" }
         val arguments = bootStrapMethodArguments.replaceTypes()
         pushConstantDynamic(ConstantDynamic(name, type.descriptor, bootStrapMethod, *arguments))
     }
 
     // -- LOAD INSTRUCTIONS -- \\
-    @AsmKt
-    fun loadLocal(index: Int, type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun loadLocal(index: Int, type: FieldType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addVarInstruction(type.getOpcode(ILOAD), index)
     }
 
-    @AsmKt
-    fun arrayLoad(type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun arrayLoad(type: FieldType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(IALOAD))
     }
 
     // -- STORE INSTRUCTIONS -- \\
-    @AsmKt
-    fun storeLocal(index: Int, type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun storeLocal(index: Int, type: FieldType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addVarInstruction(type.getOpcode(ISTORE), index)
     }
 
-    @AsmKt
-    fun arrayStore(type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun arrayStore(type: FieldType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(IASTORE))
     }
 
     // -- INT INSTRUCTIONS -- \\
     // TODO: find a better name?
-    @AsmKt
+    @AsmKtDsl
     fun ret(operand: Int): BytecodeMethod = apply {
         block.ret(operand)
     }
@@ -488,9 +488,9 @@ data class BytecodeMethod internal constructor(
      * @throws [IllegalArgumentException] if [type] is not [a primitive][Type.isDefinablePrimitive] or [object][Type.isObject]
      * type
      */
-    @AsmKt
-    fun newArray(type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun newArray(type: FieldType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
 
         if (type is TypeWithInternalName) {
             block.anewarray(type.internalName)
@@ -498,56 +498,56 @@ data class BytecodeMethod internal constructor(
         }
 
         val arrayType = when (type) {
-            is net.ormr.asmkt.types.PrimitiveBoolean -> T_BOOLEAN
-            is net.ormr.asmkt.types.PrimitiveChar -> T_CHAR
-            is net.ormr.asmkt.types.PrimitiveByte -> T_BYTE
-            is net.ormr.asmkt.types.PrimitiveShort -> T_SHORT
-            is net.ormr.asmkt.types.PrimitiveInt -> T_INT
-            is net.ormr.asmkt.types.PrimitiveFloat -> T_FLOAT
-            is net.ormr.asmkt.types.PrimitiveLong -> T_LONG
-            is net.ormr.asmkt.types.PrimitiveDouble -> T_DOUBLE
+            is PrimitiveBoolean -> T_BOOLEAN
+            is PrimitiveChar -> T_CHAR
+            is PrimitiveByte -> T_BYTE
+            is PrimitiveShort -> T_SHORT
+            is PrimitiveInt -> T_INT
+            is PrimitiveFloat -> T_FLOAT
+            is PrimitiveLong -> T_LONG
+            is PrimitiveDouble -> T_DOUBLE
             else -> throw IllegalStateException("Exhaustive switch was not exhaustive for '$type'.")
         }
 
         block.newarray(arrayType)
     }
 
-    @AsmKt
-    fun newMultiArray(type: net.ormr.asmkt.types.FieldType, dimensions: Int): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun newMultiArray(type: FieldType, dimensions: Int): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.multianewarray(type.descriptor, dimensions)
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun arrayLength(): BytecodeMethod = apply {
         block.arraylength()
     }
 
     // -- INVOKE/METHOD INSTRUCTIONS -- \\
-    @AsmKt
-    fun invokeStatic(owner: net.ormr.asmkt.types.ReferenceType, name: String, type: net.ormr.asmkt.types.MethodType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun invokeStatic(owner: ReferenceType, name: String, type: MethodType): BytecodeMethod = apply {
         block.invokestatic(owner.internalName, name, type.descriptor)
     }
 
-    @AsmKt
-    fun invokeSpecial(owner: net.ormr.asmkt.types.ReferenceType, name: String, type: net.ormr.asmkt.types.MethodType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun invokeSpecial(owner: ReferenceType, name: String, type: MethodType): BytecodeMethod = apply {
         block.invokespecial(owner.internalName, name, type.descriptor)
     }
 
-    @AsmKt
-    fun invokeVirtual(owner: net.ormr.asmkt.types.ReferenceType, name: String, type: net.ormr.asmkt.types.MethodType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun invokeVirtual(owner: ReferenceType, name: String, type: MethodType): BytecodeMethod = apply {
         block.invokevirtual(owner.internalName, name, type.descriptor)
     }
 
-    @AsmKt
-    fun invokeInterface(owner: net.ormr.asmkt.types.ReferenceType, name: String, type: net.ormr.asmkt.types.MethodType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun invokeInterface(owner: ReferenceType, name: String, type: MethodType): BytecodeMethod = apply {
         block.invokeinterface(owner.internalName, name, type.descriptor)
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun invokeDynamic(
         name: String,
-        descriptor: net.ormr.asmkt.types.MethodType,
+        descriptor: MethodType,
         bootstrapMethod: Handle,
         vararg bootstrapMethodArguments: Any,
     ): BytecodeMethod = apply {
@@ -556,23 +556,23 @@ data class BytecodeMethod internal constructor(
     }
 
     // local invokes
-    @AsmKt
-    fun invokeLocalStatic(name: String, type: net.ormr.asmkt.types.MethodType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun invokeLocalStatic(name: String, type: MethodType): BytecodeMethod = apply {
         invokeStatic(parentType, name, type)
     }
 
-    @AsmKt
-    fun invokeLocalSpecial(name: String, type: net.ormr.asmkt.types.MethodType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun invokeLocalSpecial(name: String, type: MethodType): BytecodeMethod = apply {
         invokeSpecial(parentType, name, type)
     }
 
-    @AsmKt
-    fun invokeLocalVirtual(name: String, type: net.ormr.asmkt.types.MethodType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun invokeLocalVirtual(name: String, type: MethodType): BytecodeMethod = apply {
         invokeVirtual(parentType, name, type)
     }
 
-    @AsmKt
-    fun invokeLocalInterface(name: String, type: net.ormr.asmkt.types.MethodType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun invokeLocalInterface(name: String, type: MethodType): BytecodeMethod = apply {
         invokeInterface(parentType, name, type)
     }
 
@@ -582,73 +582,73 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun returnValue(): BytecodeMethod = apply {
         block.addInstruction(returnType.getOpcode(IRETURN))
     }
 
     // -- FIELD INSTRUCTIONS -- \\
     // TODO: 'getStaticField'?
-    @AsmKt
-    fun getStatic(owner: net.ormr.asmkt.types.ReferenceType, name: String, type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'descriptor' must not be 'void'." }
+    @AsmKtDsl
+    fun getStatic(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'descriptor' must not be 'void'." }
         block.getstatic(owner.internalName, name, type.descriptor)
     }
 
     // TODO: 'putStaticField'?
-    @AsmKt
-    fun putStatic(owner: net.ormr.asmkt.types.ReferenceType, name: String, type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'descriptor' must not be 'void'." }
+    @AsmKtDsl
+    fun putStatic(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'descriptor' must not be 'void'." }
         block.putstatic(owner.internalName, name, type.descriptor)
     }
 
-    @AsmKt
-    fun getField(owner: net.ormr.asmkt.types.ReferenceType, name: String, type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'descriptor' must not be 'void'." }
+    @AsmKtDsl
+    fun getField(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'descriptor' must not be 'void'." }
         block.getfield(owner.internalName, name, type.descriptor)
     }
 
-    @AsmKt
-    fun putField(owner: net.ormr.asmkt.types.ReferenceType, name: String, type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'descriptor' must not be 'void'." }
+    @AsmKtDsl
+    fun putField(owner: ReferenceType, name: String, type: FieldType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'descriptor' must not be 'void'." }
         block.putfield(owner.internalName, name, type.descriptor)
     }
 
     // local fields
-    @AsmKt
-    fun getLocalStatic(name: String, type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun getLocalStatic(name: String, type: FieldType): BytecodeMethod = apply {
         getStatic(parentType, name, type)
     }
 
-    @AsmKt
-    fun putLocalStatic(name: String, type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun putLocalStatic(name: String, type: FieldType): BytecodeMethod = apply {
         putStatic(parentType, name, type)
     }
 
-    @AsmKt
-    fun getLocalField(name: String, type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun getLocalField(name: String, type: FieldType): BytecodeMethod = apply {
         getField(parentType, name, type)
     }
 
-    @AsmKt
-    fun putLocalField(name: String, type: net.ormr.asmkt.types.FieldType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun putLocalField(name: String, type: FieldType): BytecodeMethod = apply {
         putField(parentType, name, type)
     }
 
     // -- TYPE INSTRUCTIONS -- \\
-    @AsmKt
+    @AsmKtDsl
     @JvmName("newInstance")
-    fun new(type: net.ormr.asmkt.types.ReferenceType): BytecodeMethod = apply {
+    fun new(type: ReferenceType): BytecodeMethod = apply {
         block.new(type.internalName)
     }
 
-    @AsmKt
-    fun instanceOf(type: net.ormr.asmkt.types.ReferenceType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun instanceOf(type: ReferenceType): BytecodeMethod = apply {
         block.instanceof(type.internalName)
     }
 
-    @AsmKt
-    fun checkCast(type: net.ormr.asmkt.types.ReferenceType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun checkCast(type: ReferenceType): BytecodeMethod = apply {
         // there is no point in casting something to 'Object' as everything that isn't a primitive will be extending
         // 'Object' anyways, and we only accept 'ReferenceType' values here anyways, so 'type' can't be a primitive
         if (type != OBJECT) {
@@ -657,18 +657,18 @@ data class BytecodeMethod internal constructor(
     }
 
     // -- JUMP INSTRUCTIONS -- \\
-    @AsmKt
+    @AsmKtDsl
     @JvmName("goTo")
     fun goto(label: Label): BytecodeMethod = apply {
         block.goto(label)
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun ifNonNull(label: Label): BytecodeMethod = apply {
         block.ifnonnull(label)
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun ifNull(label: Label): BytecodeMethod = apply {
         block.ifnull(label)
     }
@@ -676,56 +676,56 @@ data class BytecodeMethod internal constructor(
     // TODO: document that 'ifEqual' and 'ifNotEqual' here actually uses the 'ifCmp' function and not the 'ifeq' and
     //       'ifne' functions as 'ifFalse' and 'ifTrue' uses those instead
 
-    @AsmKt
+    @AsmKtDsl
     fun ifFalse(label: Label): BytecodeMethod = apply {
         block.ifeq(label)
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun ifTrue(label: Label): BytecodeMethod = apply {
         block.ifne(label)
     }
 
-    @AsmKt
-    fun ifEqual(type: net.ormr.asmkt.types.FieldType, label: Label): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun ifEqual(type: FieldType, label: Label): BytecodeMethod = apply {
         ifCmp(type, EQUAL, label)
     }
 
-    @AsmKt
-    fun ifNotEqual(type: net.ormr.asmkt.types.FieldType, label: Label): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun ifNotEqual(type: FieldType, label: Label): BytecodeMethod = apply {
         ifCmp(type, NOT_EQUAL, label)
     }
 
-    @AsmKt
-    fun ifGreater(type: net.ormr.asmkt.types.PrimitiveType, label: Label): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun ifGreater(type: PrimitiveType, label: Label): BytecodeMethod = apply {
         ifCmp(type, GREATER, label)
     }
 
-    @AsmKt
-    fun ifGreaterOrEqual(type: net.ormr.asmkt.types.PrimitiveType, label: Label): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun ifGreaterOrEqual(type: PrimitiveType, label: Label): BytecodeMethod = apply {
         ifCmp(type, GREATER_OR_EQUAL, label)
     }
 
-    @AsmKt
-    fun ifLess(type: net.ormr.asmkt.types.PrimitiveType, label: Label): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun ifLess(type: PrimitiveType, label: Label): BytecodeMethod = apply {
         ifCmp(type, LESS, label)
     }
 
-    @AsmKt
-    fun ifLessOrEqual(type: net.ormr.asmkt.types.PrimitiveType, label: Label): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun ifLessOrEqual(type: PrimitiveType, label: Label): BytecodeMethod = apply {
         ifCmp(type, LESS_OR_EQUAL, label)
     }
 
-    @AsmKt
-    fun ifObjectsEqual(type: net.ormr.asmkt.types.FieldType, label: Label): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'" }
+    @AsmKtDsl
+    fun ifObjectsEqual(type: FieldType, label: Label): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'" }
 
-        invokeStatic(net.ormr.asmkt.types.ReferenceType.OBJECTS, "equals", net.ormr.asmkt.types.MethodType.ofBoolean(OBJECT, OBJECT))
+        invokeStatic(ReferenceType.OBJECTS, "equals", MethodType.ofBoolean(OBJECT, OBJECT))
         TODO("implement label usage")
     }
 
-    @AsmKt
-    fun ifObjectsNotEqual(type: net.ormr.asmkt.types.FieldType, label: Label): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun ifObjectsNotEqual(type: FieldType, label: Label): BytecodeMethod = apply {
         ifObjectsEqual(type, label)
         not()
     }
@@ -734,19 +734,19 @@ data class BytecodeMethod internal constructor(
     //       implements 'Comparable' and should therefore not be used before verifying that first
 
     // a.compareTo(b) > 0
-    @AsmKt
+    @AsmKtDsl
     fun ifObjectGreater(label: Label): BytecodeMethod = TODO("ifObjectGreater function")
 
     // a.compareTo(b) >= 0
-    @AsmKt
+    @AsmKtDsl
     fun ifObjectGreaterOrEqual(label: Label): BytecodeMethod = TODO("ifObjectGreaterOrEqual function")
 
     // a.compareTo(b) < 0
-    @AsmKt
+    @AsmKtDsl
     fun ifObjectLess(label: Label): BytecodeMethod = TODO("ifObjectLess function")
 
     // a.compareTo(b) <= 0
-    @AsmKt
+    @AsmKtDsl
     fun ifObjectLessOrEqual(label: Label): BytecodeMethod = TODO("ifObjectLessOrEqual functions")
 
     private enum class ComparisonMode(val code: Int, val intCode: Int) {
@@ -758,26 +758,26 @@ data class BytecodeMethod internal constructor(
         LESS_OR_EQUAL(IFLE, IF_ICMPLE);
     }
 
-    @AsmKt
-    private fun ifCmp(type: net.ormr.asmkt.types.FieldType, mode: ComparisonMode, label: Label): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'" }
+    @AsmKtDsl
+    private fun ifCmp(type: FieldType, mode: ComparisonMode, label: Label): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'" }
 
         when (type) {
-            is net.ormr.asmkt.types.PrimitiveLong -> {
+            is PrimitiveLong -> {
                 block.addInstruction(LCMP)
                 block.addJumpInstruction(mode.code, label)
             }
-            is net.ormr.asmkt.types.PrimitiveDouble -> {
+            is PrimitiveDouble -> {
                 val instruction = if (mode == GREATER_OR_EQUAL || mode == GREATER) DCMPL else DCMPG
                 block.addInstruction(instruction)
                 block.addJumpInstruction(mode.code, label)
             }
-            is net.ormr.asmkt.types.PrimitiveFloat -> {
+            is PrimitiveFloat -> {
                 val instruction = if (mode == GREATER_OR_EQUAL || mode == GREATER) FCMPL else FCMPG
                 block.addInstruction(instruction)
                 block.addJumpInstruction(mode.code, label)
             }
-            is net.ormr.asmkt.types.ArrayType, is net.ormr.asmkt.types.ReferenceType -> when (mode) {
+            is ArrayType, is ReferenceType -> when (mode) {
                 EQUAL -> block.addJumpInstruction(IF_ACMPEQ, label)
                 NOT_EQUAL -> block.addJumpInstruction(IF_ACMPNE, label)
                 else -> throw IllegalArgumentException("Bad comparison for type $type")
@@ -786,7 +786,7 @@ data class BytecodeMethod internal constructor(
         }
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun jsr(branch: Label): BytecodeMethod = apply {
         block.jsr(branch)
     }
@@ -796,100 +796,100 @@ data class BytecodeMethod internal constructor(
     /**
      * Creates the instructions needed to compute the bitwise negation of the value currently at the top of the stack.
      */
-    @AsmKt
+    @AsmKtDsl
     fun not(): BytecodeMethod = apply {
         pushBoolean(true)
-        xor(net.ormr.asmkt.types.PrimitiveInt)
+        xor(PrimitiveInt)
     }
 
-    @AsmKt
-    fun add(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun add(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(IADD))
     }
 
-    @AsmKt
-    fun subtract(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun subtract(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(ISUB))
     }
 
-    @AsmKt
-    fun multiply(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun multiply(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(IMUL))
     }
 
-    @AsmKt
-    fun divide(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun divide(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(IDIV))
     }
 
-    @AsmKt
-    fun remainder(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun remainder(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(IREM))
     }
 
-    @AsmKt
-    fun negate(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun negate(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(INEG))
     }
 
-    @AsmKt
-    fun shiftLeft(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun shiftLeft(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(ISHL))
     }
 
-    @AsmKt
-    fun shiftRight(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun shiftRight(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(ISHR))
     }
 
-    @AsmKt
-    fun unsignedShiftRight(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun unsignedShiftRight(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(IUSHR))
     }
 
-    @AsmKt
-    fun and(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun and(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(IAND))
     }
 
-    @AsmKt
-    fun or(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun or(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(IOR))
     }
 
-    @AsmKt
-    fun xor(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun xor(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
         block.addInstruction(type.getOpcode(IXOR))
     }
 
-    @AsmKt
-    fun cmpl(type: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun cmpl(type: PrimitiveType): BytecodeMethod = apply {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
 
-        if (type is net.ormr.asmkt.types.PrimitiveFloat) {
+        if (type is PrimitiveFloat) {
             block.fcmpl()
         } else {
             block.dcmpl()
         }
     }
 
-    @AsmKt
-    fun cmpg(type: net.ormr.asmkt.types.PrimitiveType) {
-        require(type !is net.ormr.asmkt.types.PrimitiveVoid) { "'type' must not be 'void'." }
+    @AsmKtDsl
+    fun cmpg(type: PrimitiveType) {
+        require(type !is PrimitiveVoid) { "'type' must not be 'void'." }
 
-        if (type is net.ormr.asmkt.types.PrimitiveFloat) {
+        if (type is PrimitiveFloat) {
             block.fcmpg()
         } else {
             block.dcmpg()
@@ -904,7 +904,7 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun incrementInt(index: Int, amount: Int): BytecodeMethod = apply {
         block.iinc(index, amount)
     }
@@ -916,72 +916,72 @@ data class BytecodeMethod internal constructor(
      * @param [from] the primitive type to cast from
      * @param [to] the primitive type to cast to
      */
-    @AsmKt
-    fun cast(from: net.ormr.asmkt.types.PrimitiveType, to: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = apply {
+    @AsmKtDsl
+    fun cast(from: PrimitiveType, to: PrimitiveType): BytecodeMethod = apply {
         if (from != to) {
             when (from) {
-                is net.ormr.asmkt.types.PrimitiveDouble -> when (to) {
-                    is net.ormr.asmkt.types.PrimitiveLong -> block.d2l()
-                    is net.ormr.asmkt.types.PrimitiveFloat -> block.d2f()
+                is PrimitiveDouble -> when (to) {
+                    is PrimitiveLong -> block.d2l()
+                    is PrimitiveFloat -> block.d2f()
                     else -> {
                         block.d2i()
-                        cast(net.ormr.asmkt.types.PrimitiveInt, to)
+                        cast(PrimitiveInt, to)
                     }
                 }
-                is net.ormr.asmkt.types.PrimitiveFloat -> when (to) {
-                    is net.ormr.asmkt.types.PrimitiveLong -> block.f2l()
-                    is net.ormr.asmkt.types.PrimitiveDouble -> block.f2d()
+                is PrimitiveFloat -> when (to) {
+                    is PrimitiveLong -> block.f2l()
+                    is PrimitiveDouble -> block.f2d()
                     else -> {
                         block.f2i()
-                        cast(net.ormr.asmkt.types.PrimitiveInt, to)
+                        cast(PrimitiveInt, to)
                     }
                 }
-                is net.ormr.asmkt.types.PrimitiveLong -> when (to) {
-                    is net.ormr.asmkt.types.PrimitiveFloat -> block.l2f()
-                    is net.ormr.asmkt.types.PrimitiveDouble -> block.l2d()
+                is PrimitiveLong -> when (to) {
+                    is PrimitiveFloat -> block.l2f()
+                    is PrimitiveDouble -> block.l2d()
                     else -> {
                         block.l2i()
-                        cast(net.ormr.asmkt.types.PrimitiveInt, to)
+                        cast(PrimitiveInt, to)
                     }
                 }
                 else -> when (to) {
-                    is net.ormr.asmkt.types.PrimitiveChar -> block.i2c()
-                    is net.ormr.asmkt.types.PrimitiveShort -> block.i2s()
-                    is net.ormr.asmkt.types.PrimitiveByte -> block.i2b()
-                    is net.ormr.asmkt.types.PrimitiveLong -> block.i2l()
-                    is net.ormr.asmkt.types.PrimitiveFloat -> block.i2f()
-                    is net.ormr.asmkt.types.PrimitiveDouble -> block.i2d()
+                    is PrimitiveChar -> block.i2c()
+                    is PrimitiveShort -> block.i2s()
+                    is PrimitiveByte -> block.i2b()
+                    is PrimitiveLong -> block.i2l()
+                    is PrimitiveFloat -> block.i2f()
+                    is PrimitiveDouble -> block.i2d()
                     else -> throw IllegalStateException()
                 }
             }
         }
     }
 
-    @AsmKt
+    @AsmKtDsl
     @JvmSynthetic
-    infix fun net.ormr.asmkt.types.PrimitiveType.castTo(target: net.ormr.asmkt.types.PrimitiveType): BytecodeMethod = cast(this, target)
+    infix fun PrimitiveType.castTo(target: PrimitiveType): BytecodeMethod = cast(this, target)
 
-    @AsmKt
+    @AsmKtDsl
     @JvmSynthetic
     inline fun <reified From : Any, reified To : Any> cast(): BytecodeMethod =
-        cast(net.ormr.asmkt.types.PrimitiveType<From>(), net.ormr.asmkt.types.PrimitiveType<To>())
+        cast(PrimitiveType<From>(), PrimitiveType<To>())
 
     // -- TRY CATCH INSTRUCTIONS -- \\
-    @AsmKt
+    @AsmKtDsl
     @JvmOverloads
-    fun tryCatch(start: Label, end: Label, handler: Label, exception: net.ormr.asmkt.types.ReferenceType? = null): BytecodeMethod =
+    fun tryCatch(start: Label, end: Label, handler: Label, exception: ReferenceType? = null): BytecodeMethod =
         addTryCatchBlock(start, end, handler, exception?.internalName)
 
     // TODO: documentation
-    @AsmKt
+    @AsmKtDsl
     @JvmOverloads
-    fun catchException(start: Label, end: Label, type: net.ormr.asmkt.types.ReferenceType? = null): BytecodeMethod = apply {
+    fun catchException(start: Label, end: Label, type: ReferenceType? = null): BytecodeMethod = apply {
         val catchLabel = Label()
         tryCatch(start, end, catchLabel, type)
         mark(catchLabel)
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun throwException(): BytecodeMethod = apply {
         block.addInstruction(ATHROW)
     }
@@ -992,7 +992,7 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun mark(label: Label): BytecodeMethod = apply {
         block.mark(label)
     }
@@ -1002,7 +1002,7 @@ data class BytecodeMethod internal constructor(
      *
      * @return the created label
      */
-    @AsmKt
+    @AsmKtDsl
     fun mark(): Label {
         val label = Label()
         mark(label)
@@ -1016,7 +1016,7 @@ data class BytecodeMethod internal constructor(
      *
      * @return the label created to mark the given [line]
      */
-    @AsmKt
+    @AsmKtDsl
     fun markLine(line: Int): Label {
         val label = Label()
         markLine(line, label)
@@ -1028,13 +1028,13 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun markLine(line: Int, label: Label): BytecodeMethod = apply {
         block.addLineNumber(line, label)
     }
 
     // -- SWITCH INSTRUCTIONS -- \\
-    @AsmKt
+    @AsmKtDsl
     fun lookUpSwitch(
         defaultLabel: Label,
         keys: IntArray,
@@ -1043,55 +1043,55 @@ data class BytecodeMethod internal constructor(
         block.lookupswitch(defaultLabel, keys, labels)
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun tableSwitch(min: Int, max: Int, defaultLabel: Label, cases: Array<out Label>): BytecodeMethod = apply {
         block.tableswitch(min, max, defaultLabel, cases)
     }
 
     // -- MONITOR INSTRUCTIONS -- \\
-    @AsmKt
+    @AsmKtDsl
     fun monitorEnter(): BytecodeMethod = apply {
         block.monitorenter()
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun monitorExit(): BytecodeMethod = apply {
         block.monitorexit()
     }
 
     // -- DUP INSTRUCTIONS -- \\
-    @AsmKt
+    @AsmKtDsl
     fun dup(): BytecodeMethod = apply {
         block.dup()
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun dupx2(): BytecodeMethod = apply {
         block.dup_x2()
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun dupx1(): BytecodeMethod = apply {
         block.dup_x1()
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun dup2x2(): BytecodeMethod = apply {
         block.dup2_x2()
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun dup2x1(): BytecodeMethod = apply {
         block.dup2_x1()
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun dup2(): BytecodeMethod = apply {
         block.dup2()
     }
 
     // -- SWAP INSTRUCTIONS -- \\
-    @AsmKt
+    @AsmKtDsl
     fun swap(): BytecodeMethod = apply {
         block.swap()
     }
@@ -1099,7 +1099,7 @@ data class BytecodeMethod internal constructor(
     /**
      * Creates an instruction to swap the two top values currently on the stack.
      */
-    @AsmKt
+    @AsmKtDsl
     fun swap(type: Type, prev: Type): BytecodeMethod = apply {
         if (type.size == 1) {
             if (prev.size == 1) {
@@ -1120,28 +1120,28 @@ data class BytecodeMethod internal constructor(
     }
 
     @JvmSynthetic
-    @AsmKt
+    @AsmKtDsl
     infix fun Type.swapWith(type: Type): BytecodeMethod = swap(type, this)
 
-    @AsmKt
+    @AsmKtDsl
     fun swap2(): BytecodeMethod = apply {
         dup2x2()
         pop2()
     }
 
     // -- NOP INSTRUCTIONS -- \\
-    @AsmKt
+    @AsmKtDsl
     fun nop(): BytecodeMethod = apply {
         block.nop()
     }
 
     // -- POP INSTRUCTIONS -- \\
-    @AsmKt
+    @AsmKtDsl
     fun pop(): BytecodeMethod = apply {
         block.pop()
     }
 
-    @AsmKt
+    @AsmKtDsl
     fun pop2(): BytecodeMethod = apply {
         block.pop2()
     }
@@ -1150,7 +1150,7 @@ data class BytecodeMethod internal constructor(
     /**
      * @see [MethodVisitor.visitFrame]
      */
-    @AsmKt
+    @AsmKtDsl
     fun frame(
         type: Int,
         numLocal: Int,
@@ -1166,7 +1166,7 @@ data class BytecodeMethod internal constructor(
      *
      * @see [MethodVisitor.visitFrame]
      */
-    @AsmKt
+    @AsmKtDsl
     fun frame(
         type: Int,
         local: Array<out Any>,
@@ -1181,7 +1181,7 @@ data class BytecodeMethod internal constructor(
      * @param stackArguments the argument types on the stack, represented as "class path names" e.g
      * `java/lang/RuntimeException`
      */
-    @AsmKt
+    @AsmKtDsl
     fun frameSame(vararg stackArguments: Any): BytecodeMethod = apply {
         val type: Int = when {
             stackArguments.isEmpty() -> F_SAME
@@ -1209,7 +1209,7 @@ data class BytecodeMethod internal constructor(
      *
      * @return `this` *(for chaining)*
      */
-    @AsmKt
+    @AsmKtDsl
     fun defineLocalVariable(
         name: String,
         descriptor: String,
@@ -1235,7 +1235,7 @@ data class BytecodeMethod internal constructor(
      *
      * @throws [IllegalArgumentException] if `this` [is static][isStatic] and [index] is `0`
      */
-    @AsmKt
+    @AsmKtDsl
     fun defineLocalVariable(
         name: String,
         type: Type,
@@ -1255,17 +1255,17 @@ data class BytecodeMethod internal constructor(
      * @param [access] the parameters access flags, valid values are; are [FINAL][Modifiers.FINAL],
      * [SYNTHETIC][Modifiers.SYNTHETIC] and [MANDATED][Modifiers.MANDATED], or any combination of the three.
      */
-    @AsmKt
+    @AsmKtDsl
     fun defineParameterAccess(name: String, access: Int): BytecodeMethod = apply {
         parameterNodes += ParameterNode(name, access)
     }
 
     // TODO: documentation and document throws
-    @AsmKt
+    @AsmKtDsl
     @JvmOverloads
     fun defineParameterAnnotation(
         index: Int,
-        type: net.ormr.asmkt.types.ReferenceType,
+        type: ReferenceType,
         isVisible: Boolean = true,
         allowRepeats: Boolean = false,
     ): BytecodeAnnotation {
@@ -1281,12 +1281,12 @@ data class BytecodeMethod internal constructor(
     }
 
     // TODO: documentation
-    @AsmKt
+    @AsmKtDsl
     @JvmOverloads
     fun defineTypeParameterAnnotation(
         typeRef: Int,
         typePath: TypePath,
-        type: net.ormr.asmkt.types.ReferenceType,
+        type: ReferenceType,
         isVisible: Boolean = true,
         allowRepeats: Boolean = false,
     ): BytecodeAnnotation {
@@ -1302,17 +1302,17 @@ data class BytecodeMethod internal constructor(
     }
 
     // -- ANNOTATABLE BYTECODE -- \\
-    @AsmKt
-    override fun defineAnnotation(type: net.ormr.asmkt.types.ReferenceType, isVisible: Boolean, allowRepeats: Boolean): BytecodeAnnotation {
+    @AsmKtDsl
+    override fun defineAnnotation(type: ReferenceType, isVisible: Boolean, allowRepeats: Boolean): BytecodeAnnotation {
         val annotation = BytecodeAnnotation(type)
         return handleAnnotations(this, annotation, visibleAnnotations, invisibleAnnotations, isVisible, allowRepeats)
     }
 
-    @AsmKt
+    @AsmKtDsl
     override fun defineTypeAnnotation(
         typeRef: Int,
         typePath: TypePath?,
-        annotationType: net.ormr.asmkt.types.ReferenceType,
+        annotationType: ReferenceType,
         isVisible: Boolean,
         allowRepeats: Boolean,
     ): BytecodeAnnotation {
@@ -1438,7 +1438,7 @@ data class BytecodeMethod internal constructor(
 
     private fun fixAnnotationValue(value: Any?): Any? = when (value) {
         null -> null
-        is net.ormr.asmkt.types.FieldType -> value.toAsmType()
+        is FieldType -> value.toAsmType()
         is BytecodeAnnotation -> value.node
         is List<*> -> value.mapTo(mutableListOf(), this::fixAnnotationValue)
         is Array<*> -> TODO("or an two elements String array (for enumeration values)")

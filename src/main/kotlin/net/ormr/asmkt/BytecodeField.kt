@@ -22,7 +22,7 @@ import org.objectweb.asm.TypePath
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.TypeAnnotationNode
 
-@AsmKt
+@AsmKtDsl
 data class BytecodeField internal constructor(
     val name: String,
     override val access: Int,
@@ -54,13 +54,13 @@ data class BytecodeField internal constructor(
     private val visibleTypeAnnotations: MutableList<BytecodeAnnotation> = mutableListOf()
     private val invisibleTypeAnnotations: MutableList<BytecodeAnnotation> = mutableListOf()
 
-    @AsmKt
+    @AsmKtDsl
     override fun defineAnnotation(type: ReferenceType, isVisible: Boolean, allowRepeats: Boolean): BytecodeAnnotation {
         val annotation = BytecodeAnnotation(type)
         return handleAnnotations(this, annotation, visibleAnnotations, invisibleAnnotations, isVisible, allowRepeats)
     }
 
-    @AsmKt
+    @AsmKtDsl
     override fun defineTypeAnnotation(
         typeRef: Int,
         typePath: TypePath?,
