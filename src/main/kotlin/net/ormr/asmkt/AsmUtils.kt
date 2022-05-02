@@ -18,7 +18,6 @@ package net.ormr.asmkt
 
 import net.ormr.asmkt.types.MethodType
 import net.ormr.asmkt.types.ReferenceType
-import net.ormr.asmkt.types.Type
 import net.ormr.asmkt.types.requireNotVoid
 import org.objectweb.asm.Handle
 import org.objectweb.asm.Opcodes
@@ -33,7 +32,7 @@ public fun handleOf(
     tag: Int,
     owner: ReferenceType,
     name: String,
-    type: Type,
+    type: MethodType,
     isInterface: Boolean = false,
 ): Handle {
     requireNotVoid(type)

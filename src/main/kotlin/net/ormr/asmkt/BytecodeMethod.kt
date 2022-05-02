@@ -66,7 +66,7 @@ public data class BytecodeMethod internal constructor(
                 "primitiveClass",
                 MethodType.of(
                     ReferenceType.CLASS,
-                    ReferenceType<MethodHandles.Lookup>(),
+                    ReferenceType.METHOD_HANDLES_LOOKUP,
                     ReferenceType.STRING,
                     ReferenceType.CLASS
                 )
