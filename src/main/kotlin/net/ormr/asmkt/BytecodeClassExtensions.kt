@@ -25,13 +25,14 @@ import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
 @AsmKtDsl
 public inline fun defineClass(
     type: ReferenceType,
+    version: BytecodeVersion,
     access: Int = Modifiers.PUBLIC,
     superType: ReferenceType = OBJECT,
     interfaces: List<ReferenceType> = emptyList(),
     sourceFile: String? = null,
     sourceDebug: String? = null,
     scope: BytecodeClass.() -> Unit,
-): BytecodeClass = BytecodeClass(type, access, superType, interfaces, sourceFile, sourceDebug).apply(scope)
+): BytecodeClass = BytecodeClass(type, version, access, superType, interfaces, sourceFile, sourceDebug).apply(scope)
 
 // -- MODULES -- \\
 // TODO: document the throws
