@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    api(group = "org.ow2.asm", name = "asm-commons", version = "9.1")
+    api(group = "org.ow2.asm", name = "asm-commons", version = "9.3")
     implementation(group = "moe.kanon.krautils", name = "krautils-core", version = "0.0.1")
 }
 
