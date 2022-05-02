@@ -586,6 +586,7 @@ public data class BytecodeMethod internal constructor(
         vararg bootstrapMethodArguments: Any,
     ): BytecodeMethod = apply {
         requireVersion(BytecodeVersion.JAVA_11, "Invoke Dynamic")
+        requireNotVoid(descriptor.returnType, name = "descriptor return type")
         val arguments = bootstrapMethodArguments.replaceTypes()
         block.invokedynamic(name, descriptor.descriptor, bootstrapMethod, arguments)
     }
