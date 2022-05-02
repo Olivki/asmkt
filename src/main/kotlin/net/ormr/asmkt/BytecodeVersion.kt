@@ -30,6 +30,7 @@ public enum class BytecodeVersion(public val opcode: Int) {
     JAVA_14(Opcodes.V14),
     JAVA_15(Opcodes.V15),
     JAVA_16(Opcodes.V16),
-    JAVA_17(Opcodes.V18),
-    JAVA_18(Opcodes.V19),
+    JAVA_17(Opcodes.V17),
+    JAVA_18(Opcodes.V18),
+    JAVA_19(Opcodes.V19),
 }
