@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Oliver Berg
+ * Copyright 2020-2022 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,5 +28,8 @@ enum class BytecodeVersion(val opcode: Int) {
     JAVA_12(Opcodes.V12),
     JAVA_13(Opcodes.V13),
     JAVA_14(Opcodes.V14),
-    JAVA_15(Opcodes.V15);
+    JAVA_15(Opcodes.V15),
+    JAVA_16(Opcodes.V16),
+    JAVA_17(Opcodes.V18),
+    JAVA_18(Opcodes.V19),
 }
