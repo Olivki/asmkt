@@ -219,7 +219,66 @@ internal fun calculateKeyDensity(keys: IntArray): Float = when {
     else -> keys.size.toFloat() / (keys[keys.size - 1] - keys[0] + 1)
 }
 
-// TODO: push a constant dynamic invoking the 'getStaticField' constant bootstrap instead?
+/**
+ * Pushes the [value] onto the stack and then pushes an instruction to invoke [valueOf][java.lang.Byte.valueOf],
+ * producing a boxed variant of `value`.
+ */
+@AsmKtDsl
+public fun BytecodeMethod.pushBoxedByte(value: Byte): BytecodeMethod = apply {
+    pushByte(value)
+    invokeStatic(ReferenceType.BYTE, "valueOf", MethodType.ofByteWrapper(PrimitiveType.Byte))
+}
+
+/**
+ * Pushes the [value] onto the stack and then pushes an instruction to invoke [valueOf][java.lang.Short.valueOf],
+ * producing a boxed variant of `value`.
+ */
+@AsmKtDsl
+public fun BytecodeMethod.pushBoxedShort(value: Short): BytecodeMethod = apply {
+    pushShort(value)
+    invokeStatic(ReferenceType.SHORT, "valueOf", MethodType.ofShortWrapper(PrimitiveType.Short))
+}
+
+/**
+ * Pushes the [value] onto the stack and then pushes an instruction to invoke [valueOf][java.lang.Integer.valueOf],
+ * producing a boxed variant of `value`.
+ */
+@AsmKtDsl
+public fun BytecodeMethod.pushBoxedInt(value: Int): BytecodeMethod = apply {
+    pushInt(value)
+    invokeStatic(ReferenceType.INT, "valueOf", MethodType.ofIntWrapper(PrimitiveType.Int))
+}
+
+/**
+ * Pushes the [value] onto the stack and then pushes an instruction to invoke [valueOf][java.lang.Long.valueOf],
+ * producing a boxed variant of `value`.
+ */
+@AsmKtDsl
+public fun BytecodeMethod.pushBoxedLong(value: Long): BytecodeMethod = apply {
+    pushLong(value)
+    invokeStatic(ReferenceType.LONG, "valueOf", MethodType.ofLongWrapper(PrimitiveType.Long))
+}
+
+/**
+ * Pushes the [value] onto the stack and then pushes an instruction to invoke [valueOf][java.lang.Float.valueOf],
+ * producing a boxed variant of `value`.
+ */
+@AsmKtDsl
+public fun BytecodeMethod.pushBoxedFloat(value: Float): BytecodeMethod = apply {
+    pushFloat(value)
+    invokeStatic(ReferenceType.FLOAT, "valueOf", MethodType.ofFloatWrapper(PrimitiveType.Float))
+}
+
+/**
+ * Pushes the [value] onto the stack and then pushes an instruction to invoke [valueOf][java.lang.Double.valueOf],
+ * producing a boxed variant of `value`.
+ */
+@AsmKtDsl
+public fun BytecodeMethod.pushBoxedDouble(value: Double): BytecodeMethod = apply {
+    pushDouble(value)
+    invokeStatic(ReferenceType.DOUBLE, "valueOf", MethodType.ofDoubleWrapper(PrimitiveType.Double))
+}
+
 /**
  * Pushes the `TRUE` constant from the [Boolean] class onto the stack, or the `FALSE` constant depending on the given
  * [value].
