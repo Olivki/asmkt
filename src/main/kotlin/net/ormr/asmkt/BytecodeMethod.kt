@@ -731,45 +731,6 @@ public data class BytecodeMethod internal constructor(
         ifCmp(type, LESS_OR_EQUAL, label)
     }
 
-    @AsmKtDsl
-    // TODO: remove
-    public fun ifObjectsEqual(type: FieldType, label: Label): BytecodeMethod = apply {
-        requireNotVoid(type)
-
-        invokeStatic(ReferenceType.OBJECTS, "equals", MethodType.ofBoolean(OBJECT, OBJECT))
-        TODO("implement label usage")
-    }
-
-    @AsmKtDsl
-    // TODO: remove
-    public fun ifObjectsNotEqual(type: FieldType, label: Label): BytecodeMethod = apply {
-        ifObjectsEqual(type, label)
-        not()
-    }
-
-    // TODO: document that the below comparison functions make no attempt to check that the value / type actually
-    //       implements 'Comparable' and should therefore not be used before verifying that first
-
-    // a.compareTo(b) > 0
-    @AsmKtDsl
-    // TODO: remove
-    public fun ifObjectGreater(label: Label): BytecodeMethod = TODO("ifObjectGreater function")
-
-    // a.compareTo(b) >= 0
-    @AsmKtDsl
-    // TODO: remove
-    public fun ifObjectGreaterOrEqual(label: Label): BytecodeMethod = TODO("ifObjectGreaterOrEqual function")
-
-    // a.compareTo(b) < 0
-    @AsmKtDsl
-    // TODO: remove
-    public fun ifObjectLess(label: Label): BytecodeMethod = TODO("ifObjectLess function")
-
-    // a.compareTo(b) <= 0
-    @AsmKtDsl
-    // TODO: remove
-    public fun ifObjectLessOrEqual(label: Label): BytecodeMethod = TODO("ifObjectLessOrEqual functions")
-
     private enum class ComparisonMode(val code: Int, val intCode: Int) {
         EQUAL(IFEQ, IF_ICMPEQ),
         NOT_EQUAL(IFNE, IF_ICMPNE),
