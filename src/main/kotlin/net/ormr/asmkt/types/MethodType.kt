@@ -18,7 +18,6 @@
 
 package net.ormr.asmkt.types
 
-import java.lang.invoke.CallSite
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import java.util.*
@@ -98,6 +97,10 @@ public class MethodType private constructor(override val delegate: AsmType) : Ty
 
         @JvmField
         public val NUMBER: MethodType = createConstant("()Ljava/lang/Number;")
+
+        @JvmField
+        public val BASIC_BOOT_STRAP: MethodType =
+            createConstant("(Ljava/lang/invoke/MethodHandles\$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;")
 
         public fun ofVoid(vararg argumentTypes: FieldType): MethodType =
             VOID.appendArguments(argumentTypes.asIterable())
@@ -195,13 +198,13 @@ public class MethodType private constructor(override val delegate: AsmType) : Ty
         public fun fromDescriptor(descriptor: String): MethodType = copyOf(AsmType.getMethodType(descriptor))
 
         // TODO: documentation
-        public fun forBootstrap(returnType: FieldType = ReferenceType<CallSite>()): MethodType = of(
-            returnType,
-            ReferenceType.METHOD_HANDLES_LOOKUP,
-            ReferenceType.STRING,
-            ReferenceType.METHOD_TYPE,
-            ArrayType.OBJECT,
-        )
+        public fun forBootstrap(returnType: FieldType = ReferenceType.CALL_SITE): MethodType =
+            BASIC_BOOT_STRAP.changeReturn(returnType)
+
+        public fun forBootstrap(
+            returnType: FieldType = ReferenceType.CALL_SITE,
+            vararg typeParameters: FieldType,
+        ): MethodType = forBootstrap(returnType).appendArguments(typeParameters.asIterable())
 
         public fun of(
             returnType: FieldType,

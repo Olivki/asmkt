@@ -19,6 +19,7 @@
 package net.ormr.asmkt.types
 
 import org.objectweb.asm.Type
+import java.lang.invoke.CallSite
 
 /**
  * Represents a type of an `Object` child, i.e; `java.lang.String`, `java.lang.Byte`, `java.lang.Double`, etc..
@@ -83,6 +84,9 @@ public class ReferenceType private constructor(override val delegate: Type) : Fi
 
         @JvmField
         public val METHOD_HANDLES_LOOKUP: ReferenceType = createConstant("Ljava/lang/invoke/MethodHandles\$Lookup;")
+
+        @JvmField
+        public val CALL_SITE: ReferenceType = createConstant("Ljava/lang/invoke/CallSite;")
 
         private fun createConstant(descriptor: String): ReferenceType {
             val type = ReferenceType(Type.getType(descriptor))
