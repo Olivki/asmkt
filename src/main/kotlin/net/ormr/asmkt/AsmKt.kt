@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package moe.kanon.asmkt
+package net.ormr.asmkt
 
 @DslMarker
 internal annotation class AsmKt

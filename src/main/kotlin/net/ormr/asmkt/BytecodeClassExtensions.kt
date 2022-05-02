@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Oliver Berg
+ * Copyright 2020-2022 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 @file:JvmName("BytecodeClassUtils")
 
-package moe.kanon.asmkt
+package net.ormr.asmkt
 
-import moe.kanon.asmkt.Modifiers.STATIC
-import moe.kanon.asmkt.types.ReferenceType.Companion.OBJECT
-import moe.kanon.asmkt.types.MethodType
-import moe.kanon.asmkt.types.ReferenceType
+import net.ormr.asmkt.Modifiers.STATIC
+import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
+import net.ormr.asmkt.types.MethodType
+import net.ormr.asmkt.types.ReferenceType
 import org.objectweb.asm.Opcodes
 
 // -- BYTECODE CLASS -- \\

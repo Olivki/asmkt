@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Oliver Berg
+ * Copyright 2020-2022 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package moe.kanon.asmkt
+package net.ormr.asmkt
 
-import moe.kanon.asmkt.Modifiers.ABSTRACT
-import moe.kanon.asmkt.Modifiers.FINAL
-import moe.kanon.asmkt.Modifiers.MANDATED
-import moe.kanon.asmkt.Modifiers.PRIVATE
-import moe.kanon.asmkt.Modifiers.PROTECTED
-import moe.kanon.asmkt.Modifiers.PUBLIC
-import moe.kanon.asmkt.Modifiers.STATIC
-import moe.kanon.asmkt.Modifiers.SYNTHETIC
+import net.ormr.asmkt.Modifiers.ABSTRACT
+import net.ormr.asmkt.Modifiers.FINAL
+import net.ormr.asmkt.Modifiers.MANDATED
+import net.ormr.asmkt.Modifiers.PRIVATE
+import net.ormr.asmkt.Modifiers.PROTECTED
+import net.ormr.asmkt.Modifiers.PUBLIC
+import net.ormr.asmkt.Modifiers.STATIC
+import net.ormr.asmkt.Modifiers.SYNTHETIC
 
 /**
  * Represents a type that has an `access` value defined.

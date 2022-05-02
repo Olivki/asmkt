@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Oliver Berg
+ * Copyright 2020-2022 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 @file:JvmName("BytecodeMethodUtils")
 
-package moe.kanon.asmkt
+package net.ormr.asmkt
 
-import moe.kanon.asmkt.types.ArrayType
-import moe.kanon.asmkt.types.FieldType
-import moe.kanon.asmkt.types.MethodType
-import moe.kanon.asmkt.types.ReferenceType
-import moe.kanon.asmkt.types.PrimitiveType
-import moe.kanon.asmkt.types.PrimitiveVoid
+import net.ormr.asmkt.types.ArrayType
+import net.ormr.asmkt.types.FieldType
+import net.ormr.asmkt.types.MethodType
+import net.ormr.asmkt.types.ReferenceType
+import net.ormr.asmkt.types.PrimitiveType
+import net.ormr.asmkt.types.PrimitiveVoid
 import org.objectweb.asm.Label
 
 /**

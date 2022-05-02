@@ -14,19 +14,8 @@
  * limitations under the License.
  */
 
-package moe.kanon.asmkt
+package net.ormr.asmkt.types
 
-import org.objectweb.asm.Opcodes
-
-enum class BytecodeVersion(val opcode: Int) {
-    JAVA_6(Opcodes.V1_6),
-    JAVA_7(Opcodes.V1_7),
-    JAVA_8(Opcodes.V1_8),
-    JAVA_9(Opcodes.V9),
-    JAVA_10(Opcodes.V10),
-    JAVA_11(Opcodes.V11),
-    JAVA_12(Opcodes.V12),
-    JAVA_13(Opcodes.V13),
-    JAVA_14(Opcodes.V14),
-    JAVA_15(Opcodes.V15);
+interface TypeWithInternalName {
+    val internalName: String
 }

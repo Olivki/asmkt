@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Oliver Berg
+ * Copyright 2020-2022 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package moe.kanon.asmkt
+package net.ormr.asmkt
 
-import moe.kanon.asmkt.types.FieldType
-import moe.kanon.asmkt.types.ReferenceType
+import net.ormr.asmkt.types.FieldType
+import net.ormr.asmkt.types.ReferenceType
 import org.objectweb.asm.TypePath
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.TypeAnnotationNode

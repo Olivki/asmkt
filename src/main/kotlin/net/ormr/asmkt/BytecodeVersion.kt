@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package moe.kanon.asmkt
+package net.ormr.asmkt
 
-import moe.kanon.asmkt.types.ReferenceType
-import org.objectweb.asm.TypePath
+import org.objectweb.asm.Opcodes
 
-// TODO: documentation
-interface AnnotatableTypeBytecode {
-    fun defineTypeAnnotation(
-        typeRef: Int,
-        typePath: TypePath?,
-        annotationType: ReferenceType,
-        isVisible: Boolean = true,
-        allowRepeats: Boolean = false
-    ): BytecodeAnnotation
+enum class BytecodeVersion(val opcode: Int) {
+    JAVA_6(Opcodes.V1_6),
+    JAVA_7(Opcodes.V1_7),
+    JAVA_8(Opcodes.V1_8),
+    JAVA_9(Opcodes.V9),
+    JAVA_10(Opcodes.V10),
+    JAVA_11(Opcodes.V11),
+    JAVA_12(Opcodes.V12),
+    JAVA_13(Opcodes.V13),
+    JAVA_14(Opcodes.V14),
+    JAVA_15(Opcodes.V15);
 }
