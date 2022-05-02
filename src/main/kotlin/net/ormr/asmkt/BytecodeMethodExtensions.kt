@@ -282,3 +282,11 @@ public inline fun BytecodeMethod.defineParameterAnnotation(
 ) {
     defineParameterAnnotation(index, type, isVisible, allowRepeats).apply(scope)
 }
+
+/**
+ * Scopes into the [block][BytecodeMethod.block] this `BytecodeMethod` wraps around.
+ */
+@AsmKtDsl
+public inline fun BytecodeMethod.block(scope: BytecodeBlock.() -> Unit) {
+    block.apply(scope)
+}

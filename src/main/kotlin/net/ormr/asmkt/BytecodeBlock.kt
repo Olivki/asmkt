@@ -34,6 +34,7 @@ import org.objectweb.asm.tree.*
  *
  * @see [BytecodeMethod]
  */
+@AsmKtDsl
 public class BytecodeBlock : Iterable<AbstractInsnNode> {
     public val instructions: InsnList = InsnList()
 
