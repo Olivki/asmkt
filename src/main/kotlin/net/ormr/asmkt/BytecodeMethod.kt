@@ -1235,7 +1235,7 @@ public data class BytecodeMethod internal constructor(
     @AsmKtDsl
     public fun defineLocalVariable(
         name: String,
-        type: Type,
+        type: FieldType,
         signature: String? = null,
         start: Label,
         end: Label,
