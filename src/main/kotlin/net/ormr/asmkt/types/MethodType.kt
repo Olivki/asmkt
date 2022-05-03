@@ -202,8 +202,8 @@ public class MethodType private constructor(override val delegate: AsmType) : Ty
             BASIC_BOOT_STRAP.changeReturn(returnType)
 
         public fun forBootstrap(
-            returnType: FieldType = ReferenceType.CALL_SITE,
             vararg typeParameters: FieldType,
+            returnType: FieldType = ReferenceType.CALL_SITE,
         ): MethodType = forBootstrap(returnType).appendArguments(typeParameters.asIterable())
 
         public fun of(
