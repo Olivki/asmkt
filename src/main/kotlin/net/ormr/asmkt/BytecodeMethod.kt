@@ -513,14 +513,13 @@ public data class BytecodeMethod internal constructor(
 
     // -- ARRAY INSTRUCTIONS -- \\
     /**
-     * Adds an instruction to generate and push a new array of the given [type] onto the stack.
+     * Pushes an instruction to create a new array of type [type] onto the stack.
      *
-     * @param [type] the type of the desired array
+     * @param [type] the type of the array
      *
      * @return `this` *(for chaining)*
      *
-     * @throws [IllegalArgumentException] if [type] is not [a primitive][Type.isDefinablePrimitive] or [object][Type.isObject]
-     * type
+     * @throws [IllegalArgumentException] if [type] is [void][PrimitiveType.Void]
      */
     @AsmKtDsl
     public fun newArray(type: FieldType): BytecodeMethod = apply {
