@@ -20,7 +20,7 @@ import net.ormr.asmkt.types.*
 import org.objectweb.asm.Label
 
 /**
- * Creates the instruction for invoking the constructor of [owner].
+ * Pushes the instruction for invoking the constructor of [owner] onto the stack.
  *
  * @param [owner] the object to invoke the constructor of
  * @param [type] the type of the constructor, must have a `returnType` of [void][PrimitiveType.Void]
@@ -39,7 +39,7 @@ public fun BytecodeMethod.invokeConstructor(
 }
 
 /**
- * Creates the instruction for putting the `this` pointer onto the stack.
+ * Pushes the instruction for putting the `this` pointer onto the stack.
  *
  * @throws [IllegalStateException] if `this` block represents a static method
  */
@@ -129,8 +129,8 @@ public fun BytecodeMethod.unbox(type: FieldType): BytecodeMethod = apply {
 }
 
 /**
- * Creates the instructions needed to box the value currently at the top of the stack using the `valueOf` functions
- * located in the boxed variants for primitive types.
+ * Pushes the instructions needed to box the value currently at the top of the stack using the `valueOf` functions
+ * located in the boxed variants for primitive types onto the stack.
  *
  * @param [type] the type to box
  *
@@ -149,7 +149,7 @@ public fun BytecodeMethod.pushValueOf(type: PrimitiveType): BytecodeMethod = app
 }
 
 /**
- * Creates the instructions for a `switch` statement.
+ * Pushes the instructions for a `switch` statement onto the stack.
  *
  * @param [keys] the `switch` keys
  * @param [generateCase] the generator for each case
