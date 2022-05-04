@@ -20,6 +20,24 @@ import net.ormr.asmkt.types.*
 import org.objectweb.asm.Label
 
 /**
+ * Pushes the instructions required to create a new array of type [type] with size [size] onto the stack.
+ *
+ * @param [type] the type of the array
+ * @since [size] how large the array should be
+ *
+ * @return `this` *(for chaining)*
+ *
+ * @throws [IllegalArgumentException] if [type] is [void][PrimitiveType.Void]
+ */
+@AsmKtDsl
+public fun BytecodeMethod.newArray(type: FieldType, size: Int): BytecodeMethod = apply {
+    requireNotVoid(type)
+
+    pushInt(size)
+    newArray(type)
+}
+
+/**
  * Pushes the instruction for invoking the constructor of [owner] onto the stack.
  *
  * @param [owner] the object to invoke the constructor of
