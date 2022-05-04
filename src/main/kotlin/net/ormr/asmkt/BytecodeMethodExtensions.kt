@@ -226,7 +226,7 @@ internal fun calculateKeyDensity(keys: IntArray): Float = when {
 @AsmKtDsl
 public fun BytecodeMethod.pushBoxedByte(value: Byte): BytecodeMethod = apply {
     pushByte(value)
-    invokeStatic(ReferenceType.BYTE, "valueOf", MethodType.ofByteWrapper(PrimitiveType.Byte))
+    pushValueOf(PrimitiveType.Byte)
 }
 
 /**
@@ -236,7 +236,7 @@ public fun BytecodeMethod.pushBoxedByte(value: Byte): BytecodeMethod = apply {
 @AsmKtDsl
 public fun BytecodeMethod.pushBoxedShort(value: Short): BytecodeMethod = apply {
     pushShort(value)
-    invokeStatic(ReferenceType.SHORT, "valueOf", MethodType.ofShortWrapper(PrimitiveType.Short))
+    pushValueOf(PrimitiveType.Short)
 }
 
 /**
@@ -246,7 +246,7 @@ public fun BytecodeMethod.pushBoxedShort(value: Short): BytecodeMethod = apply {
 @AsmKtDsl
 public fun BytecodeMethod.pushBoxedInt(value: Int): BytecodeMethod = apply {
     pushInt(value)
-    invokeStatic(ReferenceType.INT, "valueOf", MethodType.ofIntWrapper(PrimitiveType.Int))
+    pushValueOf(PrimitiveType.Int)
 }
 
 /**
@@ -256,7 +256,7 @@ public fun BytecodeMethod.pushBoxedInt(value: Int): BytecodeMethod = apply {
 @AsmKtDsl
 public fun BytecodeMethod.pushBoxedLong(value: Long): BytecodeMethod = apply {
     pushLong(value)
-    invokeStatic(ReferenceType.LONG, "valueOf", MethodType.ofLongWrapper(PrimitiveType.Long))
+    pushValueOf(PrimitiveType.Long)
 }
 
 /**
@@ -266,7 +266,7 @@ public fun BytecodeMethod.pushBoxedLong(value: Long): BytecodeMethod = apply {
 @AsmKtDsl
 public fun BytecodeMethod.pushBoxedFloat(value: Float): BytecodeMethod = apply {
     pushFloat(value)
-    invokeStatic(ReferenceType.FLOAT, "valueOf", MethodType.ofFloatWrapper(PrimitiveType.Float))
+    pushValueOf(PrimitiveType.Float)
 }
 
 /**
@@ -276,7 +276,7 @@ public fun BytecodeMethod.pushBoxedFloat(value: Float): BytecodeMethod = apply {
 @AsmKtDsl
 public fun BytecodeMethod.pushBoxedDouble(value: Double): BytecodeMethod = apply {
     pushDouble(value)
-    invokeStatic(ReferenceType.DOUBLE, "valueOf", MethodType.ofDoubleWrapper(PrimitiveType.Double))
+    pushValueOf(PrimitiveType.Double)
 }
 
 /**
