@@ -137,7 +137,7 @@ public fun BytecodeMethod.unbox(type: FieldType): BytecodeMethod = apply {
  * @throws [IllegalArgumentException] if [type] is a method-type
  */
 @AsmKtDsl
-public fun BytecodeMethod.valueOf(type: PrimitiveType): BytecodeMethod = apply {
+public fun BytecodeMethod.pushValueOf(type: PrimitiveType): BytecodeMethod = apply {
     if (type is PrimitiveType.Void) {
         // a boxed 'void' would actually be the 'Void' object, but we can't create instances of that
         // so 'null' is the best we'll get
