@@ -326,7 +326,7 @@ public class MethodType private constructor(override val delegate: AsmType) : Ty
             newType -> this
             else -> {
                 val newDescriptor = buildString {
-                    argumentTypes.joinTo(this, "", "(", ")")
+                    argumentTypes.joinTo(this, "", "(", ")") { it.descriptor }
                     append(newType.descriptor)
                 }
 
