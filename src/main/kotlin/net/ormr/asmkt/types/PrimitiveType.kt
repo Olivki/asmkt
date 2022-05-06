@@ -273,7 +273,7 @@ public sealed class PrimitiveType : FieldType() {
      */
     public object Double : PrimitiveType() {
         override val descriptor: String
-            get() = "F"
+            get() = "D"
 
         override val className: String
             get() = "double"
