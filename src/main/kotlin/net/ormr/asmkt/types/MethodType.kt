@@ -197,14 +197,10 @@ public class MethodType private constructor(override val delegate: AsmType) : Ty
 
         public fun fromDescriptor(descriptor: String): MethodType = copyOf(AsmType.getMethodType(descriptor))
 
-        // TODO: documentation
-        public fun forBootstrap(returnType: FieldType = ReferenceType.CALL_SITE): MethodType =
-            BASIC_BOOT_STRAP.changeReturn(returnType)
-
         public fun forBootstrap(
             vararg typeParameters: FieldType,
             returnType: FieldType = ReferenceType.CALL_SITE,
-        ): MethodType = forBootstrap(returnType).appendArguments(typeParameters.asIterable())
+        ): MethodType = BASIC_BOOT_STRAP.changeReturn(returnType).appendArguments(typeParameters.asIterable())
 
         public fun of(
             returnType: FieldType,
