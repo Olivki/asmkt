@@ -106,7 +106,7 @@ public inline fun BytecodeClass.defineConstructor(
 }
 
 @AsmKtDsl
-public inline fun BytecodeClass.defineStaticInit(scope: BytecodeMethod.() -> Unit = {}): BytecodeMethod {
+public inline fun BytecodeClass.defineStaticInit(scope: BytecodeMethod.() -> Unit): BytecodeMethod {
     contract {
         callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
     }
