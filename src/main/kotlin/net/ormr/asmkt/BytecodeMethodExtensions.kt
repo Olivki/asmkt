@@ -378,10 +378,10 @@ public inline fun BytecodeMethod.defineParameterAnnotation(
 }
 
 /**
- * Scopes into the [block][BytecodeMethod.block] this `BytecodeMethod` wraps around.
+ * Scopes into the [block][BytecodeMethod.useBlock] this `BytecodeMethod` wraps around.
  */
 @AsmKtDsl
-public inline fun BytecodeMethod.block(scope: BytecodeBlock.() -> Unit) {
+public inline fun BytecodeMethod.useBlock(scope: BytecodeBlock.() -> Unit) {
     contract {
         callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
     }
