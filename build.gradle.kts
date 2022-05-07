@@ -30,7 +30,7 @@ tasks {
     compileKotlin {
         kotlinOptions {
             jvmTarget = "15"
-            freeCompilerArgs = freeCompilerArgs + listOf("-Xuse-experimental=kotlin.Experimental")
+            freeCompilerArgs = freeCompilerArgs + listOf("-opt-in=kotlin.RequiresOptIn")
         }
     }
 }
