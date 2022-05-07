@@ -26,7 +26,6 @@ import org.objectweb.asm.*
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.tree.*
 import java.lang.invoke.ConstantBootstraps
-import java.lang.invoke.MethodHandles
 import org.objectweb.asm.Type as AsmType
 
 /**
@@ -1196,23 +1195,23 @@ public data class BytecodeMethod internal constructor(
     /**
      * Defines the name, type, signature and scope of the local variable stored at the given [index].
      *
+     * @param [index] the index at which the local variable is stored at
      * @param [name] the name of the local variable
      * @param [descriptor] the descriptor of the type of the local variable
-     * @param [signature] the signature of the local variable, or `null` if it does not use any generic types
      * @param [start] the start of the block in which the variable belongs
      * @param [end] the end of the block in which the variable belongs
-     * @param [index] the index at which the local variable is stored at
+     * @param [signature] the signature of the local variable, or `null` if it does not use any generic types
      *
      * @return `this` *(for chaining)*
      */
     @AsmKtDsl
     public fun defineLocalVariable(
+        index: Int,
         name: String,
         descriptor: String,
-        signature: String? = null,
         start: Label,
         end: Label,
-        index: Int,
+        signature: String? = null,
     ): BytecodeMethod = apply {
         localVariableNodes += LocalVariableNode(name, descriptor, signature, start.toNode(), end.toNode(), index)
     }
@@ -1220,27 +1219,25 @@ public data class BytecodeMethod internal constructor(
     /**
      * Defines the name, type, signature and scope of the local variable stored at the given [index].
      *
+     * @param [index] the index at which the local variable is stored at
      * @param [name] the name of the local variable
      * @param [type] the type of the local variable
-     * @param [signature] the signature of the local variable, or `null` if it does not use any generic types
      * @param [start] the start of the block in which the variable belongs
      * @param [end] the end of the block in which the variable belongs
-     * @param [index] the index at which the local variable is stored at
+     * @param [signature] the signature of the local variable, or `null` if it does not use any generic types
      *
      * @return `this` *(for chaining)*
-     *
-     * @throws [IllegalArgumentException] if `this` [is static][isStatic] and [index] is `0`
      */
     @AsmKtDsl
     public fun defineLocalVariable(
+        index: Int,
         name: String,
         type: FieldType,
-        signature: String? = null,
         start: Label,
         end: Label,
-        index: Int,
+        signature: String? = null,
     ): BytecodeMethod = apply {
-        defineLocalVariable(name, type.descriptor, signature, start, end, index)
+        defineLocalVariable(index, name, type.descriptor, start, end, signature)
     }
 
     // -- PARAMETER INSTRUCTIONS -- \\
