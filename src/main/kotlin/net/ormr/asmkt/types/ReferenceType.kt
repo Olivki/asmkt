@@ -19,7 +19,6 @@
 package net.ormr.asmkt.types
 
 import org.objectweb.asm.Type
-import java.lang.invoke.CallSite
 
 /**
  * Represents a type of an `Object` child, i.e; `java.lang.String`, `java.lang.Byte`, `java.lang.Double`, etc..

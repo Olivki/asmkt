@@ -18,6 +18,8 @@ package net.ormr.asmkt
 
 import net.ormr.asmkt.types.*
 import org.objectweb.asm.Label
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * Pushes the instructions required to create a new array of type [type] with size [size] onto the stack.
@@ -183,52 +185,59 @@ public inline fun BytecodeMethod.tableSwitch(
     generateCase: (key: Int, end: Label) -> Unit,
     generateDefaultCase: () -> Unit,
     useTable: Boolean = calculateKeyDensity(keys) >= 0.5F,
-): BytecodeMethod = apply {
-    for (i in 1 until keys.size) {
-        require(keys[i] >= keys[i - 1]) { "keys must be sorted in ascending order" }
+): BytecodeMethod {
+    contract {
+        callsInPlace(generateCase, InvocationKind.AT_LEAST_ONCE)
+        callsInPlace(generateDefaultCase, InvocationKind.EXACTLY_ONCE)
     }
 
-    val defaultLabel = Label()
-    val endLabel = Label()
+    return apply {
+        for (i in 1 until keys.size) {
+            require(keys[i] >= keys[i - 1]) { "keys must be sorted in ascending order" }
+        }
 
-    if (keys.isNotEmpty()) {
-        val numKeys = keys.size
+        val defaultLabel = Label()
+        val endLabel = Label()
 
-        if (useTable) {
-            val min = keys[0]
-            val max = keys[numKeys - 1]
-            val range = max - min + 1
-            val labels = Array(range) { defaultLabel }
+        if (keys.isNotEmpty()) {
+            val numKeys = keys.size
 
-            for (i in 0 until numKeys) {
-                labels[keys[i] - min] = Label()
-            }
+            if (useTable) {
+                val min = keys[0]
+                val max = keys[numKeys - 1]
+                val range = max - min + 1
+                val labels = Array(range) { defaultLabel }
 
-            tableSwitch(min, max, defaultLabel, labels)
+                for (i in 0 until numKeys) {
+                    labels[keys[i] - min] = Label()
+                }
 
-            for (i in 0 until range) {
-                val label = labels[i]
+                tableSwitch(min, max, defaultLabel, labels)
 
-                if (label != defaultLabel) {
-                    mark(label)
-                    generateCase(i + min, endLabel)
+                for (i in 0 until range) {
+                    val label = labels[i]
+
+                    if (label != defaultLabel) {
+                        mark(label)
+                        generateCase(i + min, endLabel)
+                    }
+                }
+            } else {
+                val labels = Array(numKeys) { Label() }
+
+                lookUpSwitch(defaultLabel, keys, labels)
+
+                for (i in 0 until numKeys) {
+                    mark(labels[i])
+                    generateCase(keys[i], endLabel)
                 }
             }
-        } else {
-            val labels = Array(numKeys) { Label() }
-
-            lookUpSwitch(defaultLabel, keys, labels)
-
-            for (i in 0 until numKeys) {
-                mark(labels[i])
-                generateCase(keys[i], endLabel)
-            }
         }
-    }
 
-    mark(defaultLabel)
-    generateDefaultCase()
-    mark(endLabel)
+        mark(defaultLabel)
+        generateDefaultCase()
+        mark(endLabel)
+    }
 }
 
 @PublishedApi
@@ -346,6 +355,10 @@ public inline fun <reified A : Annotation> BytecodeMethod.defineParameterAnnotat
     allowRepeats: Boolean = false,
     scope: BytecodeAnnotation.() -> Unit = {},
 ) {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
     defineParameterAnnotation(index, ReferenceType<A>(), isVisible, allowRepeats).apply(scope)
 }
 
@@ -357,6 +370,10 @@ public inline fun BytecodeMethod.defineParameterAnnotation(
     allowRepeats: Boolean = false,
     scope: BytecodeAnnotation.() -> Unit,
 ) {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
     defineParameterAnnotation(index, type, isVisible, allowRepeats).apply(scope)
 }
 
@@ -365,5 +382,9 @@ public inline fun BytecodeMethod.defineParameterAnnotation(
  */
 @AsmKtDsl
 public inline fun BytecodeMethod.block(scope: BytecodeBlock.() -> Unit) {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
     block.apply(scope)
 }

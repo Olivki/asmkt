@@ -18,6 +18,8 @@ package net.ormr.asmkt
 
 import net.ormr.asmkt.types.ReferenceType
 import org.objectweb.asm.TypePath
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * Annotates `this` with an annotation of type [A].
@@ -40,7 +42,13 @@ public inline fun <reified A : Annotation> AnnotatableBytecode.defineAnnotation(
     isVisible: Boolean = true,
     allowRepeats: Boolean = false,
     scope: BytecodeAnnotation.() -> Unit = {},
-): BytecodeAnnotation = defineAnnotation(ReferenceType<A>(), isVisible, allowRepeats).apply(scope)
+): BytecodeAnnotation {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return defineAnnotation(ReferenceType<A>(), isVisible, allowRepeats).apply(scope)
+}
 
 /**
  * Annotates `this` with an annotation of the given [type].
@@ -65,7 +73,13 @@ public inline fun AnnotatableBytecode.defineAnnotation(
     isVisible: Boolean = true,
     allowRepeats: Boolean = false,
     scope: BytecodeAnnotation.() -> Unit,
-): BytecodeAnnotation = defineAnnotation(type, isVisible, allowRepeats).apply(scope)
+): BytecodeAnnotation {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return defineAnnotation(type, isVisible, allowRepeats).apply(scope)
+}
 
 // TODO: documentation
 @AsmKtDsl
@@ -75,8 +89,13 @@ public inline fun <reified A : Annotation> AnnotatableTypeBytecode.defineTypeAnn
     isVisible: Boolean = true,
     allowRepeats: Boolean = false,
     scope: BytecodeAnnotation.() -> Unit,
-): BytecodeAnnotation =
-    defineTypeAnnotation(typeRef, typePath, ReferenceType<A>(), isVisible, allowRepeats).apply(scope)
+): BytecodeAnnotation {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return defineTypeAnnotation(typeRef, typePath, ReferenceType<A>(), isVisible, allowRepeats).apply(scope)
+}
 
 internal fun handleAnnotations(
     target: Any,

@@ -20,6 +20,8 @@ import net.ormr.asmkt.BytecodeAnnotation.ArrayBuilder
 import net.ormr.asmkt.types.ArrayType
 import net.ormr.asmkt.types.ReferenceType
 import org.objectweb.asm.AnnotationVisitor
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * Adds an `annotation` value to `this` annotation under the given [name].
@@ -36,6 +38,10 @@ public inline fun <reified A : Annotation> BytecodeAnnotation.annotation(
     name: String,
     scope: BytecodeAnnotation.() -> Unit = {},
 ) {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
     annotation(name, ReferenceType<A>()).apply(scope)
 }
 
@@ -50,6 +56,10 @@ public inline fun <reified A : Annotation> BytecodeAnnotation.annotation(
  */
 @AsmKtDsl
 public inline fun BytecodeAnnotation.array(name: String, scope: ArrayBuilder.() -> Unit) {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
     array(name).apply(scope)
 }
 
@@ -64,6 +74,10 @@ public inline fun BytecodeAnnotation.array(name: String, scope: ArrayBuilder.() 
  */
 @AsmKtDsl
 public inline fun <reified A : Annotation> ArrayBuilder.annotation(scope: BytecodeAnnotation.() -> Unit) {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
     annotation(ReferenceType<A>()).apply(scope)
 }
 
@@ -79,6 +93,10 @@ public inline fun <reified A : Annotation> ArrayBuilder.annotation(scope: Byteco
  */
 @AsmKtDsl
 public inline fun ArrayBuilder.annotation(type: ReferenceType, scope: BytecodeAnnotation.() -> Unit) {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
     annotation(type).apply(scope)
 }
 

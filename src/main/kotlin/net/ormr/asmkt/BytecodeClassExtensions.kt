@@ -20,6 +20,8 @@ import net.ormr.asmkt.Modifiers.STATIC
 import net.ormr.asmkt.types.MethodType
 import net.ormr.asmkt.types.ReferenceType
 import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 // -- BYTECODE CLASS -- \\
 @AsmKtDsl
@@ -32,7 +34,13 @@ public inline fun defineClass(
     sourceFile: String? = null,
     sourceDebug: String? = null,
     scope: BytecodeClass.() -> Unit,
-): BytecodeClass = BytecodeClass(type, version, access, superType, interfaces, sourceFile, sourceDebug).apply(scope)
+): BytecodeClass {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return BytecodeClass(type, version, access, superType, interfaces, sourceFile, sourceDebug).apply(scope)
+}
 
 // -- MODULES -- \\
 // TODO: document the throws
@@ -42,7 +50,13 @@ public inline fun BytecodeClass.defineModule(
     access: Int,
     version: String? = null,
     scope: BytecodeModule.() -> Unit,
-): BytecodeModule = defineModule(name, access, version).apply(scope)
+): BytecodeModule {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return defineModule(name, access, version).apply(scope)
+}
 
 // -- FIELDS -- \\
 @AsmKtDsl
@@ -53,7 +67,13 @@ public fun BytecodeClass.defineField(
     signature: String? = null,
     value: Any? = null,
     scope: BytecodeField.() -> Unit,
-): BytecodeField = defineField(name, access, type, signature, value).apply(scope)
+): BytecodeField {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return defineField(name, access, type, signature, value).apply(scope)
+}
 
 // -- METHODS -- \\
 // TODO: document the throws
@@ -65,18 +85,35 @@ public inline fun BytecodeClass.defineMethod(
     signature: String? = null,
     exceptions: List<ReferenceType> = emptyList(),
     scope: BytecodeMethod.() -> Unit,
-): BytecodeMethod = defineMethod(name, access, type, signature, exceptions).apply(scope)
+): BytecodeMethod {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return defineMethod(name, access, type, signature, exceptions).apply(scope)
+}
 
 @AsmKtDsl
 public inline fun BytecodeClass.defineConstructor(
     access: Int = Modifiers.PUBLIC,
     descriptor: MethodType = MethodType.VOID,
-    body: BytecodeMethod.() -> Unit,
-): BytecodeMethod = defineConstructor(access, descriptor).apply(body)
+    scope: BytecodeMethod.() -> Unit,
+): BytecodeMethod {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return defineConstructor(access, descriptor).apply(scope)
+}
 
 @AsmKtDsl
-public inline fun BytecodeClass.defineStaticInit(body: BytecodeMethod.() -> Unit = {}): BytecodeMethod =
-    defineMethod("<clinit>", STATIC, MethodType.VOID).apply(body)
+public inline fun BytecodeClass.defineStaticInit(scope: BytecodeMethod.() -> Unit = {}): BytecodeMethod {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return defineMethod("<clinit>", STATIC, MethodType.VOID).apply(scope)
+}
 
 /**
  * Defines a skeleton implementation of the `equals` method for `this` class.
@@ -84,9 +121,14 @@ public inline fun BytecodeClass.defineStaticInit(body: BytecodeMethod.() -> Unit
 @AsmKtDsl
 public inline fun BytecodeClass.defineEquals(
     isFinal: Boolean = false,
-    body: BytecodeMethod.() -> Unit,
-): BytecodeMethod =
-    defineEquals(isFinal).apply(body)
+    scope: BytecodeMethod.() -> Unit,
+): BytecodeMethod {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return defineEquals(isFinal).apply(scope)
+}
 
 /**
  * Defines a skeleton implementation of the `hashCode` method for `this` class.
@@ -94,9 +136,14 @@ public inline fun BytecodeClass.defineEquals(
 @AsmKtDsl
 public inline fun BytecodeClass.defineHashCode(
     isFinal: Boolean = false,
-    body: BytecodeMethod.() -> Unit,
-): BytecodeMethod =
-    defineHashCode(isFinal).apply(body)
+    scope: BytecodeMethod.() -> Unit,
+): BytecodeMethod {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return defineHashCode(isFinal).apply(scope)
+}
 
 /**
  * Defines a skeleton implementation of the `toString` method for `this` class.
@@ -104,6 +151,11 @@ public inline fun BytecodeClass.defineHashCode(
 @AsmKtDsl
 public inline fun BytecodeClass.defineToString(
     isFinal: Boolean = false,
-    body: BytecodeMethod.() -> Unit,
-): BytecodeMethod =
-    defineToString(isFinal).apply(body)
+    scope: BytecodeMethod.() -> Unit,
+): BytecodeMethod {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return defineToString(isFinal).apply(scope)
+}
