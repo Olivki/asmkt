@@ -16,7 +16,6 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.Modifiers.STATIC
 import net.ormr.asmkt.types.MethodType
 import net.ormr.asmkt.types.ReferenceType
 import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
@@ -112,7 +111,7 @@ public inline fun BytecodeClass.defineStaticInit(scope: BytecodeMethod.() -> Uni
         callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
     }
 
-    return defineMethod("<clinit>", STATIC, MethodType.VOID).apply(scope)
+    return defineStaticInit().apply(scope)
 }
 
 /**

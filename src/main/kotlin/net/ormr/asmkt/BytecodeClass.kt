@@ -18,7 +18,6 @@ package net.ormr.asmkt
 
 import net.ormr.asmkt.types.*
 import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
-import net.ormr.asmkt.types.requireNotVoid
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.TypePath
@@ -220,6 +219,12 @@ public data class BytecodeClass(
         require(type.returnType is PrimitiveType.Void) { "return type of a constructor must be 'void', was '$type'." }
         return defineMethod("<init>", access, type)
     }
+
+    /**
+     * Defines a skeleton implementation of a `static` block for `this` class.
+     */
+    @AsmKtDsl
+    public fun defineStaticInit(): BytecodeMethod = defineMethod("<clinit>", Modifiers.STATIC, MethodType.VOID)
 
     /**
      * Defines a basic constructor for `this` class with the given [access] that just invokes the no-arg constructor
