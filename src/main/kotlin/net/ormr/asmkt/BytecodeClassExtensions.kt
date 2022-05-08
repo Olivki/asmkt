@@ -16,6 +16,7 @@
 
 package net.ormr.asmkt
 
+import net.ormr.asmkt.types.FieldType
 import net.ormr.asmkt.types.MethodType
 import net.ormr.asmkt.types.ReferenceType
 import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
@@ -90,6 +91,20 @@ public inline fun BytecodeClass.defineMethod(
     }
 
     return defineMethod(name, access, type, signature, exceptions).apply(scope)
+}
+
+@AsmKtDsl
+public inline fun BytecodeClass.defineRecordComponent(
+    name: String,
+    type: FieldType,
+    signature: String? = null,
+    scope: BytecodeRecordComponent.() -> Unit,
+): BytecodeRecordComponent {
+    contract {
+        callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return defineRecordComponent(name, type, signature).apply(scope)
 }
 
 @AsmKtDsl

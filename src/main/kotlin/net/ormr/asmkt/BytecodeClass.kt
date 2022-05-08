@@ -102,6 +102,7 @@ public data class BytecodeClass(
     private val innerClasses: MutableMap<String, BytecodeClass> = mutableMapOf()
     private val methods: MutableSet<BytecodeMethod> = mutableSetOf()
     private val fields: MutableMap<String, BytecodeField> = mutableMapOf()
+    private val recordComponents: MutableList<BytecodeRecordComponent> = mutableListOf()
 
     // annotations
     private val visibleAnnotations: MutableList<BytecodeAnnotation> = mutableListOf()
@@ -209,6 +210,18 @@ public data class BytecodeClass(
         val block = BytecodeMethod(name, access, type, signature, exceptions, this)
         methods += block
         return block
+    }
+
+    @AsmKtDsl
+    public fun defineRecordComponent(
+        name: String,
+        type: FieldType,
+        signature: String? = null,
+    ): BytecodeRecordComponent {
+        require(isRecord) { "Can't add record component to non record class '$simpleName'" }
+        val component = BytecodeRecordComponent(name, type, signature)
+        recordComponents += component
+        return component
     }
 
     /**
@@ -326,6 +339,10 @@ public data class BytecodeClass(
         for ((_, field) in fields) {
             node.fields.add(field.toNode())
         }
+
+        node.recordComponents = recordComponents
+            .mapTo(mutableListOf(), BytecodeRecordComponent::toNode)
+            .ifEmpty { null }
 
         node.visibleAnnotations = visibleAnnotations
             .mapTo(mutableListOf(), BytecodeAnnotation::node)
