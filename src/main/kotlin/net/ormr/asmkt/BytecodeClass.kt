@@ -136,6 +136,10 @@ public data class BytecodeClass(
     public val isDefaultSuperType: Boolean
         get() = superType == OBJECT
 
+    init {
+        if (isRecord) requireVersion(BytecodeVersion.JAVA_14, "Record classes")
+    }
+
     @AsmKtDsl
     override fun defineAnnotation(type: ReferenceType, isVisible: Boolean, allowRepeats: Boolean): BytecodeAnnotation {
         val annotation = BytecodeAnnotation(type)
