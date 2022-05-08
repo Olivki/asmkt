@@ -314,7 +314,7 @@ public data class BytecodeClass(
         }
     }
 
-    public fun toClassNode(): ClassNode {
+    private fun toClassNode(): ClassNode {
         val node = ClassNode()
 
         node.version = version.opcode
