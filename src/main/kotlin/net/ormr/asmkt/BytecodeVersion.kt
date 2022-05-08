@@ -19,6 +19,11 @@ package net.ormr.asmkt
 import org.objectweb.asm.Opcodes
 
 public enum class BytecodeVersion(public val opcode: Int) {
+    JAVA_1(Opcodes.V1_1),
+    JAVA_2(Opcodes.V1_2),
+    JAVA_3(Opcodes.V1_3),
+    JAVA_4(Opcodes.V1_4),
+    JAVA_5(Opcodes.V1_5),
     JAVA_6(Opcodes.V1_6),
     JAVA_7(Opcodes.V1_7),
     JAVA_8(Opcodes.V1_8),
