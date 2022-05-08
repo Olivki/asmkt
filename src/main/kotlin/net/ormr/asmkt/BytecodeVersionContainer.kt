@@ -24,5 +24,5 @@ public sealed interface BytecodeVersionContainer {
 }
 
 internal fun BytecodeVersionContainer.requireMinVersion(version: BytecodeVersion, feature: String) {
-    require(this.version >= version) { "$feature requires version at least $version, but class version is set to ${this.version}." }
+    require(this.version >= version) { "$feature requires at least version $version, but class version is set to ${this.version}." }
 }
