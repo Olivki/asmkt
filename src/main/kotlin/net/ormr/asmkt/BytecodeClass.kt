@@ -137,6 +137,7 @@ public data class BytecodeClass(
         get() = superType == OBJECT
 
     init {
+        if (isModule) requireVersion(BytecodeVersion.JAVA_9, "Module")
         if (isRecord) requireVersion(BytecodeVersion.JAVA_14, "Record classes")
     }
 
@@ -167,6 +168,7 @@ public data class BytecodeClass(
 
     @AsmKtDsl
     public fun defineModule(name: String, access: Int, version: String? = null): BytecodeModule {
+        require(isModule) { "Can't define module for non module class '$simpleName'" }
         val module = BytecodeModule(name, access, version, this)
         this.module = module
         return module
