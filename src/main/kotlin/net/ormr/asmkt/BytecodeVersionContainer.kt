@@ -23,6 +23,6 @@ public sealed interface BytecodeVersionContainer {
     public val version: BytecodeVersion
 }
 
-internal fun BytecodeVersionContainer.requireVersion(version: BytecodeVersion, feature: String) {
-    require(this.version >= version) { "$feature requires version $version, but class version is set to ${this.version}." }
+internal fun BytecodeVersionContainer.requireMinVersion(version: BytecodeVersion, feature: String) {
+    require(this.version >= version) { "$feature requires version at least $version, but class version is set to ${this.version}." }
 }

@@ -137,8 +137,8 @@ public data class BytecodeClass(
         get() = superType == OBJECT
 
     init {
-        if (isModule) requireVersion(BytecodeVersion.JAVA_9, "Module")
-        if (isRecord) requireVersion(BytecodeVersion.JAVA_14, "Record classes")
+        if (isModule) requireMinVersion(BytecodeVersion.JAVA_9, "Module")
+        if (isRecord) requireMinVersion(BytecodeVersion.JAVA_14, "Record classes")
     }
 
     @AsmKtDsl

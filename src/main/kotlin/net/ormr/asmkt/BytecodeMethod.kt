@@ -474,7 +474,7 @@ public data class BytecodeMethod internal constructor(
         bootStrapMethod: Handle,
         vararg bootStrapMethodArguments: Any,
     ): BytecodeMethod = apply {
-        requireVersion(BytecodeVersion.JAVA_11, "Constant Dynamic")
+        requireMinVersion(BytecodeVersion.JAVA_11, "Constant Dynamic")
         requireNotVoid(type)
         val arguments = bootStrapMethodArguments.replaceTypes()
         pushConstantDynamic(ConstantDynamic(name, type.descriptor, bootStrapMethod, *arguments))
@@ -586,7 +586,7 @@ public data class BytecodeMethod internal constructor(
         bootstrapMethod: Handle,
         vararg bootstrapMethodArguments: Any,
     ): BytecodeMethod = apply {
-        requireVersion(BytecodeVersion.JAVA_11, "Invoke Dynamic")
+        requireMinVersion(BytecodeVersion.JAVA_11, "Invoke Dynamic")
         val arguments = bootstrapMethodArguments.replaceTypes()
         block.invokedynamic(name, descriptor.descriptor, bootstrapMethod, arguments)
     }
