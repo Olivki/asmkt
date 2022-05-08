@@ -39,13 +39,13 @@ import org.objectweb.asm.tree.TypeAnnotationNode
 @AsmKtDsl
 public data class BytecodeClass(
     public val type: ReferenceType,
-    public val version: BytecodeVersion,
+    override val version: BytecodeVersion,
     override val access: Int = Modifiers.PUBLIC,
     public val superType: ReferenceType = OBJECT,
     public val interfaces: List<ReferenceType> = emptyList(),
     public val sourceFile: String? = null,
     public val sourceDebug: String? = null,
-) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode {
+) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode, BytecodeVersionContainer {
     /**
      * Returns `true` if `this` class is [super][Modifiers.SUPER], otherwise `false`.
      */

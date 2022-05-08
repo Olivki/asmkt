@@ -43,7 +43,7 @@ public data class BytecodeMethod internal constructor(
     val exceptions: List<ReferenceType>,
     val parent: BytecodeClass,
     val block: BytecodeBlock = BytecodeBlock(),
-) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode {
+) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode, BytecodeVersionContainer {
     private companion object {
         // +0.0F
         private const val POSITIVE_ZERO_FLOAT = 0
@@ -72,6 +72,9 @@ public data class BytecodeMethod internal constructor(
             )
         }
     }
+
+    override val version: BytecodeVersion
+        get() = parent.version
 
     /**
      * Returns `true` if `this` method is [synchronized][Modifiers.SYNCHRONIZED], otherwise `false`.
@@ -1442,9 +1445,5 @@ public data class BytecodeMethod internal constructor(
                 action(i, annotation)
             }
         }
-    }
-
-    private fun requireVersion(version: BytecodeVersion, feature: String) {
-        require(parent.version >= version) { "$feature requires version $version, but class version is set to ${parent.version}." }
     }
 }
