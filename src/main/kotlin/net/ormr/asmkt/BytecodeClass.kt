@@ -16,7 +16,10 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.types.*
+import net.ormr.asmkt.types.FieldType
+import net.ormr.asmkt.types.MethodType
+import net.ormr.asmkt.types.PrimitiveType
+import net.ormr.asmkt.types.ReferenceType
 import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
 import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.Opcodes
@@ -25,24 +28,15 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InnerClassNode
 import org.objectweb.asm.tree.TypeAnnotationNode
 
-/**
- * TODO
- *
- * @property [type] TODO
- * @property [version] TODO
- * @property [access] TODO
- * @property [superType] TODO
- * @property [interfaces] TODO
- * @property [sourceFile] TODO
- * @property [sourceDebug] TODO
- */
 @AsmKtDsl
 public data class BytecodeClass(
     public val type: ReferenceType,
     override val version: BytecodeVersion,
+    public val kind: BytecodeClassKind = BytecodeClassKind.CLASS,
     override val access: Int = Modifiers.PUBLIC,
     public val superType: ReferenceType = OBJECT,
     public val interfaces: List<ReferenceType> = emptyList(),
+    public val permittedSubtypes: List<ReferenceType> = emptyList(),
     public val sourceFile: String? = null,
     public val sourceDebug: String? = null,
 ) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode, BytecodeVersionContainer {
@@ -54,28 +48,46 @@ public data class BytecodeClass(
         get() = true // Modifiers.contains(access, Modifiers.SUPER)
 
     /**
-     * Returns `true` if `this` class is [interface][Modifiers.INTERFACE], otherwise `false`.
+     * Returns `true` if `this` class is a [normal class][BytecodeClassKind.CLASS], otherwise `false`.
+     */
+    public val isClass: Boolean
+        get() = kind == BytecodeClassKind.CLASS
+
+    /**
+     * Returns `true` if `this` class is an [abstract class][BytecodeClassKind.ABSTRACT_CLASS], otherwise `false`.
+     */
+    override val isAbstract: Boolean
+        get() = kind == BytecodeClassKind.ABSTRACT_CLASS
+
+    /**
+     * Returns `true` if `this` class is a [interface][BytecodeClassKind.INTERFACE], otherwise `false`.
      */
     public val isInterface: Boolean
-        get() = Modifiers.contains(access, Modifiers.INTERFACE)
+        get() = kind == BytecodeClassKind.INTERFACE
 
     /**
-     * Returns `true` if `this` class is [annotation][Modifiers.ANNOTATION], otherwise `false`.
+     * Returns `true` if `this` class is an [annotation][BytecodeClassKind.ANNOTATION], otherwise `false`.
      */
     public val isAnnotation: Boolean
-        get() = Modifiers.contains(access, Modifiers.ANNOTATION)
+        get() = kind == BytecodeClassKind.ANNOTATION
 
     /**
-     * Returns `true` if `this` class is [module][Modifiers.MODULE], otherwise `false`.
+     * Returns `true` if `this` class is a [module][BytecodeClassKind.MODULE], otherwise `false`.
      */
     public val isModule: Boolean
-        get() = Modifiers.contains(access, Modifiers.MODULE)
+        get() = kind == BytecodeClassKind.MODULE
 
     /**
-     * Returns `true` if `this` class is [record][Modifiers.RECORD], otherwise `false`.
+     * Returns `true` if `this` class is a [record][BytecodeClassKind.RECORD], otherwise `false`.
      */
     public val isRecord: Boolean
-        get() = Modifiers.contains(access, Modifiers.RECORD)
+        get() = kind == BytecodeClassKind.RECORD
+
+    /**
+     * Returns `true` if `this` class represents a "sealed" type, otherwise `false`.
+     */
+    public val isSealed: Boolean
+        get() = kind.canHavePermittedSubtypes && permittedSubtypes.isNotEmpty()
 
     /**
      * The [module][BytecodeModule] that belongs to `this` class, or `null` if no module is defined for `this` class.
@@ -137,8 +149,20 @@ public data class BytecodeClass(
         get() = superType == OBJECT
 
     init {
+        checkAccess()
         if (isModule) requireMinVersion(BytecodeVersion.JAVA_9, "Module")
         if (isRecord) requireMinVersion(BytecodeVersion.JAVA_14, "Record classes")
+        if (permittedSubtypes.isNotEmpty()) {
+            requireMinVersion(BytecodeVersion.JAVA_16, "Permitted subtypes")
+            requireOneKindOf(BytecodeClassKind.havePermittedSubtypes, "permitted subtypes")
+        }
+    }
+
+    private fun checkAccess() {
+        val foundKind = BytecodeClassKind.getByOpcodeOrNull(access)
+        if (foundKind != null) {
+            throw IllegalArgumentException("Opcode '${foundKind.opcodeName}' found in 'access', use 'kind = BytecodeClassKind.${foundKind.name}' instead.")
+        }
     }
 
     @AsmKtDsl
@@ -199,7 +223,7 @@ public data class BytecodeClass(
         signature: String? = null,
         value: Any? = null,
     ): BytecodeField {
-        requireNotVoid(type)
+        requireNotOneKindOf(BytecodeClassKind.notHaveFields, "fields")
         val field = BytecodeField(name, access, type, signature, value)
         fields[name] = field
         return field
@@ -213,6 +237,7 @@ public data class BytecodeClass(
         signature: String? = null,
         exceptions: List<ReferenceType> = emptyList(),
     ): BytecodeMethod {
+        requireNotOneKindOf(BytecodeClassKind.notHaveMethods, "methods")
         val block = BytecodeMethod(name, access, type, signature, exceptions, this)
         methods += block
         return block
@@ -224,7 +249,7 @@ public data class BytecodeClass(
         type: FieldType,
         signature: String? = null,
     ): BytecodeRecordComponent {
-        require(isRecord) { "Can't add record component to non record class '$simpleName'" }
+        requireKind(BytecodeClassKind.MODULE, "record components")
         val component = BytecodeRecordComponent(name, type, signature)
         recordComponents += component
         return component
@@ -310,8 +335,14 @@ public data class BytecodeClass(
 
     private fun check() {
         for (method in methods) {
+            if (method.isAbstract && !(isAbstract || isInterface)) {
+                requireOneKindOf(BytecodeClassKind.haveAbstractMethods, "abstract methods")
+            }
             if (method.isEmpty() && !method.isAbstract) {
-                throw IllegalStateException("No instructions defined for method '${method.toComponentString()}' in '$className'.")
+                throw IllegalArgumentException("No instructions defined for non-abstract method '${method.toComponentString()}' in '$className'.")
+            }
+            if (method.isNotEmpty() && method.isAbstract) {
+                throw IllegalArgumentException("Abstract method '${method.toComponentString()}' in '$className' contains instructions")
             }
         }
     }
@@ -320,7 +351,7 @@ public data class BytecodeClass(
         val node = ClassNode()
 
         node.version = version.opcode
-        node.access = access or Opcodes.ACC_SUPER
+        node.access = kind.applyTo(access) or Opcodes.ACC_SUPER
         node.name = internalName
         node.superName = superType.internalName
         node.interfaces = interfaces.mapTo(mutableListOf()) { it.internalName }
@@ -346,6 +377,10 @@ public data class BytecodeClass(
             node.fields.add(field.toNode())
         }
 
+        node.permittedSubclasses = permittedSubtypes
+            .mapTo(mutableListOf()) { it.internalName }
+            .ifEmpty { null }
+
         node.recordComponents = recordComponents
             .mapTo(mutableListOf(), BytecodeRecordComponent::toNode)
             .ifEmpty { null }
@@ -365,6 +400,34 @@ public data class BytecodeClass(
             .ifEmpty { null }
 
         return node
+    }
+
+    private fun requireKind(kind: BytecodeClassKind, feature: String) {
+        require(this.kind == kind) { "Only a class of kind $kind can use $feature, but current kind is ${this.kind}" }
+    }
+
+    private fun requireOneKindOf(kinds: Set<BytecodeClassKind>, feature: String) {
+        require(this.kind in kinds) { "Only classes of ${kinds.listOut()} are allowed to have $feature, but current kind is ${this.kind}" }
+    }
+
+    private fun requireNotKind(kind: BytecodeClassKind, feature: String) {
+        require(this.kind != kind) { "Classes of kind $kind are not allowed to have $feature" }
+    }
+
+    private fun requireNotOneKindOf(kinds: Set<BytecodeClassKind>, feature: String) {
+        require(this.kind !in kinds) { "Classes of kind ${this.kind} are not allowed to have $feature" }
+    }
+
+    private fun Set<BytecodeClassKind>.listOut(): String = buildString {
+        val lastIndex = this@listOut.size - 1
+        for ((i, kind) in this@listOut.withIndex()) {
+            append(kind.name)
+            if (i == lastIndex - 1) {
+                append(" or ")
+            } else {
+                append(", ")
+            }
+        }
     }
 
     override fun toString(): String =

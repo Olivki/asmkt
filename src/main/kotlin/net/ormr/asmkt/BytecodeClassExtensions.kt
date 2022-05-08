@@ -28,9 +28,11 @@ import kotlin.contracts.contract
 public inline fun defineClass(
     type: ReferenceType,
     version: BytecodeVersion,
+    kind: BytecodeClassKind = BytecodeClassKind.CLASS,
     access: Int = Modifiers.PUBLIC,
     superType: ReferenceType = OBJECT,
     interfaces: List<ReferenceType> = emptyList(),
+    permittedSubtypes: List<ReferenceType> = emptyList(),
     sourceFile: String? = null,
     sourceDebug: String? = null,
     scope: BytecodeClass.() -> Unit,
@@ -39,7 +41,17 @@ public inline fun defineClass(
         callsInPlace(scope, InvocationKind.EXACTLY_ONCE)
     }
 
-    return BytecodeClass(type, version, access, superType, interfaces, sourceFile, sourceDebug).apply(scope)
+    return BytecodeClass(
+        type,
+        version,
+        kind,
+        access,
+        superType,
+        interfaces,
+        permittedSubtypes,
+        sourceFile,
+        sourceDebug,
+    ).apply(scope)
 }
 
 // -- MODULES -- \\
