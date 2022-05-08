@@ -18,6 +18,7 @@ package net.ormr.asmkt
 
 import net.ormr.asmkt.types.FieldType
 import net.ormr.asmkt.types.ReferenceType
+import net.ormr.asmkt.types.requireNotVoid
 import org.objectweb.asm.TypePath
 import org.objectweb.asm.tree.FieldNode
 import org.objectweb.asm.tree.TypeAnnotationNode
@@ -31,7 +32,7 @@ public data class BytecodeField internal constructor(
     val value: Any?,
 ) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode {
     init {
-        require(type.isValidFieldType) { "'type' must not be a 'void' type." }
+        requireNotVoid(type)
     }
 
     /**
