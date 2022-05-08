@@ -84,6 +84,12 @@ public data class BytecodeClass(
         get() = kind == BytecodeClassKind.RECORD
 
     /**
+     * Returns `true` if `this` class is an [enum][BytecodeClassKind.ENUM], otherwise `false`.
+     */
+    public val isEnum: Boolean
+        get() = kind == BytecodeClassKind.ENUM
+
+    /**
      * Returns `true` if `this` class represents a "sealed" type, otherwise `false`.
      */
     public val isSealed: Boolean
@@ -150,8 +156,12 @@ public data class BytecodeClass(
 
     init {
         checkAccess()
+        if (isEnum) requireSuperType(ReferenceType.ENUM, "Enum classes")
         if (isModule) requireMinVersion(BytecodeVersion.JAVA_9, "Module")
-        if (isRecord) requireMinVersion(BytecodeVersion.JAVA_14, "Record classes")
+        if (isRecord) {
+            requireMinVersion(BytecodeVersion.JAVA_14, "Record classes")
+            requireSuperType(ReferenceType.RECORD, "Record classes")
+        }
         if (permittedSubtypes.isNotEmpty()) {
             requireMinVersion(BytecodeVersion.JAVA_16, "Permitted subtypes")
             requireOneKindOf(BytecodeClassKind.havePermittedSubtypes, "permitted subtypes")
@@ -192,7 +202,7 @@ public data class BytecodeClass(
 
     @AsmKtDsl
     public fun defineModule(name: String, access: Int, version: String? = null): BytecodeModule {
-        require(isModule) { "Can't define module for non module class '$simpleName'" }
+        require(isModule) { "Can't define module for non module class '$className'" }
         val module = BytecodeModule(name, access, version, this)
         this.module = module
         return module
@@ -400,6 +410,10 @@ public data class BytecodeClass(
             .ifEmpty { null }
 
         return node
+    }
+
+    private fun requireSuperType(superType: ReferenceType, feature: String) {
+        require(this.superType == superType) { "$feature requires super type to be $superType, but super type was ${this.superType}." }
     }
 
     private fun requireKind(kind: BytecodeClassKind, feature: String) {

@@ -73,6 +73,12 @@ public class ReferenceType private constructor(override val delegate: Type) : Fi
         public val NUMBER: ReferenceType = createConstant("Ljava/lang/Number;")
 
         @JvmField
+        public val ENUM: ReferenceType = createConstant("Ljava/lang/Enum;")
+
+        @JvmField
+        public val RECORD: ReferenceType = createConstant("Ljava/lang/Record;")
+
+        @JvmField
         public val CONSTANT_BOOTSTRAPS: ReferenceType = createConstant("Ljava/lang/invoke/ConstantBootstraps;")
 
         @JvmField
