@@ -284,7 +284,7 @@ public data class BytecodeClass(
     public fun toByteArray(): ByteArray {
         check()
         val writer = ClassWriter(ClassWriter.COMPUTE_FRAMES)
-        val node = toNode()
+        val node = toClassNode()
         node.accept(writer)
         return writer.toByteArray()
     }
@@ -297,7 +297,7 @@ public data class BytecodeClass(
         }
     }
 
-    private fun toNode(): ClassNode {
+    public fun toClassNode(): ClassNode {
         val node = ClassNode()
 
         node.version = version.opcode
