@@ -22,7 +22,6 @@ import net.ormr.asmkt.types.PrimitiveType
 import net.ormr.asmkt.types.ReferenceType
 import net.ormr.asmkt.types.ReferenceType.Companion.OBJECT
 import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.Opcodes
 import org.objectweb.asm.TypePath
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.InnerClassNode
@@ -40,13 +39,6 @@ public data class BytecodeClass(
     public val sourceFile: String? = null,
     public val sourceDebug: String? = null,
 ) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode, BytecodeVersionContainer {
-    /**
-     * Returns `true` if `this` class is [super][Modifiers.SUPER], otherwise `false`.
-     */
-    public val isSuper: Boolean
-        // TODO: we automatically slap on 'super' to all class instances, should we maybe not do that?
-        get() = true // Modifiers.contains(access, Modifiers.SUPER)
-
     /**
      * Returns `true` if `this` class is a [normal class][BytecodeClassKind.CLASS], otherwise `false`.
      */
@@ -153,6 +145,15 @@ public data class BytecodeClass(
      */
     public val isDefaultSuperType: Boolean
         get() = superType == OBJECT
+
+    /**
+     * Whether `supercall` methods should be treated specially by the [invokeSpecial][BytecodeMethod.invokeSpecial]
+     * instruction.
+     *
+     * If this is `true` then the [SUPER][Modifiers.SUPER] modifier is added to the [access] value when writing `this`
+     * class [to a byte array][toByteArray].
+     */
+    public var treatSuperSpecially: Boolean = true
 
     init {
         checkAccess()
@@ -304,7 +305,6 @@ public data class BytecodeClass(
     ): BytecodeMethod = defineConstructor(access) {
         loadThis()
         throwException(ReferenceType<UnsupportedOperationException>(), message)
-        // TODO: do we need a 'areturn' if we've declared 'athrow'?
         returnValue()
     }
 
@@ -361,7 +361,7 @@ public data class BytecodeClass(
         val node = ClassNode()
 
         node.version = version.opcode
-        node.access = kind.applyTo(access) or Opcodes.ACC_SUPER
+        node.access = kind.applyTo(access) or if (treatSuperSpecially) Modifiers.SUPER else 0
         node.name = internalName
         node.superName = superType.internalName
         node.interfaces = interfaces.mapTo(mutableListOf()) { it.internalName }
@@ -421,7 +421,7 @@ public data class BytecodeClass(
     }
 
     private fun requireOneKindOf(kinds: Set<BytecodeClassKind>, feature: String) {
-        require(this.kind in kinds) { "Only classes of ${kinds.listOut()} are allowed to have $feature, but current kind is ${this.kind}" }
+        require(this.kind in kinds) { "Only classes of kind ${kinds.listOut()} are allowed to have $feature, but current kind is ${this.kind}" }
     }
 
     private fun requireNotKind(kind: BytecodeClassKind, feature: String) {
@@ -436,11 +436,8 @@ public data class BytecodeClass(
         val lastIndex = this@listOut.size - 1
         for ((i, kind) in this@listOut.withIndex()) {
             append(kind.name)
-            if (i == lastIndex - 1) {
-                append(" or ")
-            } else {
-                append(", ")
-            }
+            if (i == lastIndex - 1) append(" or ")
+            if (i < lastIndex - 1) append(", ")
         }
     }
 
