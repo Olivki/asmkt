@@ -29,7 +29,7 @@ mavenCentralPublish {
 tasks {
     compileKotlin {
         kotlinOptions {
-            jvmTarget = "15"
+            jvmTarget = "17"
             freeCompilerArgs = freeCompilerArgs + listOf(
                 "-opt-in=kotlin.RequiresOptIn",
                 "-opt-in=kotlin.contracts.ExperimentalContracts",
