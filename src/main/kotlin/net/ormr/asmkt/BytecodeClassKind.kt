@@ -34,10 +34,9 @@ public enum class BytecodeClassKind(private val opcode: Int?, internal val opcod
         internal val notHaveFields: Set<BytecodeClassKind> = EnumSet.of(INTERFACE, ANNOTATION, MODULE)
         internal val notHaveMethods: Set<BytecodeClassKind> = EnumSet.of(MODULE)
         internal val haveAbstractMethods: Set<BytecodeClassKind> = EnumSet.of(ABSTRACT_CLASS, INTERFACE)
-        private val values = values().toList()
 
         internal fun getByOpcodeOrNull(opcode: Int): BytecodeClassKind? =
-            values.firstOrNull { it.opcode?.let { c -> Modifiers.contains(c, opcode) } ?: false }
+            entries.firstOrNull { it.opcode?.let { c -> Modifiers.contains(c, opcode) } ?: false }
     }
 }
 
