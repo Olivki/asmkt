@@ -7,6 +7,14 @@ the [ASM](https://asm.ow2.io/) library.
 
 This library requires at least Java 17.
 
+## Installation
+
+```kotlin
+  dependencies {
+    implementation(group = "net.ormr.asmkt", name = "asmkt", version = "${RELEASE_VERSION}")
+}
+```
+
 ## Usage
 
 The main entry point to basically everything in `asmkt` is the `BytecodeClass` class, which provides builder functions
@@ -98,11 +106,3 @@ to be using, like `BytecodeClass` or `BytecodeMethod`.
 
 - [eventbus: Dynamic EventBus Dispatcher Class Generation](https://github.com/Olivki/eventbus/blob/master/core/src/main/kotlin/net/ormr/eventbus/factories/asm.kt)
   *(Uses version `0.0.9`, so modifier usage looks different)*
-
-## Installation
-
-```kotlin
-  dependencies {
-    implementation(group = "net.ormr.asmkt", name = "asmkt", version = "${RELEASE_VERSION}")
-}
-```
