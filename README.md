@@ -94,7 +94,7 @@ The above example is *very* simple, as does not delve into a lot of the other fu
 there's *a lot* of functions provided, quickest way is probably to look through the source of the classes you're going
 to be using, like `BytecodeClass` or `BytecodeMethod`.
 
-### Production Examples
+### Project Examples
 
 - [eventbus: Dynamic EventBus Dispatcher Class Generation](https://github.com/Olivki/eventbus/blob/master/core/src/main/kotlin/net/ormr/eventbus/factories/asm.kt)
   *(Uses version `0.0.9`, so modifier usage looks different)*
