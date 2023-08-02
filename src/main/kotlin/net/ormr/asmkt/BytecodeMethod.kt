@@ -61,14 +61,15 @@ public data class BytecodeMethod internal constructor(
         private const val ONE_DOUBLE = 0x3FF0000000000000L
 
         private val primitiveClassHandle: Handle by lazy {
-            constantBootstrapsHandleOf(
+            InvokeStaticHandle(
+                ReferenceType.CONSTANT_BOOTSTRAPS,
                 "primitiveClass",
                 MethodType.of(
                     ReferenceType.CLASS,
                     ReferenceType.METHOD_HANDLES_LOOKUP,
                     ReferenceType.STRING,
-                    ReferenceType.CLASS
-                )
+                    ReferenceType.CLASS,
+                ),
             )
         }
     }
