@@ -97,6 +97,7 @@ to be using, like `BytecodeClass` or `BytecodeMethod`.
 ### Production Examples
 
 - [eventbus: Dynamic EventBus Dispatcher Class Generation](https://github.com/Olivki/eventbus/blob/master/core/src/main/kotlin/net/ormr/eventbus/factories/asm.kt)
+  *(Uses version 0.0.9)*
 
 ## Installation
 
