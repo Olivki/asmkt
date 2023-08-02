@@ -16,15 +16,6 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.Modifiers.ABSTRACT
-import net.ormr.asmkt.Modifiers.FINAL
-import net.ormr.asmkt.Modifiers.MANDATED
-import net.ormr.asmkt.Modifiers.PRIVATE
-import net.ormr.asmkt.Modifiers.PROTECTED
-import net.ormr.asmkt.Modifiers.PUBLIC
-import net.ormr.asmkt.Modifiers.STATIC
-import net.ormr.asmkt.Modifiers.SYNTHETIC
-
 /**
  * Represents a type that has an `access` value defined.
  */
@@ -32,56 +23,56 @@ public sealed interface AccessibleBytecode {
     /**
      * The access code of `this` element.
      *
-     * See the values defined in [Modifiers] for a list of potentially valid codes, which values are valid depends on the
+     * See the values defined in [Modifier] for a list of potentially valid codes, which values are valid depends on the
      * type of `this` element.
      */
-    public val access: Int
+    public val access: Modifier
 
     /**
-     * Returns `true` if `this` element is [static][Modifiers.STATIC], otherwise `false`.
+     * Returns `true` if `this` element is [static][Modifier.STATIC], otherwise `false`.
      */
     public val isStatic: Boolean
-        get() = Modifiers.contains(access, STATIC)
+        get() = Modifier.STATIC in access
 
     /**
-     * Returns `true` if `this` element is [final][Modifiers.FINAL], otherwise `false`.
+     * Returns `true` if `this` element is [final][Modifier.FINAL], otherwise `false`.
      */
     public val isFinal: Boolean
-        get() = Modifiers.contains(access, FINAL)
+        get() = Modifier.FINAL in access
 
     /**
-     * Returns `true` if `this` element is [abstract][Modifiers.ABSTRACT], otherwise `false`.
+     * Returns `true` if `this` element is [abstract][Modifier.ABSTRACT], otherwise `false`.
      */
     public val isAbstract: Boolean
-        get() = Modifiers.contains(access, ABSTRACT)
+        get() = Modifier.ABSTRACT in access
 
     /**
-     * Returns `true` if `this` element is [public][Modifiers.PUBLIC], otherwise `false`.
+     * Returns `true` if `this` element is [public][Modifier.PUBLIC], otherwise `false`.
      */
     public val isPublic: Boolean
-        get() = Modifiers.contains(access, PUBLIC)
+        get() = Modifier.PUBLIC in access
 
     /**
-     * Returns `true` if `this` element is [protected][Modifiers.PROTECTED], otherwise `false`.
+     * Returns `true` if `this` element is [protected][Modifier.PROTECTED], otherwise `false`.
      */
     public val isProtected: Boolean
-        get() = Modifiers.contains(access, PROTECTED)
+        get() = Modifier.PROTECTED in access
 
     /**
-     * Returns `true` if `this` element is [private][Modifiers.PRIVATE], otherwise `false`.
+     * Returns `true` if `this` element is [private][Modifier.PRIVATE], otherwise `false`.
      */
     public val isPrivate: Boolean
-        get() = Modifiers.contains(access, PRIVATE)
+        get() = Modifier.PRIVATE in access
 
     /**
-     * Returns `true` if `this` element is [mandated][Modifiers.MANDATED], otherwise `false`.
+     * Returns `true` if `this` element is [mandated][Modifier.MANDATED], otherwise `false`.
      */
     public val isMandated: Boolean
-        get() = Modifiers.contains(access, MANDATED)
+        get() = Modifier.MANDATED in access
 
     /**
-     * Returns `true` if `this` element is [synthetic][Modifiers.SYNTHETIC], otherwise `false`.
+     * Returns `true` if `this` element is [synthetic][Modifier.SYNTHETIC], otherwise `false`.
      */
     public val isSynthetic: Boolean
-        get() = Modifiers.contains(access, SYNTHETIC)
+        get() = Modifier.SYNTHETIC in access
 }

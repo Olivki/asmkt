@@ -32,7 +32,7 @@ public data class BytecodeClass(
     public val type: ReferenceType,
     override val version: BytecodeVersion,
     public val kind: BytecodeClassKind = BytecodeClassKind.CLASS,
-    override val access: Int = Modifiers.PUBLIC,
+    override val access: Modifier = Modifier.PUBLIC,
     public val superType: ReferenceType = OBJECT,
     public val interfaces: List<ReferenceType> = emptyList(),
     public val permittedSubtypes: List<ReferenceType> = emptyList(),
@@ -150,7 +150,7 @@ public data class BytecodeClass(
      * Whether `supercall` methods should be treated specially by the [invokeSpecial][BytecodeMethod.invokeSpecial]
      * instruction.
      *
-     * If this is `true` then the [SUPER][Modifiers.SUPER] modifier is added to the [access] value when writing `this`
+     * If this is `true` then the [SUPER][Modifier.SUPER] modifier is added to the [access] value when writing `this`
      * class [to a byte array][toByteArray].
      */
     public var treatSuperSpecially: Boolean = true
@@ -170,9 +170,9 @@ public data class BytecodeClass(
     }
 
     private fun checkAccess() {
-        val foundKind = BytecodeClassKind.getByOpcodeOrNull(access)
+        val foundKind = BytecodeClassKind.getByModifierOrNull(access)
         if (foundKind != null) {
-            throw IllegalArgumentException("Opcode '${foundKind.displayName}' found in 'access', use 'kind = BytecodeClassKind.${foundKind.name}' instead.")
+            throw IllegalArgumentException("Opcode '${foundKind.modifierName}' found in 'access', use 'kind = BytecodeClassKind.${foundKind.name}' instead.")
         }
     }
 
@@ -202,7 +202,7 @@ public data class BytecodeClass(
     }
 
     @AsmKtDsl
-    public fun defineModule(name: String, access: Int, version: String? = null): BytecodeModule {
+    public fun defineModule(name: String, access: Modifier, version: String? = null): BytecodeModule {
         require(isModule) { "Can't define module for non module class '$className'" }
         val module = BytecodeModule(name, access, version, this)
         this.module = module
@@ -229,7 +229,7 @@ public data class BytecodeClass(
     @AsmKtDsl
     public fun defineField(
         name: String,
-        access: Int,
+        access: Modifier,
         type: FieldType,
         signature: String? = null,
         value: Any? = null,
@@ -243,7 +243,7 @@ public data class BytecodeClass(
     @AsmKtDsl
     public fun defineMethod(
         name: String,
-        access: Int,
+        access: Modifier,
         type: MethodType,
         signature: String? = null,
         exceptions: List<ReferenceType> = emptyList(),
@@ -270,7 +270,10 @@ public data class BytecodeClass(
      * Defines a skeleton implementation of a constructor for `this` class.
      */
     @AsmKtDsl
-    public fun defineConstructor(access: Int = Modifiers.PUBLIC, type: MethodType = MethodType.VOID): BytecodeMethod {
+    public fun defineConstructor(
+        access: Modifier = Modifier.PUBLIC,
+        type: MethodType = MethodType.VOID,
+    ): BytecodeMethod {
         require(type.returnType is PrimitiveType.Void) { "return type of a constructor must be 'void', was '$type'." }
         return defineMethod("<init>", access, type)
     }
@@ -279,7 +282,7 @@ public data class BytecodeClass(
      * Defines a skeleton implementation of a `static` block for `this` class.
      */
     @AsmKtDsl
-    public fun defineStaticInit(): BytecodeMethod = defineMethod("<clinit>", Modifiers.STATIC, MethodType.VOID)
+    public fun defineStaticInit(): BytecodeMethod = defineMethod("<clinit>", Modifier.STATIC, MethodType.VOID)
 
     /**
      * Defines a basic constructor for `this` class with the given [access] that just invokes the no-arg constructor
@@ -287,7 +290,7 @@ public data class BytecodeClass(
      */
     @AsmKtDsl
     public fun defineDefaultConstructor(
-        access: Int = Modifiers.PUBLIC,
+        access: Modifier = Modifier.PUBLIC,
     ): BytecodeMethod = defineConstructor(access) {
         loadThis()
         invokeConstructor(this@BytecodeClass.superType)
@@ -300,7 +303,7 @@ public data class BytecodeClass(
      */
     @AsmKtDsl
     public fun defineInaccessibleConstructor(
-        access: Int = Modifiers.PRIVATE,
+        access: Modifier = Modifier.PRIVATE,
         message: String = "No $simpleName instances for you!",
     ): BytecodeMethod = defineConstructor(access) {
         loadThis()
@@ -313,7 +316,7 @@ public data class BytecodeClass(
      */
     @AsmKtDsl
     public fun defineEquals(isFinal: Boolean = false): BytecodeMethod {
-        val flags = if (isFinal) Modifiers.PUBLIC_FINAL else Modifiers.PUBLIC
+        val flags = Modifier.PUBLIC + (if (isFinal) Modifier.FINAL else Modifier.NONE)
         return defineMethod("equals", flags, MethodType.ofBoolean(OBJECT))
     }
 
@@ -322,7 +325,7 @@ public data class BytecodeClass(
      */
     @AsmKtDsl
     public fun defineHashCode(isFinal: Boolean = false): BytecodeMethod {
-        val flags = if (isFinal) Modifiers.PUBLIC_FINAL else Modifiers.PUBLIC
+        val flags = Modifier.PUBLIC + (if (isFinal) Modifier.FINAL else Modifier.NONE)
         return defineMethod("hashCode", flags, MethodType.INT)
     }
 
@@ -331,7 +334,7 @@ public data class BytecodeClass(
      */
     @AsmKtDsl
     public fun defineToString(isFinal: Boolean = false): BytecodeMethod {
-        val flags = if (isFinal) Modifiers.PUBLIC_FINAL else Modifiers.PUBLIC
+        val flags = Modifier.PUBLIC + (if (isFinal) Modifier.FINAL else Modifier.NONE)
         return defineMethod("toString", flags, MethodType.STRING)
     }
 
@@ -361,7 +364,7 @@ public data class BytecodeClass(
         val node = ClassNode()
 
         node.version = version.opcode
-        node.access = kind.applyTo(access) or if (treatSuperSpecially) Modifiers.SUPER else 0
+        node.access = ((kind + access) + (if (treatSuperSpecially) Modifier.SUPER else Modifier.NONE)).asInt()
         node.name = internalName
         node.superName = superType.internalName
         node.interfaces = interfaces.mapTo(mutableListOf()) { it.internalName }
@@ -376,7 +379,7 @@ public data class BytecodeClass(
         node.module = module?.toNode()
 
         for ((innerName, clz) in innerClasses) {
-            node.innerClasses.add(InnerClassNode(clz.internalName, internalName, innerName, clz.access))
+            node.innerClasses.add(InnerClassNode(clz.internalName, internalName, innerName, clz.access.asInt()))
         }
 
         for (method in methods) {

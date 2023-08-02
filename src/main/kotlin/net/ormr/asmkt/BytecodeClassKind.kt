@@ -18,16 +18,14 @@ package net.ormr.asmkt
 
 import java.util.*
 
-public enum class BytecodeClassKind(private val opcode: Int?, internal val displayName: String) {
-    CLASS(null, "class"),
-    ABSTRACT_CLASS(Modifiers.ABSTRACT, "abstract"),
-    INTERFACE(Modifiers.INTERFACE, "interface"),
-    ANNOTATION(Modifiers.ANNOTATION, "annotation"),
-    ENUM(Modifiers.ENUM, "enum"),
-    RECORD(Modifiers.RECORD, "record"),
-    MODULE(Modifiers.MODULE, "module");
-
-    public fun applyTo(opcode: Int): Int = this.opcode?.let { opcode or it } ?: opcode
+public enum class BytecodeClassKind(public val modifier: Modifier, public val modifierName: String) {
+    CLASS(Modifier.NONE, "class"),
+    ABSTRACT_CLASS(Modifier.ABSTRACT, "abstract"),
+    INTERFACE(Modifier.INTERFACE, "interface"),
+    ANNOTATION(Modifier.ANNOTATION, "annotation"),
+    ENUM(Modifier.ENUM, "enum"),
+    RECORD(Modifier.RECORD, "record"),
+    MODULE(Modifier.MODULE, "module");
 
     internal companion object {
         @JvmField
@@ -42,10 +40,12 @@ public enum class BytecodeClassKind(private val opcode: Int?, internal val displ
         @JvmField
         internal val WITH_ABSTRACT_METHODS: Set<BytecodeClassKind> = EnumSet.of(ABSTRACT_CLASS, INTERFACE)
 
-        internal fun getByOpcodeOrNull(opcode: Int): BytecodeClassKind? =
-            entries.firstOrNull { it.opcode?.let { c -> Modifiers.contains(c, opcode) } ?: false }
+        internal fun getByModifierOrNull(modifier: Modifier): BytecodeClassKind? =
+            entries.firstOrNull { modifier in it.modifier }
     }
 }
 
-internal val BytecodeClassKind.isInheritable: Boolean
+public operator fun BytecodeClassKind.plus(modifier: Modifier): Modifier = this.modifier + modifier
+
+public val BytecodeClassKind.isInheritable: Boolean
     get() = this in BytecodeClassKind.INHERITABLE

@@ -711,7 +711,7 @@ public class BytecodeBlock : Iterable<AbstractInsnNode> {
 
     public fun toBytecodeMethod(
         name: String,
-        access: Int,
+        access: Modifier,
         type: MethodType,
         signature: String?,
         exceptions: List<ReferenceType>,

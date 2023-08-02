@@ -26,7 +26,7 @@ import org.objectweb.asm.tree.TypeAnnotationNode
 @AsmKtDsl
 public data class BytecodeField internal constructor(
     val name: String,
-    override val access: Int,
+    override val access: Modifier,
     val type: FieldType,
     val signature: String?,
     val value: Any?,
@@ -36,16 +36,16 @@ public data class BytecodeField internal constructor(
     }
 
     /**
-     * Returns `true` if `this` field is [volatile][Modifiers.VOLATILE], otherwise `false`.
+     * Returns `true` if `this` field is [volatile][Modifier.VOLATILE], otherwise `false`.
      */
     val isVolatile: Boolean
-        get() = Modifiers.contains(access, Modifiers.VOLATILE)
+        get() = Modifier.VOLATILE in access
 
     /**
-     * Returns `true` if `this` field is [volatile][Modifiers.VOLATILE], otherwise `false`.
+     * Returns `true` if `this` field is [volatile][Modifier.VOLATILE], otherwise `false`.
      */
     val isTransient: Boolean
-        get() = Modifiers.contains(access, Modifiers.TRANSIENT)
+        get() = Modifier.TRANSIENT in access
 
     // annotations
     private val visibleAnnotations: MutableList<BytecodeAnnotation> = mutableListOf()
@@ -82,7 +82,7 @@ public data class BytecodeField internal constructor(
     }
 
     internal fun toNode(): FieldNode {
-        val node = FieldNode(access, name, type.descriptor, signature, value)
+        val node = FieldNode(access.asInt(), name, type.descriptor, signature, value)
         // annotations
         node.visibleAnnotations = visibleAnnotations
             .mapTo(mutableListOf(), BytecodeAnnotation::node)

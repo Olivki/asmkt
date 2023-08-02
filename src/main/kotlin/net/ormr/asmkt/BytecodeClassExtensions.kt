@@ -29,7 +29,7 @@ public inline fun defineClass(
     type: ReferenceType,
     version: BytecodeVersion,
     kind: BytecodeClassKind = BytecodeClassKind.CLASS,
-    access: Int = Modifiers.PUBLIC,
+    access: Modifier = Modifier.PUBLIC,
     superType: ReferenceType = OBJECT,
     interfaces: List<ReferenceType> = emptyList(),
     permittedSubtypes: List<ReferenceType> = emptyList(),
@@ -59,7 +59,7 @@ public inline fun defineClass(
 @AsmKtDsl
 public inline fun BytecodeClass.defineModule(
     name: String,
-    access: Int,
+    access: Modifier,
     version: String? = null,
     scope: BytecodeModule.() -> Unit,
 ): BytecodeModule {
@@ -74,7 +74,7 @@ public inline fun BytecodeClass.defineModule(
 @AsmKtDsl
 public fun BytecodeClass.defineField(
     name: String,
-    access: Int,
+    access: Modifier,
     type: ReferenceType,
     signature: String? = null,
     value: Any? = null,
@@ -92,7 +92,7 @@ public fun BytecodeClass.defineField(
 @AsmKtDsl
 public inline fun BytecodeClass.defineMethod(
     name: String,
-    access: Int,
+    access: Modifier,
     type: MethodType,
     signature: String? = null,
     exceptions: List<ReferenceType> = emptyList(),
@@ -121,7 +121,7 @@ public inline fun BytecodeClass.defineRecordComponent(
 
 @AsmKtDsl
 public inline fun BytecodeClass.defineConstructor(
-    access: Int = Modifiers.PUBLIC,
+    access: Modifier = Modifier.PUBLIC,
     descriptor: MethodType = MethodType.VOID,
     scope: BytecodeMethod.() -> Unit,
 ): BytecodeMethod {

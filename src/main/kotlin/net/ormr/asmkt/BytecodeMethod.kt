@@ -37,7 +37,7 @@ import org.objectweb.asm.Type as AsmType
 @AsmKtDsl
 public data class BytecodeMethod internal constructor(
     val name: String,
-    override val access: Int,
+    override val access: Modifier,
     val type: MethodType,
     val signature: String?,
     val exceptions: List<ReferenceType>,
@@ -77,34 +77,34 @@ public data class BytecodeMethod internal constructor(
         get() = parent.version
 
     /**
-     * Returns `true` if `this` method is [synchronized][Modifiers.SYNCHRONIZED], otherwise `false`.
+     * Returns `true` if `this` method is [synchronized][Modifier.SYNCHRONIZED], otherwise `false`.
      */
     public val isSynchronized: Boolean
-        get() = Modifiers.contains(access, Modifiers.SYNCHRONIZED)
+        get() = Modifier.SYNCHRONIZED in access
 
     /**
-     * Returns `true` if `this` method is [bridge][Modifiers.BRIDGE], otherwise `false`.
+     * Returns `true` if `this` method is [bridge][Modifier.BRIDGE], otherwise `false`.
      */
     public val isBridge: Boolean
-        get() = Modifiers.contains(access, Modifiers.BRIDGE)
+        get() = Modifier.BRIDGE in access
 
     /**
-     * Returns `true` if `this` method is [varargs][Modifiers.VARARGS], otherwise `false`.
+     * Returns `true` if `this` method is [varargs][Modifier.VARARGS], otherwise `false`.
      */
     public val isVarargs: Boolean
-        get() = Modifiers.contains(access, Modifiers.VARARGS)
+        get() = Modifier.VARARGS in access
 
     /**
-     * Returns `true` if `this` method is [native][Modifiers.NATIVE], otherwise `false`.
+     * Returns `true` if `this` method is [native][Modifier.NATIVE], otherwise `false`.
      */
     public val isNative: Boolean
-        get() = Modifiers.contains(access, Modifiers.NATIVE)
+        get() = Modifier.NATIVE in access
 
     /**
-     * Returns `true` if `this` method is [strict][Modifiers.STRICT], otherwise `false`.
+     * Returns `true` if `this` method is [strict][Modifier.STRICT], otherwise `false`.
      */
     public val isStrict: Boolean
-        get() = Modifiers.contains(access, Modifiers.STRICT)
+        get() = Modifier.STRICT in access
 
     /**
      * Returns the return type of `this` method.
@@ -1248,12 +1248,12 @@ public data class BytecodeMethod internal constructor(
      * Sets the `access` of the parameter with the given [name] to the given [access].
      *
      * @param [name] the name of the parameter
-     * @param [access] the parameters access flags, valid values are; are [FINAL][Modifiers.FINAL],
-     * [SYNTHETIC][Modifiers.SYNTHETIC] and [MANDATED][Modifiers.MANDATED], or any combination of the three.
+     * @param [access] the parameters access flags, valid values are; are [FINAL][Modifier.FINAL],
+     * [SYNTHETIC][Modifier.SYNTHETIC] and [MANDATED][Modifier.MANDATED], or any combination of the three.
      */
     @AsmKtDsl
-    public fun defineParameterAccess(name: String, access: Int): BytecodeMethod = apply {
-        parameterNodes += ParameterNode(name, access)
+    public fun defineParameterAccess(name: String, access: Modifier): BytecodeMethod = apply {
+        parameterNodes += ParameterNode(name, access.asInt())
     }
 
     // TODO: documentation and document throws
@@ -1364,7 +1364,7 @@ public data class BytecodeMethod internal constructor(
      * Returns a new [MethodNode] based on the contents of `this` bytecode method.
      */
     public fun toMethodNode(): MethodNode {
-        val node = MethodNode(access, name, type.descriptor, signature, null)
+        val node = MethodNode(access.asInt(), name, type.descriptor, signature, null)
 
         node.annotationDefault = fixAnnotationValue(defaultAnnotationValue)
 

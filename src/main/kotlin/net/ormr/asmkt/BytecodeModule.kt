@@ -23,7 +23,7 @@ import org.objectweb.asm.tree.*
 @AsmKtDsl
 public data class BytecodeModule internal constructor(
     public val name: String,
-    override val access: Int,
+    override val access: Modifier,
     public val version: String?,
     public val mainClass: BytecodeClass,
 ) : AccessibleBytecode {
@@ -70,11 +70,11 @@ public data class BytecodeModule internal constructor(
     }
 
     internal fun toNode(): ModuleNode =
-        ModuleNode(Opcodes.ASM8, name, access, version, requires, exports, opens, uses, provides)
+        ModuleNode(Opcodes.ASM8, name, access.asInt(), version, requires, exports, opens, uses, provides)
 }
 
 /**
- * Returns `true` if `this` module is [open][Modifiers.OPEN], otherwise `false`.
+ * Returns `true` if `this` module is [open][Modifier.OPEN], otherwise `false`.
  */
 public val BytecodeModule.isOpen: Boolean
-    get() = Modifiers.contains(access, Modifiers.OPEN)
+    get() = Modifier.OPEN in access
