@@ -38,7 +38,7 @@ public value class Modifier(private val code: Int) {
     public operator fun contains(other: Modifier): Boolean =
         if (this == NONE || other == NONE) false else code and other.code != 0
 
-    public fun asInt(): Int = code
+    public fun asInt(): Int = if (this == NONE) 0 else code
 
     public companion object {
         /**
