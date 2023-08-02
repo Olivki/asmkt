@@ -85,7 +85,7 @@ public data class BytecodeClass(
      * Returns `true` if `this` class represents a "sealed" type, otherwise `false`.
      */
     public val isSealed: Boolean
-        get() = kind.canHavePermittedSubtypes && permittedSubtypes.isNotEmpty()
+        get() = kind.isInheritable && permittedSubtypes.isNotEmpty()
 
     /**
      * The [module][BytecodeModule] that belongs to `this` class, or `null` if no module is defined for `this` class.
@@ -165,14 +165,14 @@ public data class BytecodeClass(
         }
         if (permittedSubtypes.isNotEmpty()) {
             requireMinVersion(BytecodeVersion.JAVA_16, "Permitted subtypes")
-            requireOneKindOf(BytecodeClassKind.havePermittedSubtypes, "permitted subtypes")
+            requireOneKindOf(BytecodeClassKind.INHERITABLE, "permitted subtypes")
         }
     }
 
     private fun checkAccess() {
         val foundKind = BytecodeClassKind.getByOpcodeOrNull(access)
         if (foundKind != null) {
-            throw IllegalArgumentException("Opcode '${foundKind.opcodeName}' found in 'access', use 'kind = BytecodeClassKind.${foundKind.name}' instead.")
+            throw IllegalArgumentException("Opcode '${foundKind.displayName}' found in 'access', use 'kind = BytecodeClassKind.${foundKind.name}' instead.")
         }
     }
 
@@ -234,7 +234,7 @@ public data class BytecodeClass(
         signature: String? = null,
         value: Any? = null,
     ): BytecodeField {
-        requireNotOneKindOf(BytecodeClassKind.notHaveFields, "fields")
+        requireNotOneKindOf(BytecodeClassKind.NO_FIELDS, "fields")
         val field = BytecodeField(name, access, type, signature, value)
         fields[name] = field
         return field
@@ -248,7 +248,7 @@ public data class BytecodeClass(
         signature: String? = null,
         exceptions: List<ReferenceType> = emptyList(),
     ): BytecodeMethod {
-        requireNotOneKindOf(BytecodeClassKind.notHaveMethods, "methods")
+        requireNotOneKindOf(BytecodeClassKind.NO_METHODS, "methods")
         val block = BytecodeMethod(name, access, type, signature, exceptions, this)
         methods += block
         return block
@@ -346,7 +346,7 @@ public data class BytecodeClass(
     private fun check() {
         for (method in methods) {
             if (method.isAbstract && !(isAbstract || isInterface)) {
-                requireOneKindOf(BytecodeClassKind.haveAbstractMethods, "abstract methods")
+                requireOneKindOf(BytecodeClassKind.WITH_ABSTRACT_METHODS, "abstract methods")
             }
             if (method.isEmpty() && !method.isAbstract) {
                 throw IllegalArgumentException("No instructions defined for non-abstract method '${method.toComponentString()}' in '$className'.")
