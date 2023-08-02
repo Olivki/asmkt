@@ -44,36 +44,6 @@ public data class BytecodeMethod internal constructor(
     val parent: BytecodeClass,
     val block: BytecodeBlock = BytecodeBlock(),
 ) : AccessibleBytecode, AnnotatableBytecode, AnnotatableTypeBytecode, BytecodeVersionContainer {
-    private companion object {
-        // +0.0F
-        private const val POSITIVE_ZERO_FLOAT = 0
-
-        // 1.0F
-        private const val ONE_FLOAT = 0x3F800000
-
-        // 2.0F
-        private const val TWO_FLOAT = 0x40000000
-
-        // +0.0D
-        private const val POSITIVE_ZERO_DOUBLE = 0L
-
-        // 1.0D
-        private const val ONE_DOUBLE = 0x3FF0000000000000L
-
-        private val primitiveClassHandle: Handle by lazy {
-            InvokeStaticHandle(
-                ReferenceType.CONSTANT_BOOTSTRAPS,
-                "primitiveClass",
-                MethodType.of(
-                    ReferenceType.CLASS,
-                    ReferenceType.METHOD_HANDLES_LOOKUP,
-                    ReferenceType.STRING,
-                    ReferenceType.CLASS,
-                ),
-            )
-        }
-    }
-
     override val version: BytecodeVersion
         get() = parent.version
 
@@ -1445,6 +1415,36 @@ public data class BytecodeMethod internal constructor(
             for (annotation in annotations) {
                 action(i, annotation)
             }
+        }
+    }
+
+    private companion object {
+        // +0.0F
+        private const val POSITIVE_ZERO_FLOAT = 0
+
+        // 1.0F
+        private const val ONE_FLOAT = 0x3F800000
+
+        // 2.0F
+        private const val TWO_FLOAT = 0x40000000
+
+        // +0.0D
+        private const val POSITIVE_ZERO_DOUBLE = 0L
+
+        // 1.0D
+        private const val ONE_DOUBLE = 0x3FF0000000000000L
+
+        private val primitiveClassHandle: Handle by lazy {
+            InvokeStaticHandle(
+                ReferenceType.CONSTANT_BOOTSTRAPS,
+                "primitiveClass",
+                MethodType.of(
+                    ReferenceType.CLASS,
+                    ReferenceType.METHOD_HANDLES_LOOKUP,
+                    ReferenceType.STRING,
+                    ReferenceType.CLASS,
+                ),
+            )
         }
     }
 }
