@@ -152,6 +152,9 @@ public fun BytecodeMethod.unbox(type: FieldType): BytecodeMethod = apply {
  * Pushes the instructions needed to box the value currently at the top of the stack using the `valueOf` functions
  * located in the boxed variants for primitive types onto the stack.
  *
+ * Note that for [void][PrimitiveType.Void] types, this will push `null` onto the stack, as we can't actually create
+ * instances of the `Void` class.
+ *
  * @param [type] the type to box
  *
  * @throws [IllegalArgumentException] if [type] is a method-type
