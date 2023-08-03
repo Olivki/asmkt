@@ -115,6 +115,18 @@ public fun BytecodeMethod.box(type: PrimitiveType): BytecodeMethod = apply {
     }
 }
 
+/**
+ * Attempts to push the instruction for unboxing the top-most value on the stack to the given [type].
+ *
+ * Note that if `type` is [void][PrimitiveType.Void] the no instructions are pushed onto the stack. In the case that
+ * `type` is a [ReferenceType] then the value is simply cast to `type`.
+ *
+ * @param [type] the type to unbox to, must not be an [ArrayType]
+ *
+ * @throws [IllegalArgumentException] if [type] is an [ArrayType]
+ *
+ * @see [box]
+ */
 @AsmKtDsl
 public fun BytecodeMethod.unbox(type: FieldType): BytecodeMethod = apply {
     require(type !is ArrayType) { "'type' must not be an array type." }
@@ -156,8 +168,6 @@ public fun BytecodeMethod.unbox(type: FieldType): BytecodeMethod = apply {
  * instances of the `Void` class.
  *
  * @param [type] the type to box
- *
- * @throws [IllegalArgumentException] if [type] is a method-type
  */
 @AsmKtDsl
 public fun BytecodeMethod.pushValueOf(type: PrimitiveType): BytecodeMethod = apply {
