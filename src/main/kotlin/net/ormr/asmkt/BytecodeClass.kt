@@ -464,5 +464,5 @@ public data class BytecodeClass(
     }
 
     override fun toString(): String =
-        "BytecodeClass(type='${type.className}', version=$version, access=$access, superType='${superType.className}', interfaces=$interfaces, sourceFile=$sourceFile, sourceDebug=$sourceDebug, enclosingClass=${enclosingClass?.type?.className})"
+        "BytecodeClass(type='${type.className}', version=$version, access=$access, superType='${superType.className}', interfaces=$interfaces, sourceFile=$sourceFile, sourceDebug=$sourceDebug, enclosingClass=${enclosingClass?.type?.className}, nestHostClass=${nestHostClass?.type?.className})"
 }
