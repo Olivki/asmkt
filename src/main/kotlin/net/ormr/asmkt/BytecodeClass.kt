@@ -409,8 +409,8 @@ public data class BytecodeClass(
         }
 
         node.nestMembers = nestMembers
-            .mapTo(mutableListOf()) { it.internalName }
             .ifEmpty { null }
+            ?.mapTo(mutableListOf(), BytecodeClass::internalName)
 
         for (method in methods) {
             node.methods.add(method.toMethodNode())
@@ -421,26 +421,26 @@ public data class BytecodeClass(
         }
 
         node.permittedSubclasses = permittedSubtypes
-            .mapTo(mutableListOf()) { it.internalName }
             .ifEmpty { null }
+            ?.mapTo(mutableListOf(), ReferenceType::internalName)
 
         node.recordComponents = recordComponents
-            .mapTo(mutableListOf(), BytecodeRecordComponent::toNode)
             .ifEmpty { null }
+            ?.mapTo(mutableListOf(), BytecodeRecordComponent::toNode)
 
         node.visibleAnnotations = visibleAnnotations
-            .mapTo(mutableListOf(), BytecodeAnnotation::node)
             .ifEmpty { null }
+            ?.mapTo(mutableListOf(), BytecodeAnnotation::node)
         node.invisibleAnnotations = invisibleAnnotations
-            .mapTo(mutableListOf(), BytecodeAnnotation::node)
             .ifEmpty { null }
+            ?.mapTo(mutableListOf(), BytecodeAnnotation::node)
 
         node.visibleTypeAnnotations = visibleTypeAnnotations
-            .mapTo(mutableListOf(), BytecodeAnnotation::asTypeNode)
             .ifEmpty { null }
+            ?.mapTo(mutableListOf(), BytecodeAnnotation::asTypeNode)
         node.invisibleTypeAnnotations = invisibleTypeAnnotations
-            .mapTo(mutableListOf(), BytecodeAnnotation::asTypeNode)
             .ifEmpty { null }
+            ?.mapTo(mutableListOf(), BytecodeAnnotation::asTypeNode)
 
         return node
     }
