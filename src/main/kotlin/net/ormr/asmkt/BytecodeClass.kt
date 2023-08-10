@@ -338,15 +338,7 @@ public data class BytecodeClass(
         return defineMethod("toString", flags, MethodType.STRING)
     }
 
-    public fun toByteArray(): ByteArray {
-        check()
-        val writer = ClassWriter(ClassWriter.COMPUTE_FRAMES)
-        val node = toClassNode()
-        node.accept(writer)
-        return writer.toByteArray()
-    }
-
-    private fun check() {
+    private fun validate() {
         for (method in methods) {
             if (method.isAbstract && !(isAbstract || isInterface)) {
                 requireOneKindOf(BytecodeClassKind.WITH_ABSTRACT_METHODS, "abstract methods")
@@ -360,7 +352,24 @@ public data class BytecodeClass(
         }
     }
 
+    /**
+     * Returns this [BytecodeClass] converted into JVM bytecode.
+     *
+     * @throws [IllegalArgumentException] if the class is invalid
+     *
+     * @see [ClassWriter]
+     * @see [ClassWriter.toByteArray]
+     */
+    public fun toByteArray(): ByteArray {
+        val writer = ClassWriter(ClassWriter.COMPUTE_FRAMES)
+        val node = toClassNode()
+        node.accept(writer)
+        return writer.toByteArray()
+    }
+
     private fun toClassNode(): ClassNode {
+        validate()
+
         val node = ClassNode()
 
         node.version = version.opcode
