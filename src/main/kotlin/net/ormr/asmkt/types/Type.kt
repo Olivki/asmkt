@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Oliver Berg
+ * Copyright 2020-2023 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,18 +21,6 @@ package net.ormr.asmkt.types
 import org.objectweb.asm.Type as AsmType
 
 public sealed class Type {
-    public companion object {
-        public fun copyOf(type: AsmType): Type = when (type.sort) {
-            AsmType.VOID, AsmType.BOOLEAN, AsmType.CHAR, AsmType.BYTE, AsmType.SHORT,
-            AsmType.INT, AsmType.LONG, AsmType.FLOAT, AsmType.DOUBLE,
-            -> PrimitiveType.copyOf(type)
-            AsmType.ARRAY -> ArrayType.copyOf(type)
-            AsmType.OBJECT -> ReferenceType.copyOf(type)
-            AsmType.METHOD -> MethodType.copyOf(type)
-            else -> throw UnsupportedOperationException("Unknown 'sort' value ${type.sort}.")
-        }
-    }
-
     protected abstract val delegate: AsmType
 
     // TODO: documentation
@@ -52,4 +40,16 @@ public sealed class Type {
     final override fun hashCode(): Int = cachedHash
 
     abstract override fun toString(): String
+
+    public companion object {
+        public fun copyOf(type: AsmType): Type = when (type.sort) {
+            AsmType.VOID, AsmType.BOOLEAN, AsmType.CHAR, AsmType.BYTE, AsmType.SHORT,
+            AsmType.INT, AsmType.LONG, AsmType.FLOAT, AsmType.DOUBLE,
+            -> PrimitiveType.copyOf(type)
+            AsmType.ARRAY -> ArrayType.copyOf(type)
+            AsmType.OBJECT -> ReferenceType.copyOf(type)
+            AsmType.METHOD -> MethodType.copyOf(type)
+            else -> throw UnsupportedOperationException("Unknown 'sort' value ${type.sort}.")
+        }
+    }
 }

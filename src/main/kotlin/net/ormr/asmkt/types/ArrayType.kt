@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Oliver Berg
+ * Copyright 2020-2023 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,67 @@ import org.objectweb.asm.Type as AsmType
  * Represents an array type containing a [FieldType], i.e; `java.lang.String[]`, `int[]`, `java.lang.Byte[][]`.
  */
 public class ArrayType private constructor(override val delegate: AsmType) : FieldType(), TypeWithInternalName {
+    override val descriptor: String = delegate.descriptor
+
+    override val className: String = delegate.className
+
+    override val simpleName: String
+        get() = elementType.className.substringAfterLast('.')
+
+    /**
+     * Returns the internal name of the class corresponding to `this` type.
+     *
+     * The internal name of a type is its fully qualified name *(as returned by [className])* with `.` replaced with
+     * `/`.
+     */
+    override val internalName: String = delegate.internalName
+
+    /**
+     * The amount of dimensions `this` array type has.
+     */
+    public val dimensions: Int = delegate.dimensions
+
+    /**
+     * Returns `true` if `this` array type only has `1` [dimension][dimensions], otherwise `false`.
+     */
+    public val isShallow: Boolean
+        get() = dimensions == 1
+
+    /**
+     * The type of the elements of `this` array type.
+     */
+    public val elementType: FieldType = FieldType.copyOf(delegate.elementType)
+
+    override val isValidFieldType: Boolean
+        get() = true
+
+    // TODO: does this work like it should?
+    /**
+     * Returns a class representation of `this` array type.
+     *
+     * @throws [ClassNotFoundException] if the class for [elementType] could not be found
+     */
+    @Throws(ClassNotFoundException::class)
+    override fun toClass(): Class<*> = Array.newInstance(elementType.toClass(), 0).javaClass
+
+    /**
+     * Returns a class representation of `this` array type, loaded using the given [loader].
+     *
+     * Note that `loader` is only used if [elementType] is a [ReferenceType] or an [ArrayType].
+     *
+     * @throws [ClassNotFoundException] if the class for [elementType] could not be found
+     */
+    @Throws(ClassNotFoundException::class)
+    public fun toClass(loader: ClassLoader): Class<*> {
+        val clz = when (elementType) {
+            is PrimitiveType -> elementType.toClass()
+            is ReferenceType -> elementType.toClass(loader)
+            is ArrayType -> elementType.toClass(loader)
+        }
+
+        return Array.newInstance(clz, 0).javaClass
+    }
+
     public companion object {
         private val cachedTypes: MutableMap<String, ArrayType> = hashMapOf()
 
@@ -137,67 +198,6 @@ public class ArrayType private constructor(override val delegate: AsmType) : Fie
 
             return fromDescriptor(descriptor)
         }
-    }
-
-    override val descriptor: String = delegate.descriptor
-
-    override val className: String = delegate.className
-
-    override val simpleName: String
-        get() = elementType.className.substringAfterLast('.')
-
-    /**
-     * Returns the internal name of the class corresponding to `this` type.
-     *
-     * The internal name of a type is its fully qualified name *(as returned by [className])* with `.` replaced with
-     * `/`.
-     */
-    override val internalName: String = delegate.internalName
-
-    /**
-     * The amount of dimensions `this` array type has.
-     */
-    public val dimensions: Int = delegate.dimensions
-
-    /**
-     * Returns `true` if `this` array type only has `1` [dimension][dimensions], otherwise `false`.
-     */
-    public val isShallow: Boolean
-        get() = dimensions == 1
-
-    /**
-     * The type of the elements of `this` array type.
-     */
-    public val elementType: FieldType = FieldType.copyOf(delegate.elementType)
-
-    override val isValidFieldType: Boolean
-        get() = true
-
-    // TODO: does this work like it should?
-    /**
-     * Returns a class representation of `this` array type.
-     *
-     * @throws [ClassNotFoundException] if the class for [elementType] could not be found
-     */
-    @Throws(ClassNotFoundException::class)
-    override fun toClass(): Class<*> = Array.newInstance(elementType.toClass(), 0).javaClass
-
-    /**
-     * Returns a class representation of `this` array type, loaded using the given [loader].
-     *
-     * Note that `loader` is only used if [elementType] is a [ReferenceType] or an [ArrayType].
-     *
-     * @throws [ClassNotFoundException] if the class for [elementType] could not be found
-     */
-    @Throws(ClassNotFoundException::class)
-    public fun toClass(loader: ClassLoader): Class<*> {
-        val clz = when (elementType) {
-            is PrimitiveType -> elementType.toClass()
-            is ReferenceType -> elementType.toClass(loader)
-            is ArrayType -> elementType.toClass(loader)
-        }
-
-        return Array.newInstance(clz, 0).javaClass
     }
 }
 

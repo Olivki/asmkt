@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Oliver Berg
+ * Copyright 2020-2023 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,69 @@ import org.objectweb.asm.Type
  * Represents a type of an `Object` child, i.e; `java.lang.String`, `java.lang.Byte`, `java.lang.Double`, etc..
  */
 public class ReferenceType private constructor(override val delegate: Type) : FieldType(), TypeWithInternalName {
+
+    override val descriptor: String = delegate.descriptor
+
+    override val className: String = delegate.className
+
+    override val simpleName: String
+        get() = className.substringAfterLast('.')
+
+    /**
+     * Returns the internal name of the class corresponding to `this` type.
+     *
+     * The internal name of a type is its fully qualified name *(as returned by [className])* with `.` replaced with
+     * `/`.
+     */
+    override val internalName: String = delegate.internalName
+
+    override val isValidFieldType: Boolean
+        get() = true
+
+    /**
+     * Returns `true` if `this` object type is the boxed variant of a [primitive type][PrimitiveType], otherwise
+     * `false`.
+     */
+    public val isBoxedPrimitive: Boolean
+        get() = toPrimitive() != null
+
+    /**
+     * Returns the primitive type of `this` type if it's a boxed type, or itself if it's already a primitive, or
+     * `null` if there exists no primitive type for `this` type.
+     */
+    public fun toPrimitive(): PrimitiveType? = when (this) {
+        VOID -> PrimitiveType.Void
+        BOOLEAN -> PrimitiveType.Boolean
+        CHAR -> PrimitiveType.Char
+        BYTE -> PrimitiveType.Byte
+        SHORT -> PrimitiveType.Short
+        INT -> PrimitiveType.Int
+        LONG -> PrimitiveType.Long
+        FLOAT -> PrimitiveType.Float
+        DOUBLE -> PrimitiveType.Double
+        else -> null
+    }
+
+    /**
+     * Returns the class corresponding to the [className] of `this` type.
+     *
+     * @throws [ClassNotFoundException] if no class could be found for the [className] of `this` type
+     *
+     * @see [Class.forName]
+     */
+    @Throws(ClassNotFoundException::class)
+    override fun toClass(): Class<*> = Class.forName(className)
+
+    /**
+     * Returns the class corresponding to the [className] of `this` type, loaded with the given [loader].
+     *
+     * @throws [ClassNotFoundException] if no class could be found for the [className] of `this` type
+     *
+     * @see [Class.forName]
+     */
+    @Throws(ClassNotFoundException::class)
+    public fun toClass(loader: ClassLoader): Class<*> = Class.forName(className, false, loader)
+
     public companion object {
         private val cachedTypes: MutableMap<String, ReferenceType> = hashMapOf()
 
@@ -113,68 +176,6 @@ public class ReferenceType private constructor(override val delegate: Type) : Fi
 
         public fun of(clz: Class<*>): ReferenceType = fromDescriptor(Type.getDescriptor(clz))
     }
-
-    override val descriptor: String = delegate.descriptor
-
-    override val className: String = delegate.className
-
-    override val simpleName: String
-        get() = className.substringAfterLast('.')
-
-    /**
-     * Returns the internal name of the class corresponding to `this` type.
-     *
-     * The internal name of a type is its fully qualified name *(as returned by [className])* with `.` replaced with
-     * `/`.
-     */
-    override val internalName: String = delegate.internalName
-
-    override val isValidFieldType: Boolean
-        get() = true
-
-    /**
-     * Returns `true` if `this` object type is the boxed variant of a [primitive type][PrimitiveType], otherwise
-     * `false`.
-     */
-    public val isBoxedPrimitive: Boolean
-        get() = toPrimitive() != null
-
-    /**
-     * Returns the primitive type of `this` type if it's a boxed type, or itself if it's already a primitive, or
-     * `null` if there exists no primitive type for `this` type.
-     */
-    public fun toPrimitive(): PrimitiveType? = when (this) {
-        VOID -> PrimitiveType.Void
-        BOOLEAN -> PrimitiveType.Boolean
-        CHAR -> PrimitiveType.Char
-        BYTE -> PrimitiveType.Byte
-        SHORT -> PrimitiveType.Short
-        INT -> PrimitiveType.Int
-        LONG -> PrimitiveType.Long
-        FLOAT -> PrimitiveType.Float
-        DOUBLE -> PrimitiveType.Double
-        else -> null
-    }
-
-    /**
-     * Returns the class corresponding to the [className] of `this` type.
-     *
-     * @throws [ClassNotFoundException] if no class could be found for the [className] of `this` type
-     *
-     * @see [Class.forName]
-     */
-    @Throws(ClassNotFoundException::class)
-    override fun toClass(): Class<*> = Class.forName(className)
-
-    /**
-     * Returns the class corresponding to the [className] of `this` type, loaded with the given [loader].
-     *
-     * @throws [ClassNotFoundException] if no class could be found for the [className] of `this` type
-     *
-     * @see [Class.forName]
-     */
-    @Throws(ClassNotFoundException::class)
-    public fun toClass(loader: ClassLoader): Class<*> = Class.forName(className, false, loader)
 }
 
 public inline fun <reified T : Any> ReferenceType(): ReferenceType = ReferenceType.of(T::class.java)

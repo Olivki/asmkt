@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Oliver Berg
+ * Copyright 2020-2023 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,49 +35,6 @@ import kotlin.Boolean as KBoolean
  * Represents a primitive type, i.e; `byte`, `void`, `double`, etc..
  */
 public sealed class PrimitiveType : FieldType() {
-    public companion object {
-        /**
-         * Returns a list of all the known primitive types.
-         */
-        public val primitives: List<PrimitiveType>
-            get() = Collections.unmodifiableList(listOf(Void, Boolean, Char, Byte, Short, Int, Long, Float, Double))
-
-        public fun copyOf(type: Type): PrimitiveType = when (type.sort) {
-            Type.VOID -> Void
-            Type.BOOLEAN -> Boolean
-            Type.CHAR -> Char
-            Type.BYTE -> Byte
-            Type.SHORT -> Short
-            Type.INT -> Int
-            Type.LONG -> Long
-            Type.FLOAT -> Float
-            Type.DOUBLE -> Double
-            else -> throw IllegalArgumentException("'type' must be a primitive type, was a ${sortNames[type.sort]} type.")
-        }
-
-        public fun fromDescriptor(descriptor: String): PrimitiveType = when (descriptor) {
-            "V" -> Void
-            "Z" -> Boolean
-            "C" -> Char
-            "B" -> Byte
-            "S" -> Short
-            "I" -> Int
-            "J" -> Long
-            "F" -> Float
-            "D" -> Double
-            else -> throw IllegalArgumentException("'descriptor' ($descriptor) is not a valid primitive type descriptor.")
-        }
-
-        // TODO: documentation
-        public fun of(clz: Class<*>): PrimitiveType {
-            require(clz.isPrimitive || clz.isPrimitiveWrapper) { "'clz' must be a primitive or a primitive wrapper, was '${clz.name}'." }
-            return when {
-                clz.isPrimitive -> copyOf(Type.getType(clz))
-                clz.isPrimitiveWrapper -> fromDescriptor(Type.getDescriptor(clz.primitiveClass))
-                else -> throw IllegalStateException("Exhaustive 'when' was not exhaustive, for $clz.")
-            }
-        }
-    }
 
     abstract override val descriptor: String
 
@@ -287,6 +244,50 @@ public sealed class PrimitiveType : FieldType() {
         override fun toBoxed(): ReferenceType = ReferenceType.DOUBLE
 
         override fun toClass(): Class<*> = JDouble.TYPE
+    }
+
+    public companion object {
+        /**
+         * Returns a list of all the known primitive types.
+         */
+        public val primitives: List<PrimitiveType>
+            get() = Collections.unmodifiableList(listOf(Void, Boolean, Char, Byte, Short, Int, Long, Float, Double))
+
+        public fun copyOf(type: Type): PrimitiveType = when (type.sort) {
+            Type.VOID -> Void
+            Type.BOOLEAN -> Boolean
+            Type.CHAR -> Char
+            Type.BYTE -> Byte
+            Type.SHORT -> Short
+            Type.INT -> Int
+            Type.LONG -> Long
+            Type.FLOAT -> Float
+            Type.DOUBLE -> Double
+            else -> throw IllegalArgumentException("'type' must be a primitive type, was a ${sortNames[type.sort]} type.")
+        }
+
+        public fun fromDescriptor(descriptor: String): PrimitiveType = when (descriptor) {
+            "V" -> Void
+            "Z" -> Boolean
+            "C" -> Char
+            "B" -> Byte
+            "S" -> Short
+            "I" -> Int
+            "J" -> Long
+            "F" -> Float
+            "D" -> Double
+            else -> throw IllegalArgumentException("'descriptor' ($descriptor) is not a valid primitive type descriptor.")
+        }
+
+        // TODO: documentation
+        public fun of(clz: Class<*>): PrimitiveType {
+            require(clz.isPrimitive || clz.isPrimitiveWrapper) { "'clz' must be a primitive or a primitive wrapper, was '${clz.name}'." }
+            return when {
+                clz.isPrimitive -> copyOf(Type.getType(clz))
+                clz.isPrimitiveWrapper -> fromDescriptor(Type.getDescriptor(clz.primitiveClass))
+                else -> throw IllegalStateException("Exhaustive 'when' was not exhaustive, for $clz.")
+            }
+        }
     }
 }
 

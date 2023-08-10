@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Oliver Berg
+ * Copyright 2020-2023 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,122 @@ import java.lang.invoke.MethodType as JMethodType
  * Represents the type of method.
  */
 public class MethodType private constructor(override val delegate: AsmType) : Type() {
+    override val descriptor: String = delegate.descriptor
+
+    override val size: Int
+        get() = delegate.argumentsAndReturnSizes
+
+    /**
+     * The return type of `this` method type.
+     */
+    public val returnType: FieldType = FieldType.copyOf(delegate.returnType)
+
+    /**
+     * An unmodifiable list of the types of the arguments of `this` method type.
+     */
+    public val argumentTypes: List<FieldType> =
+        Collections.unmodifiableList(delegate.argumentTypes.map { FieldType.copyOf(it) })
+
+    public fun prependArguments(newArgumentTypes: Iterable<FieldType>): MethodType {
+        if (newArgumentTypes.none()) {
+            return this
+        }
+
+        val newDescriptor = buildString {
+            append('(')
+            newArgumentTypes.joinTo(this, "") { it.descriptor }
+            argumentTypes.joinTo(this, "") { it.descriptor }
+            append(')')
+            append(returnType.descriptor)
+        }
+
+        return fromDescriptor(newDescriptor)
+    }
+
+    public fun prependArguments(vararg newArgumentTypes: FieldType): MethodType =
+        prependArguments(newArgumentTypes.asIterable())
+
+    public fun appendArguments(newArgumentTypes: Iterable<FieldType>): MethodType {
+        if (newArgumentTypes.none()) {
+            return this
+        }
+
+        val newDescriptor = buildString {
+            append('(')
+            argumentTypes.joinTo(this, "") { it.descriptor }
+            newArgumentTypes.joinTo(this, "") { it.descriptor }
+            append(')')
+            append(returnType.descriptor)
+        }
+
+        return fromDescriptor(newDescriptor)
+    }
+
+    public fun appendArguments(vararg newArgumentTypes: FieldType): MethodType =
+        appendArguments(newArgumentTypes.asIterable())
+
+    /**
+     * Returns a type based on `this` type but with the type of the argument at the given [index] changed to [newType].
+     *
+     * If the type at `index` is the same the given `newType` then `this` instance is returned.
+     *
+     * @throws [IllegalArgumentException] if `index` is negative, or if `index` is larger than the available
+     * [argumentTypes]
+     */
+    public fun changeArgument(index: Int, newType: FieldType): MethodType {
+        require(index >= 0) { "'index' must not be negative." }
+        require(index < argumentTypes.size) { "'index' is larger than available arguments; $index > ${argumentTypes.size}." }
+
+        return when (newType) {
+            argumentTypes[index] -> this
+            else -> {
+                val newDescriptor = buildString {
+                    append('(')
+
+                    for ((i, type) in argumentTypes.withIndex()) {
+                        append(if (i == index) newType.descriptor else type.descriptor)
+                    }
+
+                    append(')')
+                    append(returnType.descriptor)
+                }
+
+                fromDescriptor(newDescriptor)
+            }
+        }
+    }
+
+    /**
+     * Returns a type based on `this` type but with the [return type][returnType] changed to the given [newType].
+     *
+     * If the current `returnType` is the same as `newType` then `this` instance is returned.
+     */
+    public fun changeReturn(newType: FieldType): MethodType {
+        return when (returnType) {
+            newType -> this
+            else -> {
+                val newDescriptor = buildString {
+                    argumentTypes.joinTo(this, "", "(", ")") { it.descriptor }
+                    append(newType.descriptor)
+                }
+
+                fromDescriptor(newDescriptor)
+            }
+        }
+    }
+
+    /**
+     * Returns a [JMethodType] representing the same method type as `this` type, loaded using the given [loader].
+     *
+     * @throws [UnsupportedOperationException] if `this` type is not a method type
+     *
+     * @see [JMethodType.fromMethodDescriptorString]
+     */
+    public fun toMethodType(loader: ClassLoader? = null): JMethodType =
+        JMethodType.fromMethodDescriptorString(descriptor, loader)
+
+    override fun toString(): String = "(${argumentTypes.joinToString()}) -> $returnType"
+
     public companion object {
         private val cachedTypes: MutableMap<String, MethodType> = hashMapOf()
 
@@ -230,122 +346,6 @@ public class MethodType private constructor(override val delegate: AsmType) : Ty
             return fromDescriptor(descriptor)
         }
     }
-
-    override val descriptor: String = delegate.descriptor
-
-    override val size: Int
-        get() = delegate.argumentsAndReturnSizes
-
-    /**
-     * The return type of `this` method type.
-     */
-    public val returnType: FieldType = FieldType.copyOf(delegate.returnType)
-
-    /**
-     * An unmodifiable list of the types of the arguments of `this` method type.
-     */
-    public val argumentTypes: List<FieldType> =
-        Collections.unmodifiableList(delegate.argumentTypes.map { FieldType.copyOf(it) })
-
-    public fun prependArguments(newArgumentTypes: Iterable<FieldType>): MethodType {
-        if (newArgumentTypes.none()) {
-            return this
-        }
-
-        val newDescriptor = buildString {
-            append('(')
-            newArgumentTypes.joinTo(this, "") { it.descriptor }
-            argumentTypes.joinTo(this, "") { it.descriptor }
-            append(')')
-            append(returnType.descriptor)
-        }
-
-        return fromDescriptor(newDescriptor)
-    }
-
-    public fun prependArguments(vararg newArgumentTypes: FieldType): MethodType =
-        prependArguments(newArgumentTypes.asIterable())
-
-    public fun appendArguments(newArgumentTypes: Iterable<FieldType>): MethodType {
-        if (newArgumentTypes.none()) {
-            return this
-        }
-
-        val newDescriptor = buildString {
-            append('(')
-            argumentTypes.joinTo(this, "") { it.descriptor }
-            newArgumentTypes.joinTo(this, "") { it.descriptor }
-            append(')')
-            append(returnType.descriptor)
-        }
-
-        return fromDescriptor(newDescriptor)
-    }
-
-    public fun appendArguments(vararg newArgumentTypes: FieldType): MethodType =
-        appendArguments(newArgumentTypes.asIterable())
-
-    /**
-     * Returns a type based on `this` type but with the type of the argument at the given [index] changed to [newType].
-     *
-     * If the type at `index` is the same the given `newType` then `this` instance is returned.
-     *
-     * @throws [IllegalArgumentException] if `index` is negative, or if `index` is larger than the available
-     * [argumentTypes]
-     */
-    public fun changeArgument(index: Int, newType: FieldType): MethodType {
-        require(index >= 0) { "'index' must not be negative." }
-        require(index < argumentTypes.size) { "'index' is larger than available arguments; $index > ${argumentTypes.size}." }
-
-        return when (newType) {
-            argumentTypes[index] -> this
-            else -> {
-                val newDescriptor = buildString {
-                    append('(')
-
-                    for ((i, type) in argumentTypes.withIndex()) {
-                        append(if (i == index) newType.descriptor else type.descriptor)
-                    }
-
-                    append(')')
-                    append(returnType.descriptor)
-                }
-
-                fromDescriptor(newDescriptor)
-            }
-        }
-    }
-
-    /**
-     * Returns a type based on `this` type but with the [return type][returnType] changed to the given [newType].
-     *
-     * If the current `returnType` is the same as `newType` then `this` instance is returned.
-     */
-    public fun changeReturn(newType: FieldType): MethodType {
-        return when (returnType) {
-            newType -> this
-            else -> {
-                val newDescriptor = buildString {
-                    argumentTypes.joinTo(this, "", "(", ")") { it.descriptor }
-                    append(newType.descriptor)
-                }
-
-                fromDescriptor(newDescriptor)
-            }
-        }
-    }
-
-    /**
-     * Returns a [JMethodType] representing the same method type as `this` type, loaded using the given [loader].
-     *
-     * @throws [UnsupportedOperationException] if `this` type is not a method type
-     *
-     * @see [JMethodType.fromMethodDescriptorString]
-     */
-    public fun toMethodType(loader: ClassLoader? = null): JMethodType =
-        JMethodType.fromMethodDescriptorString(descriptor, loader)
-
-    override fun toString(): String = "(${argumentTypes.joinToString()}) -> $returnType"
 }
 
 public fun MethodType(

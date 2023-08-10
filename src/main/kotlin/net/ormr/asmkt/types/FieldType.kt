@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Oliver Berg
+ * Copyright 2020-2023 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,24 +26,6 @@ import org.objectweb.asm.Type as AsmType
  * @see [ArrayType]
  */
 public sealed class FieldType : Type() {
-    public companion object {
-        public fun copyOf(type: AsmType): FieldType = when (type.sort) {
-            AsmType.VOID, AsmType.BOOLEAN, AsmType.CHAR, AsmType.BYTE, AsmType.SHORT, AsmType.INT, AsmType.LONG,
-            AsmType.FLOAT, AsmType.DOUBLE,
-            -> PrimitiveType.copyOf(type)
-            AsmType.ARRAY -> ArrayType.copyOf(type)
-            AsmType.OBJECT -> ReferenceType.copyOf(type)
-            AsmType.METHOD -> throw IllegalArgumentException("A method type is not a definable type; '$type'.")
-            else -> throw UnsupportedOperationException("Unknown 'sort' value ${type.sort}.")
-        }
-
-        public fun of(clz: Class<*>): FieldType = when {
-            clz.isPrimitive -> PrimitiveType.of(clz)
-            clz.isArray -> ArrayType.of(clz)
-            else -> ReferenceType.of(clz)
-        }
-    }
-
     final override val size: Int
         get() = delegate.size
 
@@ -71,4 +53,22 @@ public sealed class FieldType : Type() {
     public abstract fun toClass(): Class<*>
 
     final override fun toString(): String = className
+
+    public companion object {
+        public fun copyOf(type: AsmType): FieldType = when (type.sort) {
+            AsmType.VOID, AsmType.BOOLEAN, AsmType.CHAR, AsmType.BYTE, AsmType.SHORT, AsmType.INT, AsmType.LONG,
+            AsmType.FLOAT, AsmType.DOUBLE,
+            -> PrimitiveType.copyOf(type)
+            AsmType.ARRAY -> ArrayType.copyOf(type)
+            AsmType.OBJECT -> ReferenceType.copyOf(type)
+            AsmType.METHOD -> throw IllegalArgumentException("A method type is not a definable type; '$type'.")
+            else -> throw UnsupportedOperationException("Unknown 'sort' value ${type.sort}.")
+        }
+
+        public fun of(clz: Class<*>): FieldType = when {
+            clz.isPrimitive -> PrimitiveType.of(clz)
+            clz.isArray -> ArrayType.of(clz)
+            else -> ReferenceType.of(clz)
+        }
+    }
 }
