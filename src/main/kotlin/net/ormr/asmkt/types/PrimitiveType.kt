@@ -18,7 +18,6 @@
 
 package net.ormr.asmkt.types
 
-import org.objectweb.asm.Type
 import java.util.*
 import java.lang.Boolean as JBoolean
 import java.lang.Byte as JByte
@@ -38,7 +37,7 @@ public sealed class PrimitiveType : FieldType() {
 
     abstract override val descriptor: String
 
-    abstract override val delegate: Type
+    abstract override val delegate: AsmType
 
     override val simpleName: String
         get() = className
@@ -67,8 +66,8 @@ public sealed class PrimitiveType : FieldType() {
         override val className: String
             get() = "void"
 
-        override val delegate: Type
-            get() = Type.VOID_TYPE
+        override val delegate: AsmType
+            get() = AsmType.VOID_TYPE
 
         override val isValidFieldType: KBoolean
             get() = false
@@ -88,8 +87,8 @@ public sealed class PrimitiveType : FieldType() {
         override val className: String
             get() = "boolean"
 
-        override val delegate: Type
-            get() = Type.BOOLEAN_TYPE
+        override val delegate: AsmType
+            get() = AsmType.BOOLEAN_TYPE
 
         override val isValidFieldType: KBoolean
             get() = true
@@ -109,8 +108,8 @@ public sealed class PrimitiveType : FieldType() {
         override val className: String
             get() = "char"
 
-        override val delegate: Type
-            get() = Type.CHAR_TYPE
+        override val delegate: AsmType
+            get() = AsmType.CHAR_TYPE
 
         override val isValidFieldType: KBoolean
             get() = true
@@ -130,8 +129,8 @@ public sealed class PrimitiveType : FieldType() {
         override val className: String
             get() = "byte"
 
-        override val delegate: Type
-            get() = Type.BYTE_TYPE
+        override val delegate: AsmType
+            get() = AsmType.BYTE_TYPE
 
         override val isValidFieldType: KBoolean
             get() = true
@@ -151,8 +150,8 @@ public sealed class PrimitiveType : FieldType() {
         override val className: String
             get() = "short"
 
-        override val delegate: Type
-            get() = Type.SHORT_TYPE
+        override val delegate: AsmType
+            get() = AsmType.SHORT_TYPE
 
         override val isValidFieldType: KBoolean
             get() = true
@@ -172,8 +171,8 @@ public sealed class PrimitiveType : FieldType() {
         override val className: String
             get() = "int"
 
-        override val delegate: Type
-            get() = Type.INT_TYPE
+        override val delegate: AsmType
+            get() = AsmType.INT_TYPE
 
         override val isValidFieldType: KBoolean
             get() = true
@@ -193,8 +192,8 @@ public sealed class PrimitiveType : FieldType() {
         override val className: String
             get() = "long"
 
-        override val delegate: Type
-            get() = Type.LONG_TYPE
+        override val delegate: AsmType
+            get() = AsmType.LONG_TYPE
 
         override val isValidFieldType: KBoolean
             get() = true
@@ -214,8 +213,8 @@ public sealed class PrimitiveType : FieldType() {
         override val className: String
             get() = "float"
 
-        override val delegate: Type
-            get() = Type.FLOAT_TYPE
+        override val delegate: AsmType
+            get() = AsmType.FLOAT_TYPE
 
         override val isValidFieldType: KBoolean
             get() = true
@@ -235,8 +234,8 @@ public sealed class PrimitiveType : FieldType() {
         override val className: String
             get() = "double"
 
-        override val delegate: Type
-            get() = Type.DOUBLE_TYPE
+        override val delegate: AsmType
+            get() = AsmType.DOUBLE_TYPE
 
         override val isValidFieldType: KBoolean
             get() = true
@@ -253,16 +252,16 @@ public sealed class PrimitiveType : FieldType() {
         public val primitives: List<PrimitiveType>
             get() = Collections.unmodifiableList(listOf(Void, Boolean, Char, Byte, Short, Int, Long, Float, Double))
 
-        public fun copyOf(type: Type): PrimitiveType = when (type.sort) {
-            Type.VOID -> Void
-            Type.BOOLEAN -> Boolean
-            Type.CHAR -> Char
-            Type.BYTE -> Byte
-            Type.SHORT -> Short
-            Type.INT -> Int
-            Type.LONG -> Long
-            Type.FLOAT -> Float
-            Type.DOUBLE -> Double
+        public fun copyOf(type: AsmType): PrimitiveType = when (type.sort) {
+            AsmType.VOID -> Void
+            AsmType.BOOLEAN -> Boolean
+            AsmType.CHAR -> Char
+            AsmType.BYTE -> Byte
+            AsmType.SHORT -> Short
+            AsmType.INT -> Int
+            AsmType.LONG -> Long
+            AsmType.FLOAT -> Float
+            AsmType.DOUBLE -> Double
             else -> throw IllegalArgumentException("'type' must be a primitive type, was a ${sortNames[type.sort]} type.")
         }
 
@@ -283,8 +282,8 @@ public sealed class PrimitiveType : FieldType() {
         public fun of(clz: Class<*>): PrimitiveType {
             require(clz.isPrimitive || clz.isPrimitiveWrapper) { "'clz' must be a primitive or a primitive wrapper, was '${clz.name}'." }
             return when {
-                clz.isPrimitive -> copyOf(Type.getType(clz))
-                clz.isPrimitiveWrapper -> fromDescriptor(Type.getDescriptor(clz.primitiveClass))
+                clz.isPrimitive -> copyOf(AsmType.getType(clz))
+                clz.isPrimitiveWrapper -> fromDescriptor(AsmType.getDescriptor(clz.primitiveClass))
                 else -> throw IllegalStateException("Exhaustive 'when' was not exhaustive, for $clz.")
             }
         }

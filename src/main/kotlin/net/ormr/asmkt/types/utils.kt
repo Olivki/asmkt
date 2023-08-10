@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Oliver Berg
+ * Copyright 2020-2023 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package net.ormr.asmkt.types
 
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
-import org.objectweb.asm.Type as AsmType
 
 internal val Class<*>.isPrimitiveWrapper: Boolean
     get() = when (this) {

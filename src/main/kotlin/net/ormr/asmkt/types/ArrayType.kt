@@ -17,7 +17,6 @@
 package net.ormr.asmkt.types
 
 import java.lang.reflect.Array
-import org.objectweb.asm.Type as AsmType
 
 /**
  * Represents an array type containing a [FieldType], i.e; `java.lang.String[]`, `int[]`, `java.lang.Byte[][]`.

@@ -18,12 +18,10 @@
 
 package net.ormr.asmkt.types
 
-import org.objectweb.asm.Type
-
 /**
  * Represents a type of an `Object` child, i.e; `java.lang.String`, `java.lang.Byte`, `java.lang.Double`, etc..
  */
-public class ReferenceType private constructor(override val delegate: Type) : FieldType(), TypeWithInternalName {
+public class ReferenceType private constructor(override val delegate: AsmType) : FieldType(), TypeWithInternalName {
 
     override val descriptor: String = delegate.descriptor
 
@@ -157,24 +155,24 @@ public class ReferenceType private constructor(override val delegate: Type) : Fi
         public val CALL_SITE: ReferenceType = createConstant("Ljava/lang/invoke/CallSite;")
 
         private fun createConstant(descriptor: String): ReferenceType {
-            val type = ReferenceType(Type.getType(descriptor))
+            val type = ReferenceType(AsmType.getType(descriptor))
             cachedTypes[descriptor] = type
             return type
         }
 
-        public fun copyOf(type: Type): ReferenceType {
-            requireSort(type, Type.OBJECT)
+        public fun copyOf(type: AsmType): ReferenceType {
+            requireSort(type, AsmType.OBJECT)
             return cachedTypes.getOrPut(type.descriptor) { ReferenceType(type) }
         }
 
         public fun fromDescriptor(descriptor: String): ReferenceType = when (descriptor) {
             in cachedTypes -> cachedTypes.getValue(descriptor)
-            else -> copyOf(Type.getType(descriptor))
+            else -> copyOf(AsmType.getType(descriptor))
         }
 
         public fun fromInternal(internalName: String): ReferenceType = fromDescriptor("L$internalName;")
 
-        public fun of(clz: Class<*>): ReferenceType = fromDescriptor(Type.getDescriptor(clz))
+        public fun of(clz: Class<*>): ReferenceType = fromDescriptor(AsmType.getDescriptor(clz))
     }
 }
 

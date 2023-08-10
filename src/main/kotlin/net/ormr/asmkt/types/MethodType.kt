@@ -21,7 +21,6 @@ package net.ormr.asmkt.types
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import java.util.*
-import org.objectweb.asm.Type as AsmType
 import java.lang.invoke.MethodType as JMethodType
 
 /**

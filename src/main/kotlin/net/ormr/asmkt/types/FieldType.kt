@@ -16,8 +16,6 @@
 
 package net.ormr.asmkt.types
 
-import org.objectweb.asm.Type as AsmType
-
 /**
  * Represents a type that can be used as the type of variable/parameter/return type, etc..
  *

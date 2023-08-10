@@ -18,8 +18,6 @@
 
 package net.ormr.asmkt.types
 
-import org.objectweb.asm.Type as AsmType
-
 public sealed class Type {
     protected abstract val delegate: AsmType
 
