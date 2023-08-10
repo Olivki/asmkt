@@ -104,11 +104,20 @@ public data class BytecodeClass(
         private set
 
     /**
+     * The [class][BytecodeClass] that is the nest host of `this` class, or `null` if `this` class is not a nest member.
+     *
+     * @see [defineNestMember]
+     */
+    public var nestHostClass: BytecodeClass? = null
+        private set
+
+    /**
      * The method that this class belongs to, or `null` if this class does not belong to a method.
      */
     public var enclosingMethod: BytecodeMethod? = null
         internal set
 
+    private val nestMembers: MutableList<BytecodeClass> = mutableListOf()
     private val innerClasses: MutableMap<String, BytecodeClass> = mutableMapOf()
     private val methods: MutableSet<BytecodeMethod> = mutableSetOf()
     private val fields: MutableMap<String, BytecodeField> = mutableMapOf()
@@ -224,6 +233,12 @@ public data class BytecodeClass(
     public fun defineInnerClass(innerName: String, child: BytecodeClass) {
         child.enclosingClass = this
         innerClasses[innerName] = child
+    }
+
+    @AsmKtDsl
+    public fun defineNestMember(member: BytecodeClass) {
+        member.nestHostClass = this
+        nestMembers += member
     }
 
     @AsmKtDsl
@@ -385,11 +400,17 @@ public data class BytecodeClass(
         node.outerMethod = enclosingMethod?.name
         node.outerMethodDesc = enclosingMethod?.type?.descriptor
 
+        node.nestHostClass = nestHostClass?.internalName
+
         node.module = module?.toNode()
 
         for ((innerName, clz) in innerClasses) {
             node.innerClasses.add(InnerClassNode(clz.internalName, internalName, innerName, clz.access.asInt()))
         }
+
+        node.nestMembers = nestMembers
+            .mapTo(mutableListOf()) { it.internalName }
+            .ifEmpty { null }
 
         for (method in methods) {
             node.methods.add(method.toMethodNode())
