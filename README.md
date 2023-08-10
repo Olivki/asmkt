@@ -10,7 +10,7 @@ This library requires at least Java 17.
 ## Installation
 
 ```kotlin
-  dependencies {
+dependencies {
     implementation(group = "net.ormr.asmkt", name = "asmkt", version = "${RELEASE_VERSION}")
 }
 ```
