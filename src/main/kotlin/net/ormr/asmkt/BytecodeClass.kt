@@ -118,7 +118,7 @@ public data class BytecodeClass(
         internal set
 
     private val nestMembers: MutableList<BytecodeClass> = mutableListOf()
-    private val innerClasses: MutableMap<String, BytecodeClass> = mutableMapOf()
+    private val innerClasses: MutableList<InnerClass> = mutableListOf()
     private val methods: MutableSet<BytecodeMethod> = mutableSetOf()
     private val fields: MutableMap<String, BytecodeField> = mutableMapOf()
     private val recordComponents: MutableList<BytecodeRecordComponent> = mutableListOf()
@@ -219,9 +219,9 @@ public data class BytecodeClass(
     }
 
     @AsmKtDsl
-    public fun defineInnerClass(innerName: String, child: BytecodeClass) {
+    public fun defineInnerClass(innerName: String?, child: BytecodeClass) {
         child.enclosingClass = this
-        innerClasses[innerName] = child
+        innerClasses += InnerClass(innerName, child)
     }
 
     @AsmKtDsl
@@ -465,4 +465,6 @@ public data class BytecodeClass(
 
     override fun toString(): String =
         "BytecodeClass(type='${type.className}', version=$version, access=$access, superType='${superType.className}', interfaces=$interfaces, sourceFile=$sourceFile, sourceDebug=$sourceDebug, enclosingClass=${enclosingClass?.type?.className}, nestHostClass=${nestHostClass?.type?.className})"
+
+    private data class InnerClass(val name: String?, val clz: BytecodeClass)
 }
