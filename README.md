@@ -24,7 +24,7 @@ function.
 Once the desired class has been built, you can retrieve the bytecode of it by calling the `toByteArray` function on
 the `BytecodeClass` instance.
 
-`asmkt` has *should* have full support for all JVM features introduced up to Java 19, if something is missing, please
+`asmkt` *should* have full support for all JVM features introduced up to Java 19, if something is missing, please
 create an issue regarding it.
 
 ### `BytecodeMethod` vs `BytecodeBlock`
