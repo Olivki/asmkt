@@ -78,11 +78,11 @@ val clz = defineClass(
 
 We can then compile this `BytecodeClass` instance into JVM bytecode and dynamically load it, to see that it works.
 
-First we'll need a simple `ClassLoader` implementation that allows us to load a class from a `ByteArray`:
+First we'll need a `ClassLoader` implementation that allows us to load a class from a `ByteArray`:
 
 ```kotlin
-class ByteArrayClassLoader(val bytes: ByteArray) : ClassLoader() {
-    override fun findClass(name: String): Class<*> = defineClass(name, bytes, 0, bytes.size)
+class ByteArrayClassLoader : ClassLoader() {
+    fun loadBytes(name: String, bytes: ByteArray): Class<*> = defineClass(name, bytes, 0, bytes.size)
 }
 ```
 
@@ -90,8 +90,8 @@ And then the actual code to compile, load, and invoke the `main` method of the `
 
 ```kotlin
 val bytes = clz.toByteArray() // compiles the class into bytecode
-val loader = ByteArrayClassLoader(bytes)
-val loadedClass = loader.loadClass(clz.className) // defines and loads our custom class
+val loader = ByteArrayClassLoader()
+val loadedClass = loader.loadBytes(clz.className, bytes) // defines and loads our custom class
 // retrieves the 'main' method and invokes it
 loadedClass.getDeclaredMethod("main", Array<String>::class.java).invoke(null, arrayOf<String>())
 ```
