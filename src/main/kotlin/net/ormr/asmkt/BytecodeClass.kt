@@ -219,17 +219,6 @@ public data class BytecodeClass(
     }
 
     @AsmKtDsl
-    public fun defineInnerClass(child: BytecodeClass) {
-        var childName = child.internalName
-        childName = when {
-            '$' in childName -> childName.substringAfterLast('$')
-            else -> childName.substringAfterLast('/')
-        }
-
-        defineInnerClass(childName.substringAfterLast('$'), child)
-    }
-
-    @AsmKtDsl
     public fun defineInnerClass(innerName: String, child: BytecodeClass) {
         child.enclosingClass = this
         innerClasses[innerName] = child
