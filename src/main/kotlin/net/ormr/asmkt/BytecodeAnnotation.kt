@@ -16,9 +16,7 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.types.ReferenceType
-import net.ormr.asmkt.types.Type
-import net.ormr.asmkt.types.toReferenceType
+import net.ormr.asmkt.types.*
 import org.objectweb.asm.AnnotationVisitor
 import org.objectweb.asm.tree.AnnotationNode
 import org.objectweb.asm.tree.TypeAnnotationNode
@@ -43,7 +41,7 @@ public class BytecodeAnnotation internal constructor(
      * @param [name] the name to store [value] under
      * @param [value] the actual value, allowed types are; [Boolean], [BooleanArray], [Char], [CharArray], [String],
      * [Byte], [ByteArray], [Short], [ShortArray], [Int], [IntArray], [Long], [LongArray], [Float], [FloatArray],
-     * [Double], [DoubleArray], and a [Type] of sort [OBJECT][Type.OBJECT] or [ARRAY][Type.ARRAY].
+     * [Double], [DoubleArray], [ReferenceType], [ArrayType] and an [AsmType] of sort `OBJECT` or `ARRAY`.
      *
      * @return `this` *(for chaining)*
      *
@@ -53,8 +51,8 @@ public class BytecodeAnnotation internal constructor(
      */
     @AsmKtDsl
     public fun value(name: String, value: Any): BytecodeAnnotation = apply {
-        require(isValidAnnotationValue(value) || isPrimitiveArray(value)) { "'value' is not a valid annotation value, '$value' (${value.javaClass.name})." }
-        node.visit(name, value)
+        require(isValidAnnotationValue(value) || isPrimitiveArray(value)) { "'value' ($value) is not a valid annotation value. (${value.javaClass.name})." }
+        node.visit(name, convertToAnnotationValue(value))
     }
 
     /**
@@ -126,8 +124,8 @@ public class BytecodeAnnotation internal constructor(
      *
      * @param [name] the name to store the array value under
      * @param [values] the values to add to the [ArrayBuilder] before returning it, allowed types are; [Boolean],
-     * [Char], [String], [Byte], [Short], [Int], [Long], [Float], [Double], [Enum], and a [Type] of sort
-     * [OBJECT][Type.OBJECT] or [ARRAY][Type.ARRAY].
+     * [Char], [String], [Byte], [Short], [Int], [Long], [Float], [Double], [Enum], [ReferenceType], [ArrayType] and
+     * an [AsmType] of sort `OBJECT` or `ARRAY`.
      *
      * @return a new [ArrayBuilder] instance used to build the array
      *
@@ -159,8 +157,8 @@ public class BytecodeAnnotation internal constructor(
      *
      * @param [name] the name to store the array value under
      * @param [values] the values to add to the [ArrayBuilder] before returning it, allowed types are; [Boolean],
-     * [Char], [String], [Byte], [Short], [Int], [Long], [Float], [Double], [Enum], and a [Type] of sort
-     * [OBJECT][Type.OBJECT] or [ARRAY][Type.ARRAY].
+     * [Char], [String], [Byte], [Short], [Int], [Long], [Float], [Double], [Enum], [ReferenceType], [ArrayType] and
+     *      * an [AsmType] of sort `OBJECT` or `ARRAY`.
      *
      * @return a new [ArrayBuilder] instance used to build the array
      *
@@ -191,7 +189,7 @@ public class BytecodeAnnotation internal constructor(
          * Adds the given [value] to `this` array.
          *
          * @param [value] the actual value, allowed types are; [Boolean], [Char], [String], [Byte], [Short], [Int],
-         * [Long], [Float], [Double], [ReferenceType] and [ArrayType].
+         * [Long], [Float], [Double], [ReferenceType], [ArrayType] and an [AsmType] of sort `OBJECT` or `ARRAY`..
          *
          * @return `this` *(for chaining)*
          *
@@ -202,7 +200,7 @@ public class BytecodeAnnotation internal constructor(
         @AsmKtDsl
         public fun value(value: Any): ArrayBuilder = apply {
             require(isValidAnnotationValue(value)) { "'value' is not a valid annotation value, '$value' (${value.javaClass.name})." }
-            node.visit(name, value)
+            node.visit(name, convertToAnnotationValue(value))
         }
 
         /**

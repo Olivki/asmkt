@@ -18,7 +18,9 @@ package net.ormr.asmkt
 
 import net.ormr.asmkt.BytecodeAnnotation.ArrayBuilder
 import net.ormr.asmkt.types.ArrayType
+import net.ormr.asmkt.types.AsmType
 import net.ormr.asmkt.types.ReferenceType
+import net.ormr.asmkt.types.Type
 import org.objectweb.asm.AnnotationVisitor
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -103,6 +105,10 @@ public inline fun ArrayBuilder.annotation(type: ReferenceType, scope: BytecodeAn
 internal fun isValidAnnotationValue(value: Any): Boolean = when (value) {
     is Boolean, is Char, is String, is Byte, is Short, is Int, is Long, is Float, is Double -> true
     is ReferenceType, is ArrayType -> true
+    is AsmType -> when (value.sort) {
+        AsmType.OBJECT, AsmType.ARRAY -> true
+        else -> false
+    }
     else -> false
 }
 
@@ -111,4 +117,9 @@ internal fun isPrimitiveArray(value: Any): Boolean = when (value) {
     is DoubleArray,
     -> true
     else -> false
+}
+
+internal fun convertToAnnotationValue(value: Any): Any = when (value) {
+    is Type -> value.toAsmType()
+    else -> value
 }
