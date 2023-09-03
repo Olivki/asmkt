@@ -5,7 +5,7 @@ plugins {
 
 group = "net.ormr.asmkt"
 description = "Kotlin DSL wrapper for ASM"
-version = "0.0.12"
+version = "0.0.13"
 
 repositories {
     mavenCentral()
