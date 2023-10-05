@@ -16,8 +16,12 @@
 
 package net.ormr.asmkt
 
-@RequiresOptIn
-public annotation class AsmKtReflection
+/**
+ * Returns `true` if any instructions have been added to `this` block, otherwise `false`.
+ */
+public fun CodeModel.isNotEmpty(): Boolean = !(isEmpty())
 
-@DslMarker
-public annotation class AsmKtDsl
+/**
+ * Returns `true` if no instructions have been added to `this` block, otherwise `false`.
+ */
+public fun CodeModel.isEmpty(): Boolean = instructions.size() == 0
