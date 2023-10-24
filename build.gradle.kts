@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.9.10"
+    kotlin("jvm") version "1.9.20-RC"
     id("me.him188.maven-central-publish") version "1.0.0-dev-3"
 }
 
@@ -15,14 +15,14 @@ dependencies {
     api("org.ow2.asm:asm-commons:9.6")
 }
 
-kotlin {
-    explicitApi()
-}
-
 mavenCentralPublish {
     useCentralS01()
     singleDevGithubProject("Olivki", "asmkt")
     licenseApacheV2()
+}
+
+kotlin {
+    explicitApi()
 }
 
 tasks {
