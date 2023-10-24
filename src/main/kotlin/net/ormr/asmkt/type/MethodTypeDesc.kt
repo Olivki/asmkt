@@ -16,7 +16,6 @@
 
 package net.ormr.asmkt.type
 
-import org.objectweb.asm.Type
 import java.lang.invoke.MethodType
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
@@ -37,7 +36,7 @@ public class MethodTypeDesc private constructor(private val delegate: AsmType) :
      * A list of all the argument types of the method.
      */
     public val argumentTypes: List<FieldTypeDesc> =
-        Collections.unmodifiableList(delegate.argumentTypes.map(Type::toFieldTypeDesc))
+        Collections.unmodifiableList(delegate.argumentTypes.map(AsmType::toFieldTypeDesc))
 
     /**
      * The return type of the method.
