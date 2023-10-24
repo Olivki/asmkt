@@ -46,7 +46,6 @@ public class ClassModel(
         exceptions: List<ClassDesc>,
     ): MethodModel {
         val model = MethodModel(this, name, flags, type, signature, exceptions)
-        val dab = ((kind.plus(this.flags)))
         TODO("add model and stuff to class model")
     }
 }
