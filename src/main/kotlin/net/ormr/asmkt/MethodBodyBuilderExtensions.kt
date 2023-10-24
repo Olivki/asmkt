@@ -16,8 +16,8 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.FieldTypeDesc
-import net.ormr.asmkt.type.MethodTypeDesc
+import net.ormr.asmkt.type.FieldType
+import net.ormr.asmkt.type.MethodType
 
 /**
  * Pushes the instructions needed to compute the bitwise negation of the value currently at the top of the stack.
@@ -36,49 +36,49 @@ public fun not() {
 // -- SELF INVOKE -- \\
 context(MethodBodyBuilder)
 @AsmKtDsl
-public fun invokeSelfStatic(name: String, type: MethodTypeDesc) {
+public fun invokeSelfStatic(name: String, type: MethodType) {
     invokeStatic(method.parentType, name, type)
 }
 
 context(MethodBodyBuilder)
 @AsmKtDsl
-public fun invokeSelfSpecial(name: String, type: MethodTypeDesc) {
+public fun invokeSelfSpecial(name: String, type: MethodType) {
     invokeSpecial(method.parentType, name, type)
 }
 
 context(MethodBodyBuilder)
 @AsmKtDsl
-public fun invokeSelfVirtual(name: String, type: MethodTypeDesc) {
+public fun invokeSelfVirtual(name: String, type: MethodType) {
     invokeVirtual(method.parentType, name, type)
 }
 
 context(MethodBodyBuilder)
 @AsmKtDsl
-public fun invokeSelfInterface(name: String, type: MethodTypeDesc) {
+public fun invokeSelfInterface(name: String, type: MethodType) {
     invokeInterface(method.parentType, name, type)
 }
 
 // -- SELF FIELD -- \\
 context(MethodBodyBuilder)
 @AsmKtDsl
-public fun getSelfStaticField(name: String, type: FieldTypeDesc) {
+public fun getSelfStaticField(name: String, type: FieldType) {
     getStaticField(method.parentType, name, type)
 }
 
 context(MethodBodyBuilder)
 @AsmKtDsl
-public fun setSelfStaticField(name: String, type: FieldTypeDesc) {
+public fun setSelfStaticField(name: String, type: FieldType) {
     setStaticField(method.parentType, name, type)
 }
 
 context(MethodBodyBuilder)
 @AsmKtDsl
-public fun getSelfField(name: String, type: FieldTypeDesc) {
+public fun getSelfField(name: String, type: FieldType) {
     getField(method.parentType, name, type)
 }
 
 context(MethodBodyBuilder)
 @AsmKtDsl
-public fun setSelfField(name: String, type: FieldTypeDesc) {
+public fun setSelfField(name: String, type: FieldType) {
     setField(method.parentType, name, type)
 }

@@ -17,6 +17,8 @@
 package net.ormr.asmkt.type
 
 /**
- * See [AsmType.getOpcode][org.objectweb.asm.Type.getOpcode].
+ * Represents a type that can be used for fields.
+ *
+ * This includes all types that are not [method type][MethodType]s, or [void][VoidType].
  */
-public fun ReturnableTypeDesc.getOpcode(opcode: Int): Int = asAsmType().getOpcode(opcode)
+public sealed interface FieldType : ReturnableType

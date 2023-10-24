@@ -90,7 +90,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
             is Boolean -> pushBoolean(value)
             is Char -> pushChar(value)
             is String -> pushString(value)
-            is ReturnableTypeDesc -> pushType(value)
+            is ReturnableType -> pushType(value)
             is Handle -> pushHandle(value)
             is ConstantDynamic -> pushConstantDynamic(value)
             is Byte -> pushByte(value)
@@ -254,20 +254,20 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
     /**
      * Pushes a `LDC` instruction to retrieve the `class` instance for the given [value] onto the stack.
      *
-     * If `value` is [a primitive][PrimitiveTypeDesc] then depending on the [version] a different behavior will happen:
+     * If `value` is [a primitive][PrimitiveType] then depending on the [version] a different behavior will happen:
      * - If `version` >= [RELEASE_11][ClassFileVersion.RELEASE_11] then a [constant dynamic][pushConstantDynamic]
      * pointing to the `ConstantBootstraps.primitiveClass` function is pushed onto the stack.
      * - If `version` < [RELEASE_11][ClassFileVersion.RELEASE_11] then a [GETSTATIC][getStaticField] instruction
-     * pointing to the `TYPE` field located in the [wrapper][PrimitiveTypeDesc.box] class for `value` is pushed onto
+     * pointing to the `TYPE` field located in the [wrapper][PrimitiveType.box] class for `value` is pushed onto
      * the stack.
      */
     @AsmKtDsl
-    public fun pushType(value: ReturnableTypeDesc) {
-        if (value is PrimitiveTypeDesc) {
+    public fun pushType(value: ReturnableType) {
+        if (value is PrimitiveType) {
             if (version >= ClassFileVersion.RELEASE_11) {
-                pushConstantDynamic(value.descriptor, ClassDesc.CLASS, primitiveClassHandle)
+                pushConstantDynamic(value.descriptor, ReferenceType.CLASS, primitiveClassHandle)
             } else {
-                getStaticField(value.box(), "TYPE", ClassDesc.CLASS)
+                getStaticField(value.box(), "TYPE", ReferenceType.CLASS)
             }
         } else {
             code.ldc(value.asAsmType())
@@ -302,7 +302,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
     @AsmKtDsl
     public fun pushConstantDynamic(
         name: String,
-        type: FieldTypeDesc,
+        type: FieldType,
         bootStrapMethod: Handle,
         bootStrapMethodArguments: List<Any> = emptyList(),
     ) {
@@ -313,23 +313,23 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
 
     // -- LOAD INSTRUCTIONS -- \\
     @AsmKtDsl
-    public fun loadLocal(index: Int, type: FieldTypeDesc) {
+    public fun loadLocal(index: Int, type: FieldType) {
         code.addVarInstruction(type.getOpcode(Opcodes.ILOAD), index)
     }
 
     @AsmKtDsl
-    public fun arrayLoad(type: FieldTypeDesc) {
+    public fun arrayLoad(type: FieldType) {
         code.addInstruction(type.getOpcode(Opcodes.IALOAD))
     }
 
     // -- STORE INSTRUCTIONS -- \\
     @AsmKtDsl
-    public fun storeLocal(index: Int, type: FieldTypeDesc) {
+    public fun storeLocal(index: Int, type: FieldType) {
         code.addVarInstruction(type.getOpcode(Opcodes.ISTORE), index)
     }
 
     @AsmKtDsl
-    public fun arrayStore(type: FieldTypeDesc) {
+    public fun arrayStore(type: FieldType) {
         code.addInstruction(type.getOpcode(Opcodes.IASTORE))
     }
 
@@ -349,21 +349,21 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the array
      */
     @AsmKtDsl
-    public fun newArray(type: FieldTypeDesc) {
-        if (type is TypeDescWithInternalName) {
+    public fun newArray(type: FieldType) {
+        if (type is TypeWithInternalName) {
             code.anewarray(type.internalName)
             return
         }
 
         val arrayType = when (type) {
-            BooleanTypeDesc -> Opcodes.T_BOOLEAN
-            CharTypeDesc -> Opcodes.T_CHAR
-            ByteTypeDesc -> Opcodes.T_BYTE
-            ShortTypeDesc -> Opcodes.T_SHORT
-            IntTypeDesc -> Opcodes.T_INT
-            LongTypeDesc -> Opcodes.T_LONG
-            FloatTypeDesc -> Opcodes.T_FLOAT
-            DoubleTypeDesc -> Opcodes.T_DOUBLE
+            BooleanType -> Opcodes.T_BOOLEAN
+            CharType -> Opcodes.T_CHAR
+            ByteType -> Opcodes.T_BYTE
+            ShortType -> Opcodes.T_SHORT
+            IntType -> Opcodes.T_INT
+            LongType -> Opcodes.T_LONG
+            FloatType -> Opcodes.T_FLOAT
+            DoubleType -> Opcodes.T_DOUBLE
             // Kotlin (maybe just the IDE) knows that this is unreachable, but the compiler doesn't
             else -> throw IllegalStateException("Exhaustive when was not exhaustive for '$type'.")
         }
@@ -372,7 +372,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
     }
 
     @AsmKtDsl
-    public fun newMultiArray(type: FieldTypeDesc, dimensions: Int) {
+    public fun newMultiArray(type: FieldType, dimensions: Int) {
         code.multianewarray(type.descriptor, dimensions)
     }
 
@@ -386,7 +386,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * See [invokestatic][CodeBuilder.invokestatic].
      */
     @AsmKtDsl
-    public fun invokeStatic(owner: ClassDesc, name: String, type: MethodTypeDesc) {
+    public fun invokeStatic(owner: ReferenceType, name: String, type: MethodType) {
         code.invokestatic(owner.internalName, name, type.descriptor)
     }
 
@@ -394,7 +394,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * See [invokespecial][CodeBuilder.invokespecial].
      */
     @AsmKtDsl
-    public fun invokeSpecial(owner: ClassDesc, name: String, type: MethodTypeDesc) {
+    public fun invokeSpecial(owner: ReferenceType, name: String, type: MethodType) {
         code.invokespecial(owner.internalName, name, type.descriptor)
     }
 
@@ -402,7 +402,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * See [invokevirtual][CodeBuilder.invokevirtual].
      */
     @AsmKtDsl
-    public fun invokeVirtual(owner: ClassDesc, name: String, type: MethodTypeDesc) {
+    public fun invokeVirtual(owner: ReferenceType, name: String, type: MethodType) {
         code.invokevirtual(owner.internalName, name, type.descriptor)
     }
 
@@ -410,7 +410,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * See [invokeinterface][CodeBuilder.invokeinterface].
      */
     @AsmKtDsl
-    public fun invokeInterface(owner: ClassDesc, name: String, type: MethodTypeDesc) {
+    public fun invokeInterface(owner: ReferenceType, name: String, type: MethodType) {
         code.invokeinterface(owner.internalName, name, type.descriptor)
     }
 
@@ -418,7 +418,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * See [invokedynamic][CodeBuilder.invokedynamic].
      */
     @AsmKtDsl
-    public fun invokeDynamic(name: String, type: MethodTypeDesc, method: Handle, arguments: List<Any> = emptyList()) {
+    public fun invokeDynamic(name: String, type: MethodType, method: Handle, arguments: List<Any> = emptyList()) {
         requireMinVersion(ClassFileVersion.RELEASE_7) { "Invoke Dynamic" }
         code.invokedynamic(name, type.descriptor, method, arguments)
     }
@@ -428,7 +428,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * See [getstatic][CodeBuilder.getstatic].
      */
     @AsmKtDsl
-    public fun getStaticField(owner: ClassDesc, name: String, type: FieldTypeDesc) {
+    public fun getStaticField(owner: ReferenceType, name: String, type: FieldType) {
         code.getstatic(owner.internalName, name, type.descriptor)
     }
 
@@ -436,7 +436,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * See [putstatic][CodeBuilder.putstatic].
      */
     @AsmKtDsl
-    public fun setStaticField(owner: ClassDesc, name: String, type: FieldTypeDesc) {
+    public fun setStaticField(owner: ReferenceType, name: String, type: FieldType) {
         code.putstatic(owner.internalName, name, type.descriptor)
     }
 
@@ -444,7 +444,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * See [getfield][CodeBuilder.getfield].
      */
     @AsmKtDsl
-    public fun getField(owner: ClassDesc, name: String, type: FieldTypeDesc) {
+    public fun getField(owner: ReferenceType, name: String, type: FieldType) {
         code.getfield(owner.internalName, name, type.descriptor)
     }
 
@@ -452,7 +452,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * See [putfield][CodeBuilder.putfield].
      */
     @AsmKtDsl
-    public fun setField(owner: ClassDesc, name: String, type: FieldTypeDesc) {
+    public fun setField(owner: ReferenceType, name: String, type: FieldType) {
         code.putfield(owner.internalName, name, type.descriptor)
     }
 
@@ -471,7 +471,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      */
     @AsmKtDsl
     @JvmName("new_")
-    public fun new(type: ClassDesc) {
+    public fun new(type: ReferenceType) {
         code.new(type.internalName)
     }
 
@@ -479,7 +479,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * See [instanceof][CodeBuilder.instanceof].
      */
     @AsmKtDsl
-    public fun instanceOf(type: ClassDesc) {
+    public fun instanceOf(type: ReferenceType) {
         code.instanceof(type.internalName)
     }
 
@@ -487,10 +487,10 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * See [checkcast][CodeBuilder.checkcast].
      */
     @AsmKtDsl
-    public fun checkCast(type: ClassDesc) {
+    public fun checkCast(type: ReferenceType) {
         // there is no point in casting something to 'Object' as everything that isn't a primitive will be extending
         // 'Object' anyway, and we only accept 'ReferenceType' values here anyway, so 'type' can't be a primitive
-        if (type != ClassDesc.OBJECT) {
+        if (type != ReferenceType.OBJECT) {
             code.checkcast(type.internalName)
         }
     }
@@ -548,7 +548,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * Pushes the appropriate comparison instruction based on the [type] of the values on the stack.
      */
     @AsmKtDsl
-    public fun ifEqual(type: FieldTypeDesc, label: Label) {
+    public fun ifEqual(type: FieldType, label: Label) {
         ifCmp(type, ComparisonMode.EQUAL, label)
     }
 
@@ -556,7 +556,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * Pushes the appropriate comparison instruction based on the [type] of the values on the stack.
      */
     @AsmKtDsl
-    public fun ifNotEqual(type: FieldTypeDesc, label: Label) {
+    public fun ifNotEqual(type: FieldType, label: Label) {
         ifCmp(type, ComparisonMode.NOT_EQUAL, label)
     }
 
@@ -564,7 +564,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * Pushes the appropriate comparison instruction based on the [type] of the values on the stack.
      */
     @AsmKtDsl
-    public fun ifGreater(type: NonVoidPrimitiveTypeDesc, label: Label) {
+    public fun ifGreater(type: PrimitiveFieldType, label: Label) {
         ifCmp(type, ComparisonMode.GREATER, label)
     }
 
@@ -572,7 +572,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * Pushes the appropriate comparison instruction based on the [type] of the values on the stack.
      */
     @AsmKtDsl
-    public fun ifGreaterOrEqual(type: NonVoidPrimitiveTypeDesc, label: Label) {
+    public fun ifGreaterOrEqual(type: PrimitiveFieldType, label: Label) {
         ifCmp(type, ComparisonMode.GREATER_OR_EQUAL, label)
     }
 
@@ -580,7 +580,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * Pushes the appropriate comparison instruction based on the [type] of the values on the stack.
      */
     @AsmKtDsl
-    public fun ifLess(type: NonVoidPrimitiveTypeDesc, label: Label) {
+    public fun ifLess(type: PrimitiveFieldType, label: Label) {
         ifCmp(type, ComparisonMode.LESS, label)
     }
 
@@ -588,7 +588,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * Pushes the appropriate comparison instruction based on the [type] of the values on the stack.
      */
     @AsmKtDsl
-    public fun ifLessOrEqual(type: NonVoidPrimitiveTypeDesc, label: Label) {
+    public fun ifLessOrEqual(type: PrimitiveFieldType, label: Label) {
         ifCmp(type, ComparisonMode.LESS_OR_EQUAL, label)
     }
 
@@ -601,14 +601,14 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
         LESS_OR_EQUAL(Opcodes.IFLE, Opcodes.IF_ICMPLE);
     }
 
-    private fun ifCmp(type: FieldTypeDesc, mode: ComparisonMode, label: Label) {
+    private fun ifCmp(type: FieldType, mode: ComparisonMode, label: Label) {
         withCode {
             when (type) {
-                LongTypeDesc -> {
+                LongType -> {
                     addInstruction(Opcodes.LCMP)
                     addJumpInstruction(mode.code, label)
                 }
-                DoubleTypeDesc -> {
+                DoubleType -> {
                     val instruction = when (mode) {
                         ComparisonMode.GREATER_OR_EQUAL, ComparisonMode.GREATER -> Opcodes.DCMPL
                         else -> Opcodes.DCMPG
@@ -616,7 +616,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
                     addInstruction(instruction)
                     addJumpInstruction(mode.code, label)
                 }
-                FloatTypeDesc -> {
+                FloatType -> {
                     val instruction = when (mode) {
                         ComparisonMode.GREATER_OR_EQUAL, ComparisonMode.GREATER -> Opcodes.FCMPL
                         else -> Opcodes.FCMPG
@@ -624,7 +624,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
                     addInstruction(instruction)
                     addJumpInstruction(mode.code, label)
                 }
-                is ArrayTypeDesc, is ClassDesc -> when (mode) {
+                is ArrayType, is ReferenceType -> when (mode) {
                     ComparisonMode.EQUAL -> addJumpInstruction(Opcodes.IF_ACMPEQ, label)
                     ComparisonMode.NOT_EQUAL -> addJumpInstruction(Opcodes.IF_ACMPNE, label)
                     else -> throw IllegalArgumentException("Bad comparison ($mode) for type ($type)")
@@ -641,7 +641,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun add(type: NonVoidPrimitiveTypeDesc) {
+    public fun add(type: PrimitiveFieldType) {
         code.addInstruction(type.getOpcode(Opcodes.IADD))
     }
 
@@ -651,7 +651,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun sub(type: NonVoidPrimitiveTypeDesc) {
+    public fun sub(type: PrimitiveFieldType) {
         code.addInstruction(type.getOpcode(Opcodes.ISUB))
     }
 
@@ -662,7 +662,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun mul(type: NonVoidPrimitiveTypeDesc) {
+    public fun mul(type: PrimitiveFieldType) {
         code.addInstruction(type.getOpcode(Opcodes.IMUL))
     }
 
@@ -672,7 +672,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun div(type: NonVoidPrimitiveTypeDesc) {
+    public fun div(type: PrimitiveFieldType) {
         code.addInstruction(type.getOpcode(Opcodes.IDIV))
     }
 
@@ -682,7 +682,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun rem(type: NonVoidPrimitiveTypeDesc) {
+    public fun rem(type: PrimitiveFieldType) {
         code.addInstruction(type.getOpcode(Opcodes.IREM))
     }
 
@@ -692,7 +692,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun neg(type: NonVoidPrimitiveTypeDesc) {
+    public fun neg(type: PrimitiveFieldType) {
         code.addInstruction(type.getOpcode(Opcodes.INEG))
     }
 
@@ -703,7 +703,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun shl(type: NonVoidPrimitiveTypeDesc) {
+    public fun shl(type: PrimitiveFieldType) {
         code.addInstruction(type.getOpcode(Opcodes.ISHL))
     }
 
@@ -714,7 +714,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun shr(type: NonVoidPrimitiveTypeDesc) {
+    public fun shr(type: PrimitiveFieldType) {
         code.addInstruction(type.getOpcode(Opcodes.ISHR))
     }
 
@@ -725,7 +725,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun ushr(type: NonVoidPrimitiveTypeDesc) {
+    public fun ushr(type: PrimitiveFieldType) {
         code.addInstruction(type.getOpcode(Opcodes.IUSHR))
     }
 
@@ -735,7 +735,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun and(type: NonVoidPrimitiveTypeDesc) {
+    public fun and(type: PrimitiveFieldType) {
         code.addInstruction(type.getOpcode(Opcodes.IAND))
     }
 
@@ -746,7 +746,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun or(type: NonVoidPrimitiveTypeDesc) {
+    public fun or(type: PrimitiveFieldType) {
         code.addInstruction(type.getOpcode(Opcodes.IOR))
     }
 
@@ -757,7 +757,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [type] the type of the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun xor(type: NonVoidPrimitiveTypeDesc) {
+    public fun xor(type: PrimitiveFieldType) {
         code.addInstruction(type.getOpcode(Opcodes.IXOR))
     }
 
@@ -785,41 +785,41 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [to] the type to convert the value to
      */
     @AsmKtDsl
-    public fun convert(from: NonVoidPrimitiveTypeDesc, to: NonVoidPrimitiveTypeDesc) {
+    public fun convert(from: PrimitiveFieldType, to: PrimitiveFieldType) {
         if (from != to) {
             withCode {
                 when (from) {
-                    DoubleTypeDesc -> when (to) {
-                        LongTypeDesc -> d2l()
-                        FloatTypeDesc -> d2f()
+                    DoubleType -> when (to) {
+                        LongType -> d2l()
+                        FloatType -> d2f()
                         else -> {
                             d2i()
-                            body.convert(IntTypeDesc, to)
+                            body.convert(IntType, to)
                         }
                     }
-                    FloatTypeDesc -> when (to) {
-                        LongTypeDesc -> f2l()
-                        DoubleTypeDesc -> f2d()
+                    FloatType -> when (to) {
+                        LongType -> f2l()
+                        DoubleType -> f2d()
                         else -> {
                             f2i()
-                            body.convert(IntTypeDesc, to)
+                            body.convert(IntType, to)
                         }
                     }
-                    LongTypeDesc -> when (to) {
-                        FloatTypeDesc -> l2f()
-                        DoubleTypeDesc -> l2d()
+                    LongType -> when (to) {
+                        FloatType -> l2f()
+                        DoubleType -> l2d()
                         else -> {
                             l2i()
-                            body.convert(IntTypeDesc, to)
+                            body.convert(IntType, to)
                         }
                     }
                     else -> when (to) {
-                        CharTypeDesc -> i2c()
-                        ShortTypeDesc -> i2s()
-                        ByteTypeDesc -> i2b()
-                        LongTypeDesc -> i2l()
-                        FloatTypeDesc -> i2f()
-                        DoubleTypeDesc -> i2d()
+                        CharType -> i2c()
+                        ShortType -> i2s()
+                        ByteType -> i2b()
+                        LongType -> i2l()
+                        FloatType -> i2f()
+                        DoubleType -> i2d()
                         else -> throw IllegalArgumentException("Invalid conversion from ($from) to ($to)")
                     }
                 }
@@ -840,7 +840,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [exception] the exception to catch, or `null` to catch all exceptions *(for `finally` blocks)*
      */
     @AsmKtDsl
-    public fun tryCatch(start: Label, end: Label, handler: Label, exception: ClassDesc? = null) {
+    public fun tryCatch(start: Label, end: Label, handler: Label, exception: ReferenceType? = null) {
         method.addTryCatchBlock(start, end, handler, exception?.internalName)
     }
 
@@ -1000,7 +1000,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
      * @param [to] the type of the value below the value currently at the top of the stack
      */
     @AsmKtDsl
-    public fun swap(from: ReturnableTypeDesc, to: ReturnableTypeDesc) {
+    public fun swap(from: ReturnableType, to: ReturnableType) {
         when (to.slotSize) {
             1 -> when (from.slotSize) {
                 1 -> code.swap()
@@ -1061,7 +1061,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
     public fun localVariable(
         index: Int,
         name: String,
-        type: FieldTypeDesc,
+        type: FieldType,
         signature: String? = null,
         start: Label,
         end: Label,
@@ -1098,7 +1098,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
 
     private fun fixAnnotationValue(value: Any?): Any? = when (value) {
         null -> null
-        is ReturnableTypeDesc -> value.asAsmType()
+        is ReturnableType -> value.asAsmType()
         //is BytecodeAnnotation -> value.node
         is List<*> -> value.mapTo(mutableListOf(), this::fixAnnotationValue)
         is Array<*> -> TODO("or an two elements String array (for enumeration values)")
@@ -1107,13 +1107,13 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
 
     private companion object {
         private val primitiveClassHandle: Handle = InvokeStaticHandle(
-            owner = ClassDesc("java/lang/invoke/ConstantBootstraps"),
+            owner = ReferenceType("java/lang/invoke/ConstantBootstraps"),
             name = "primitiveClass",
-            type = MethodTypeDesc(
-                ClassDesc.CLASS,
-                ClassDesc.METHOD_HANDLES_LOOKUP,
-                ClassDesc.STRING,
-                ClassDesc.CLASS,
+            type = MethodType(
+                ReferenceType.CLASS,
+                ReferenceType.METHOD_HANDLES_LOOKUP,
+                ReferenceType.STRING,
+                ReferenceType.CLASS,
             ),
         )
     }

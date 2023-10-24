@@ -16,12 +16,12 @@
 
 package net.ormr.asmkt.type
 
-import net.ormr.asmkt.type.MethodTypeDesc.Companion.fromDescriptor
+import net.ormr.asmkt.type.MethodType.Companion.fromDescriptor
 
-public fun MethodTypeDesc.prependArguments(vararg newArgumentTypes: FieldTypeDesc): MethodTypeDesc =
+public fun MethodType.prependArguments(vararg newArgumentTypes: FieldType): MethodType =
     prependArguments(newArgumentTypes.asIterable())
 
-public fun MethodTypeDesc.prependArguments(newArgumentTypes: Iterable<FieldTypeDesc>): MethodTypeDesc {
+public fun MethodType.prependArguments(newArgumentTypes: Iterable<FieldType>): MethodType {
     if (newArgumentTypes.none()) {
         return this
     }
@@ -35,7 +35,7 @@ public fun MethodTypeDesc.prependArguments(newArgumentTypes: Iterable<FieldTypeD
     return fromDescriptor(newDescriptor)
 }
 
-public fun MethodTypeDesc.appendArguments(newArgumentTypes: Iterable<FieldTypeDesc>): MethodTypeDesc {
+public fun MethodType.appendArguments(newArgumentTypes: Iterable<FieldType>): MethodType {
     if (newArgumentTypes.none()) {
         return this
     }
@@ -49,7 +49,7 @@ public fun MethodTypeDesc.appendArguments(newArgumentTypes: Iterable<FieldTypeDe
     return fromDescriptor(newDescriptor)
 }
 
-public fun MethodTypeDesc.appendArguments(vararg newArgumentTypes: FieldTypeDesc): MethodTypeDesc =
+public fun MethodType.appendArguments(vararg newArgumentTypes: FieldType): MethodType =
     appendArguments(newArgumentTypes.asIterable())
 
 /**
@@ -58,9 +58,9 @@ public fun MethodTypeDesc.appendArguments(vararg newArgumentTypes: FieldTypeDesc
  * If the type at `index` is the same the given `newType` then `this` instance is returned.
  *
  * @throws [IllegalArgumentException] if `index` is negative, or if `index` is larger than the available
- * [argumentTypes][MethodTypeDesc.argumentTypes]
+ * [argumentTypes][MethodType.argumentTypes]
  */
-public fun MethodTypeDesc.withArgument(index: Int, newType: FieldTypeDesc): MethodTypeDesc {
+public fun MethodType.withArgument(index: Int, newType: FieldType): MethodType {
     require(index >= 0) { "index ($index) < 0" }
     require(index < argumentTypes.size) { "index ($index) is out of argument bounds (${argumentTypes.size})" }
     return when (newType) {
@@ -86,9 +86,9 @@ public fun MethodTypeDesc.withArgument(index: Int, newType: FieldTypeDesc): Meth
  * Returns a type based on `this` type but with the argument at the given [index] removed.
  *
  * @throws [IllegalArgumentException] if `index` is negative, or if `index` is larger than the available
- * [argumentTypes][MethodTypeDesc.argumentTypes]
+ * [argumentTypes][MethodType.argumentTypes]
  */
-public fun MethodTypeDesc.dropArgument(index: Int): MethodTypeDesc {
+public fun MethodType.dropArgument(index: Int): MethodType {
     require(index >= 0) { "index ($index) < 0" }
     require(index < argumentTypes.size) { "index ($index) is out of argument bounds (${argumentTypes.size})" }
     val newDescriptor = buildString {
@@ -110,9 +110,9 @@ public fun MethodTypeDesc.dropArgument(index: Int): MethodTypeDesc {
  * Returns a type based on `this` type but with the given [arguments] inserted at the given [index].
  *
  * @throws [IllegalArgumentException] if `index` is negative, or if `index` is larger than the available number of
- * [argumentTypes][MethodTypeDesc.argumentTypes]
+ * [argumentTypes][MethodType.argumentTypes]
  */
-public fun MethodTypeDesc.insertArguments(index: Int, arguments: Iterable<FieldTypeDesc>): MethodTypeDesc {
+public fun MethodType.insertArguments(index: Int, arguments: Iterable<FieldType>): MethodType {
     require(index >= 0) { "index ($index) < 0" }
     require(index < argumentTypes.size) { "index ($index) is out of argument bounds (${argumentTypes.size})" }
     val newDescriptor = buildString {
@@ -132,11 +132,11 @@ public fun MethodTypeDesc.insertArguments(index: Int, arguments: Iterable<FieldT
 }
 
 /**
- * Returns a type based on `this` type but with the [return type][MethodTypeDesc.returnType] changed to the given [newType].
+ * Returns a type based on `this` type but with the [return type][MethodType.returnType] changed to the given [newType].
  *
  * If the current `returnType` is the same as `newType` then `this` instance is returned.
  */
-public fun MethodTypeDesc.withReturn(newType: FieldTypeDesc): MethodTypeDesc = when (returnType) {
+public fun MethodType.withReturn(newType: FieldType): MethodType = when (returnType) {
     newType -> this
     else -> {
         val newDescriptor = buildString {

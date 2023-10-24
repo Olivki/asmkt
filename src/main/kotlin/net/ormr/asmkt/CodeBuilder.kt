@@ -18,7 +18,7 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.TypeDesc
+import net.ormr.asmkt.type.Type
 import org.objectweb.asm.Handle
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
@@ -72,7 +72,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      */
     @AsmKtDsl
     public fun ldc(value: Any) {
-        addLdcInstruction(if (value is TypeDesc) value.asAsmType() else value)
+        addLdcInstruction(if (value is Type) value.asAsmType() else value)
     }
 
     // -- CONSTANTS -- \\

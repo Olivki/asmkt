@@ -16,19 +16,19 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.ClassDesc
-import net.ormr.asmkt.type.MethodTypeDesc
+import net.ormr.asmkt.type.MethodType
+import net.ormr.asmkt.type.ReferenceType
 
 @AsmKtDsl
 public class ClassModel(
     override val version: ClassFileVersion,
     public val kind: ClassKind,
-    public val type: ClassDesc,
+    public val type: ReferenceType,
     override val flags: SimpleClassAccessFlags = AccessFlag.PUBLIC.asAccessFlags(),
     public val signature: String? = null,
-    public val superType: ClassDesc = ClassDesc.OBJECT,
-    public val interfaces: List<ClassDesc> = emptyList(),
-    public val permittedSubtypes: List<ClassDesc> = emptyList(),
+    public val superType: ReferenceType = ReferenceType.OBJECT,
+    public val interfaces: List<ReferenceType> = emptyList(),
+    public val permittedSubtypes: List<ReferenceType> = emptyList(),
     public val sourceFile: String? = null,
     public val sourceDebug: String? = null,
 ) : ElementModel, ElementWithFlags<SimpleClassAccessFlag>, ElementWithVersion {
@@ -41,9 +41,9 @@ public class ClassModel(
     public fun method(
         name: String,
         flags: MethodAccessFlags,
-        type: MethodTypeDesc,
+        type: MethodType,
         signature: String?,
-        exceptions: List<ClassDesc>,
+        exceptions: List<ReferenceType>,
     ): MethodModel {
         val model = MethodModel(this, name, flags, type, signature, exceptions)
         TODO("add model and stuff to class model")

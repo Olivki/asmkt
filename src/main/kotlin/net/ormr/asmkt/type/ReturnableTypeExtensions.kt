@@ -16,28 +16,7 @@
 
 package net.ormr.asmkt.type
 
-public sealed interface TypeDesc {
-    /**
-     * The descriptor of the type.
-     */
-    public val descriptor: String
-
-    /**
-     * The size of the type.
-     *
-     * The semantics of the returned value is implementation specific.
-     */
-    public val slotSize: Int
-
-    /**
-     * Returns the [AsmType][org.objectweb.asm.Type] that this type represents.
-     */
-    public fun asAsmType(): AsmType
-
-    /**
-     * Returns a string representation of this type.
-     *
-     * Note that the returned string is meant for debugging purposes *only*.
-     */
-    public fun asString(): String
-}
+/**
+ * See [AsmType.getOpcode][org.objectweb.asm.Type.getOpcode].
+ */
+public fun ReturnableType.getOpcode(opcode: Int): Int = asAsmType().getOpcode(opcode)

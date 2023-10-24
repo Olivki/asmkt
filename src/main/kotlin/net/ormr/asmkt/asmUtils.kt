@@ -16,7 +16,7 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.TypeDesc
+import net.ormr.asmkt.type.Type
 import org.objectweb.asm.Label
 import org.objectweb.asm.tree.LabelNode
 
@@ -30,15 +30,15 @@ internal inline fun <K, V> Map<K, List<V>>.doEach(action: (K, V) -> Unit) {
 
 internal fun List<Any>.replaceTypes(): List<Any> = when {
     isEmpty() -> this
-    any { it is TypeDesc } -> map { if (it is TypeDesc) it.asAsmType() else it }
+    any { it is Type } -> map { if (it is Type) it.asAsmType() else it }
     else -> this
 }
 
 internal fun Array<out Any>.replaceTypes(): Array<out Any> = when {
     isEmpty() -> this
-    any { it is TypeDesc } -> Array(size) {
+    any { it is Type } -> Array(size) {
         val value = this[it]
-        if (value is TypeDesc) value.asAsmType() else value
+        if (value is Type) value.asAsmType() else value
     }
     else -> this
 }

@@ -18,14 +18,14 @@ package net.ormr.asmkt.type
 
 import net.ormr.asmkt.AsmKtReflection
 
-public sealed interface ReturnableTypeDesc : TypeDesc {
+/**
+ * Represents a type that can be returned from a method.
+ *
+ * This includes all types that are not [method type][MethodType]s.
+ */
+public sealed interface ReturnableType : Type {
     /**
-     * The size of the type.
-     *
-     * Note that the size of a type is *not* the size of the type in bytes, but rather how many slots it takes up.
-     * For example, an `int` type has a size of `1`, while a `long` type has a size of `2`, and void has a size of `0`.
-     * Following this, an `int` requires a `pop` instruction to get it off the stack, while a long requires
-     * `popx2`, and void requires no pop instruction at all.
+     * How many slots this type takes up on the stack.
      */
     override val slotSize: Int
         get() = asAsmType().size

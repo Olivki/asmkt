@@ -18,8 +18,8 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.ClassDesc
-import net.ormr.asmkt.type.MethodTypeDesc
+import net.ormr.asmkt.type.MethodType
+import net.ormr.asmkt.type.ReferenceType
 import org.objectweb.asm.Handle
 
 /**
@@ -29,71 +29,71 @@ import org.objectweb.asm.Handle
  */
 public fun Handle(
     kind: HandleKind,
-    owner: ClassDesc,
+    owner: ReferenceType,
     name: String,
-    type: MethodTypeDesc,
+    type: MethodType,
     isInterface: Boolean = false,
 ): Handle = Handle(kind.asInt(), owner.internalName, name, type.descriptor, isInterface)
 
 public inline fun GetFieldHandle(
-    owner: ClassDesc,
+    owner: ReferenceType,
     name: String,
-    type: MethodTypeDesc,
+    type: MethodType,
     isInterface: Boolean = false,
 ): Handle = Handle(HandleKind.GET_FIELD, owner, name, type, isInterface)
 
 public inline fun GetStaticHandle(
-    owner: ClassDesc,
+    owner: ReferenceType,
     name: String,
-    type: MethodTypeDesc,
+    type: MethodType,
     isInterface: Boolean = false,
 ): Handle = Handle(HandleKind.GET_STATIC, owner, name, type, isInterface)
 
 public inline fun PutFieldHandle(
-    owner: ClassDesc,
+    owner: ReferenceType,
     name: String,
-    type: MethodTypeDesc,
+    type: MethodType,
     isInterface: Boolean = false,
 ): Handle = Handle(HandleKind.PUT_FIELD, owner, name, type, isInterface)
 
 public inline fun PutStaticHandle(
-    owner: ClassDesc,
+    owner: ReferenceType,
     name: String,
-    type: MethodTypeDesc,
+    type: MethodType,
     isInterface: Boolean = false,
 ): Handle = Handle(HandleKind.PUT_STATIC, owner, name, type, isInterface)
 
 public inline fun InvokeVirtualHandle(
-    owner: ClassDesc,
+    owner: ReferenceType,
     name: String,
-    type: MethodTypeDesc,
+    type: MethodType,
     isInterface: Boolean = false,
 ): Handle = Handle(HandleKind.INVOKE_VIRTUAL, owner, name, type, isInterface)
 
 public inline fun InvokeStaticHandle(
-    owner: ClassDesc,
+    owner: ReferenceType,
     name: String,
-    type: MethodTypeDesc,
+    type: MethodType,
     isInterface: Boolean = false,
 ): Handle = Handle(HandleKind.INVOKE_STATIC, owner, name, type, isInterface)
 
 public inline fun InvokeSpecialHandle(
-    owner: ClassDesc,
+    owner: ReferenceType,
     name: String,
-    type: MethodTypeDesc,
+    type: MethodType,
     isInterface: Boolean = false,
 ): Handle = Handle(HandleKind.INVOKE_SPECIAL, owner, name, type, isInterface)
 
 public inline fun NewInvokeSpecialHandle(
-    owner: ClassDesc,
+    owner: ReferenceType,
     name: String,
-    type: MethodTypeDesc,
+    type: MethodType,
     isInterface: Boolean = false,
 ): Handle = Handle(HandleKind.NEW_INVOKE_SPECIAL, owner, name, type, isInterface)
 
 public inline fun InvokeInterfaceHandle(
-    owner: ClassDesc,
+    owner: ReferenceType,
     name: String,
-    type: MethodTypeDesc,
+    type: MethodType,
     isInterface: Boolean = false,
 ): Handle = Handle(HandleKind.INVOKE_INTERFACE, owner, name, type, isInterface)

@@ -16,18 +16,18 @@
 
 package net.ormr.asmkt.type
 
-import java.lang.invoke.MethodType
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 import java.util.*
+import java.lang.invoke.MethodType as JMethodType
 
-public class MethodTypeDesc private constructor(private val delegate: AsmType) : TypeDesc {
+public class MethodType private constructor(private val delegate: AsmType) : Type {
     override val descriptor: String = delegate.descriptor
 
     /**
      * The size of the [argument types][argumentTypes] and [return type][returnType] of the method.
      *
-     * For more information on how the size of a type is calculated, see [ReturnableTypeDesc.slotSize].
+     * For more information on how the size of a type is calculated, see [ReturnableType.slotSize].
      */
     override val slotSize: Int
         get() = delegate.argumentsAndReturnSizes
@@ -35,13 +35,13 @@ public class MethodTypeDesc private constructor(private val delegate: AsmType) :
     /**
      * A list of all the argument types of the method.
      */
-    public val argumentTypes: List<FieldTypeDesc> =
-        Collections.unmodifiableList(delegate.argumentTypes.map(AsmType::toFieldTypeDesc))
+    public val argumentTypes: List<FieldType> =
+        Collections.unmodifiableList(delegate.argumentTypes.map(AsmType::toFieldType))
 
     /**
      * The return type of the method.
      */
-    public val returnType: ReturnableTypeDesc = delegate.returnType.toReturnableTypeDesc()
+    public val returnType: ReturnableType = delegate.returnType.toReturnableType()
 
     override fun asAsmType(): AsmType = delegate
 
@@ -50,7 +50,7 @@ public class MethodTypeDesc private constructor(private val delegate: AsmType) :
 
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
-        other !is MethodTypeDesc -> false
+        other !is MethodType -> false
         delegate != other.delegate -> false
         else -> true
     }
@@ -60,26 +60,51 @@ public class MethodTypeDesc private constructor(private val delegate: AsmType) :
     override fun toString(): String = "MethodTypeDesc(argumentTypes=$argumentTypes, returnType=$returnType)"
 
     public companion object {
-        public fun copyOf(type: AsmType): MethodTypeDesc {
+        /**
+         * Returns a [MethodType] that is wrapped around the given [type].
+         *
+         * @throws [IllegalArgumentException] if the given [type] is not a method type.
+         */
+        public fun copyOf(type: AsmType): MethodType {
             require(type.isMethod) { "Type (${type.asString()}) is not a method type" }
-            return MethodTypeDesc(type)
+            return MethodType(type)
         }
 
-        public fun of(returnType: ReturnableTypeDesc): MethodTypeDesc = fromDescriptor("()${returnType.descriptor}")
+        /**
+         * Returns a [MethodType] representing the method-type of the given [type].
+         */
+        public fun from(type: JMethodType): MethodType = fromDescriptor(type.toMethodDescriptorString())
 
-        public fun of(returnType: ReturnableTypeDesc, vararg argumentTypes: FieldTypeDesc): MethodTypeDesc =
+        /**
+         * Returns a [MethodType] representing the method-type of the given [method].
+         */
+        public fun from(method: Method): MethodType = fromDescriptor(AsmType.getMethodDescriptor(method))
+
+        /**
+         * Returns a [MethodType] representing the method-type of the given [constructor].
+         *
+         * The `return type` of a constructor will *always* be [void][VoidType].
+         */
+        public fun from(constructor: Constructor<*>): MethodType =
+            fromDescriptor(AsmType.getConstructorDescriptor(constructor))
+
+        public fun of(returnType: ReturnableType): MethodType =
+            fromDescriptor("()${returnType.descriptor}")
+
+        public fun of(returnType: ReturnableType, vararg argumentTypes: FieldType): MethodType =
             fromDescriptor(descriptorOf(returnType, argumentTypes.asIterable()))
 
-        public fun of(returnType: ReturnableTypeDesc, argumentTypes: Iterable<FieldTypeDesc>): MethodTypeDesc =
+        public fun of(returnType: ReturnableType, argumentTypes: Iterable<FieldType>): MethodType =
             fromDescriptor(descriptorOf(returnType, argumentTypes))
 
-        public fun fromDescriptor(descriptor: String): MethodTypeDesc = copyOf(AsmType.getMethodType(descriptor))
+        public fun fromDescriptor(descriptor: String): MethodType =
+            copyOf(AsmType.getMethodType(descriptor))
 
         public fun generic(
             arity: Int,
             finalArray: Boolean = false,
-            returnType: FieldTypeDesc = ClassDesc.OBJECT,
-        ): MethodTypeDesc {
+            returnType: FieldType = ReferenceType.OBJECT,
+        ): MethodType {
             require(arity >= 0) { "arity ($arity) < 0" }
             val size = if (finalArray) arity + 1 else arity
             val descriptor = buildString {
@@ -98,8 +123,8 @@ public class MethodTypeDesc private constructor(private val delegate: AsmType) :
         }
 
         private fun descriptorOf(
-            returnType: ReturnableTypeDesc,
-            typeParameters: Iterable<FieldTypeDesc>,
+            returnType: ReturnableType,
+            typeParameters: Iterable<FieldType>,
         ): String = buildString {
             typeParameters.joinTo(this, "", "(", ")") { it.descriptor }
             append(returnType.descriptor)
@@ -107,28 +132,27 @@ public class MethodTypeDesc private constructor(private val delegate: AsmType) :
     }
 }
 
-public fun MethodTypeDesc(returnType: ReturnableTypeDesc): MethodTypeDesc = MethodTypeDesc.of(returnType)
+public fun MethodType(returnType: ReturnableType): MethodType = MethodType.of(returnType)
 
-public fun MethodTypeDesc(returnType: ReturnableTypeDesc, vararg argumentTypes: FieldTypeDesc): MethodTypeDesc =
-    MethodTypeDesc.of(returnType, argumentTypes.asIterable())
+public fun MethodType(returnType: ReturnableType, vararg argumentTypes: FieldType): MethodType =
+    MethodType.of(returnType, argumentTypes.asIterable())
 
-public fun MethodTypeDesc(returnType: ReturnableTypeDesc, argumentTypes: Iterable<FieldTypeDesc>): MethodTypeDesc =
-    MethodTypeDesc.of(returnType, argumentTypes)
+public fun MethodType(returnType: ReturnableType, argumentTypes: Iterable<FieldType>): MethodType =
+    MethodType.of(returnType, argumentTypes)
 
 /**
  * Returns a type representing `this` method-type.
  */
-public fun MethodType.toMethodTypeDesc(): MethodTypeDesc = MethodTypeDesc.fromDescriptor(toMethodDescriptorString())
+public fun JMethodType.toMethodType(): MethodType = MethodType.from(this)
 
 /**
  * Returns a type representing the method-type of `this` method.
  */
-public fun Method.toMethodTypeDesc(): MethodTypeDesc = MethodTypeDesc.fromDescriptor(AsmType.getMethodDescriptor(this))
+public fun Method.toMethodType(): MethodType = MethodType.from(this)
 
 /**
  * Returns a type representing the method-type of `this` constructor.
  *
- * The `return type` of a constructor will *always* be [void][VoidTypeDesc].
+ * The `return type` of a constructor will *always* be [void][VoidType].
  */
-public fun Constructor<*>.toMethodTypeDesc(): MethodTypeDesc =
-    MethodTypeDesc.fromDescriptor(AsmType.getConstructorDescriptor(this))
+public fun Constructor<*>.toMethodType(): MethodType = MethodType.from(this)

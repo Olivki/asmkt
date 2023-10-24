@@ -16,4 +16,12 @@
 
 package net.ormr.asmkt.type
 
-public sealed interface FieldTypeDesc : ReturnableTypeDesc
+public sealed interface TypeWithInternalName : Type {
+    /**
+     * The internal name of the type.
+     *
+     * The internal name for a type is the fully qualified name of the type, with `.` replaced with `/`. For example,
+     * the internal name for `java.lang.String` is `java/lang/String`.
+     */
+    public val internalName: String
+}

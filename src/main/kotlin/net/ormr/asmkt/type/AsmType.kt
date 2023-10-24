@@ -51,35 +51,35 @@ public val AsmType.isArray: Boolean
 public val AsmType.isMethod: Boolean
     get() = sort == AsmType.METHOD
 
-public fun AsmType.toTypeDesc(): TypeDesc = when {
-    isPrimitive -> toPrimitiveTypeDesc()
-    isObject -> toReferenceTypeDesc()
-    isArray -> toArrayTypeDesc()
-    isMethod -> toMethodTypeDesc()
+public fun AsmType.toType(): Type = when {
+    isPrimitive -> toPrimitiveType()
+    isObject -> toReferenceType()
+    isArray -> toArrayType()
+    isMethod -> toMethodType()
     else -> throw IllegalArgumentException("Type (${this.asString()}) is not supported")
 }
 
-public fun AsmType.toReturnableTypeDesc(): ReturnableTypeDesc = when {
-    isPrimitive -> toPrimitiveTypeDesc()
-    isObject -> toReferenceTypeDesc()
-    isArray -> toArrayTypeDesc()
+public fun AsmType.toReturnableType(): ReturnableType = when {
+    isPrimitive -> toPrimitiveType()
+    isObject -> toReferenceType()
+    isArray -> toArrayType()
     else -> throw IllegalArgumentException("Type (${this.asString()}) is not a returnable type")
 }
 
-public fun AsmType.toFieldTypeDesc(): FieldTypeDesc = when {
-    isPrimitiveAndNotVoid -> toPrimitiveTypeDesc() as FieldTypeDesc
-    isObject -> toReferenceTypeDesc()
-    isArray -> toArrayTypeDesc()
+public fun AsmType.toFieldType(): FieldType = when {
+    isPrimitiveAndNotVoid -> toPrimitiveType() as FieldType
+    isObject -> toReferenceType()
+    isArray -> toArrayType()
     else -> throw IllegalArgumentException("Type (${this.asString()}) is not a field type")
 }
 
-public fun AsmType.toPrimitiveTypeDesc(): PrimitiveTypeDesc = PrimitiveTypeDesc.copyOf(this)
+public fun AsmType.toPrimitiveType(): PrimitiveType = PrimitiveType.copyOf(this)
 
-public fun AsmType.toReferenceTypeDesc(): ClassDesc = ClassDesc.copyOf(this)
+public fun AsmType.toReferenceType(): ReferenceType = ReferenceType.copyOf(this)
 
-public fun AsmType.toArrayTypeDesc(): ArrayTypeDesc = ArrayTypeDesc.copyOf(this)
+public fun AsmType.toArrayType(): ArrayType = ArrayType.copyOf(this)
 
-public fun AsmType.toMethodTypeDesc(): MethodTypeDesc = MethodTypeDesc.copyOf(this)
+public fun AsmType.toMethodType(): MethodType = MethodType.copyOf(this)
 
 private val sortNames =
     arrayOf("void", "boolean", "char", "byte", "short", "int", "float", "long", "double", "array", "object", "method")

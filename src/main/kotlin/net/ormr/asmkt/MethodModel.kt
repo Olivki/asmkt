@@ -16,9 +16,9 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.ClassDesc
-import net.ormr.asmkt.type.MethodTypeDesc
-import net.ormr.asmkt.type.ReturnableTypeDesc
+import net.ormr.asmkt.type.MethodType
+import net.ormr.asmkt.type.ReferenceType
+import net.ormr.asmkt.type.ReturnableType
 import org.objectweb.asm.Label
 import org.objectweb.asm.tree.LocalVariableNode
 import org.objectweb.asm.tree.ParameterNode
@@ -31,19 +31,19 @@ public class MethodModel(
     public val parent: ClassModel,
     public val name: String,
     override val flags: MethodAccessFlags,
-    public val type: MethodTypeDesc,
+    public val type: MethodType,
     public val signature: String?,
-    public val exceptions: List<ClassDesc>,
+    public val exceptions: List<ReferenceType>,
 ) : ElementModel, ElementWithFlags<MethodAccessFlag>, ElementWithVersion {
     public val body: MethodBodyBuilder = MethodBodyBuilder(this)
 
     override val version: ClassFileVersion
         get() = parent.version
 
-    public val parentType: ClassDesc
+    public val parentType: ReferenceType
         get() = parent.type
 
-    public val returnType: ReturnableTypeDesc
+    public val returnType: ReturnableType
         get() = type.returnType
 
     private val tryCatchBlocks = mutableListOf<TryCatchBlockNode>()
