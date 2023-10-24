@@ -36,11 +36,11 @@ public sealed interface PrimitiveTypeDesc : ReturnableTypeDesc {
     /**
      * Returns the boxed version of this type.
      *
-     * For example, if this type is [BooleanTypeDesc], then this method will return [ReferenceTypeDesc.BOOLEAN].
+     * For example, if this type is [BooleanTypeDesc], then this method will return [ClassDesc.BOOLEAN].
      *
-     * @see [ReferenceTypeDesc.unboxOrNull]
+     * @see [ClassDesc.unboxOrNull]
      */
-    public fun box(): ReferenceTypeDesc
+    public fun box(): ClassDesc
 
     override fun asString(): String = name
 
@@ -73,6 +73,8 @@ public sealed interface PrimitiveTypeDesc : ReturnableTypeDesc {
     }
 }
 
+public sealed interface NonVoidPrimitiveTypeDesc : PrimitiveTypeDesc, FieldTypeDesc
+
 /**
  * Represents the `void` primitive type.
  */
@@ -88,13 +90,13 @@ public data object VoidTypeDesc : PrimitiveTypeDesc {
     @AsmKtReflection
     override fun getOrLoadClass(): Class<*> = JVoid.TYPE
 
-    override fun box(): ReferenceTypeDesc = ReferenceTypeDesc.VOID
+    override fun box(): ClassDesc = ClassDesc.VOID
 }
 
 /**
  * Represents the `boolean` primitive type.
  */
-public data object BooleanTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
+public data object BooleanTypeDesc : NonVoidPrimitiveTypeDesc {
     override val descriptor: String
         get() = "Z"
 
@@ -106,13 +108,13 @@ public data object BooleanTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
     @AsmKtReflection
     override fun getOrLoadClass(): Class<*> = JBoolean.TYPE
 
-    override fun box(): ReferenceTypeDesc = ReferenceTypeDesc.BOOLEAN
+    override fun box(): ClassDesc = ClassDesc.BOOLEAN
 }
 
 /**
  * Represents the `char` primitive type.
  */
-public data object CharTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
+public data object CharTypeDesc : NonVoidPrimitiveTypeDesc {
     override val descriptor: String
         get() = "C"
 
@@ -124,13 +126,13 @@ public data object CharTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
     @AsmKtReflection
     override fun getOrLoadClass(): Class<*> = JChar.TYPE
 
-    override fun box(): ReferenceTypeDesc = ReferenceTypeDesc.CHAR
+    override fun box(): ClassDesc = ClassDesc.CHAR
 }
 
 /**
  * Represents the `byte` primitive type.
  */
-public data object ByteTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
+public data object ByteTypeDesc : NonVoidPrimitiveTypeDesc {
     override val descriptor: String
         get() = "B"
 
@@ -142,13 +144,13 @@ public data object ByteTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
     @AsmKtReflection
     override fun getOrLoadClass(): Class<*> = JByte.TYPE
 
-    override fun box(): ReferenceTypeDesc = ReferenceTypeDesc.BYTE
+    override fun box(): ClassDesc = ClassDesc.BYTE
 }
 
 /**
  * Represents the `short` primitive type.
  */
-public data object ShortTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
+public data object ShortTypeDesc : NonVoidPrimitiveTypeDesc {
     override val descriptor: String
         get() = "S"
 
@@ -160,13 +162,13 @@ public data object ShortTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
     @AsmKtReflection
     override fun getOrLoadClass(): Class<*> = JShort.TYPE
 
-    override fun box(): ReferenceTypeDesc = ReferenceTypeDesc.SHORT
+    override fun box(): ClassDesc = ClassDesc.SHORT
 }
 
 /**
  * Represents the `int` primitive type.
  */
-public data object IntTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
+public data object IntTypeDesc : NonVoidPrimitiveTypeDesc {
     override val descriptor: String
         get() = "I"
 
@@ -178,13 +180,13 @@ public data object IntTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
     @AsmKtReflection
     override fun getOrLoadClass(): Class<*> = JInt.TYPE
 
-    override fun box(): ReferenceTypeDesc = ReferenceTypeDesc.INT
+    override fun box(): ClassDesc = ClassDesc.INT
 }
 
 /**
  * Represents the `long` primitive type.
  */
-public data object LongTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
+public data object LongTypeDesc : NonVoidPrimitiveTypeDesc {
     override val descriptor: String
         get() = "J"
 
@@ -196,13 +198,13 @@ public data object LongTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
     @AsmKtReflection
     override fun getOrLoadClass(): Class<*> = JLong.TYPE
 
-    override fun box(): ReferenceTypeDesc = ReferenceTypeDesc.LONG
+    override fun box(): ClassDesc = ClassDesc.LONG
 }
 
 /**
  * Represents the `float` primitive type.
  */
-public data object FloatTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
+public data object FloatTypeDesc : NonVoidPrimitiveTypeDesc {
     override val descriptor: String
         get() = "F"
 
@@ -214,13 +216,13 @@ public data object FloatTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
     @AsmKtReflection
     override fun getOrLoadClass(): Class<*> = JFloat.TYPE
 
-    override fun box(): ReferenceTypeDesc = ReferenceTypeDesc.FLOAT
+    override fun box(): ClassDesc = ClassDesc.FLOAT
 }
 
 /**
  * Represents the `double` primitive type.
  */
-public data object DoubleTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
+public data object DoubleTypeDesc : NonVoidPrimitiveTypeDesc {
     override val descriptor: String
         get() = "D"
 
@@ -232,5 +234,5 @@ public data object DoubleTypeDesc : PrimitiveTypeDesc, FieldTypeDesc {
     @AsmKtReflection
     override fun getOrLoadClass(): Class<*> = JDouble.TYPE
 
-    override fun box(): ReferenceTypeDesc = ReferenceTypeDesc.DOUBLE
+    override fun box(): ClassDesc = ClassDesc.DOUBLE
 }

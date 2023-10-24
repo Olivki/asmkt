@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-package net.ormr.asmkt.type
+package net.ormr.asmkt
 
-/**
- * See [AsmType.getOpcode][org.objectweb.asm.Type.getOpcode].
- */
-public fun FieldTypeDesc.getOpcode(opcode: Int): Int = asAsmType().getOpcode(opcode)
+public sealed interface ElementModel

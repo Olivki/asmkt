@@ -27,7 +27,7 @@ public sealed interface ReturnableTypeDesc : TypeDesc {
      * Following this, an `int` requires a `pop` instruction to get it off the stack, while a long requires
      * `popx2`, and void requires no pop instruction at all.
      */
-    override val size: Int
+    override val slotSize: Int
         get() = asAsmType().size
 
     /**

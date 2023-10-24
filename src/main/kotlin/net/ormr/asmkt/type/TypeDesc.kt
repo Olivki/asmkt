@@ -27,7 +27,7 @@ public sealed interface TypeDesc {
      *
      * The semantics of the returned value is implementation specific.
      */
-    public val size: Int
+    public val slotSize: Int
 
     /**
      * Returns the [AsmType][org.objectweb.asm.Type] that this type represents.

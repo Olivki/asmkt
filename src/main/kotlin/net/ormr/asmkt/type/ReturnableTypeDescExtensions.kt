@@ -16,4 +16,7 @@
 
 package net.ormr.asmkt.type
 
-public sealed interface FieldTypeDesc : ReturnableTypeDesc
+/**
+ * See [AsmType.getOpcode][org.objectweb.asm.Type.getOpcode].
+ */
+public fun ReturnableTypeDesc.getOpcode(opcode: Int): Int = asAsmType().getOpcode(opcode)

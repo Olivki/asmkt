@@ -23,6 +23,14 @@ import org.objectweb.asm.Opcodes
 public sealed interface AccessFlag {
     public fun asInt(): Int
 
+    /**
+     * Not an actual access flag, but used as a sentinel value.
+     */
+    public data object NONE : AccessFlag, SimpleClassAccessFlag, MethodAccessFlag, FieldAccessFlag,
+        ParameterAccessFlag {
+        override fun asInt(): Int = 0
+    }
+
     // -- Class Access Flags -- \\
     public data object SUPER : AccessFlag, ClassAccessFlag {
         override fun asInt(): Int = Opcodes.ACC_SUPER
@@ -92,37 +100,40 @@ public sealed interface AccessFlag {
         override fun asInt(): Int = Opcodes.ACC_ENUM
     }
 
-    public data object MANDATED : AccessFlag, ClassAccessFlag, MethodAccessFlag, FieldAccessFlag, ParameterAccessFlag,
+    public data object MANDATED : AccessFlag, SimpleClassAccessFlag, MethodAccessFlag, FieldAccessFlag,
+        ParameterAccessFlag,
         ModuleAccessFlag {
         override fun asInt(): Int = Opcodes.ACC_MANDATED
     }
 
-    public data object SYNTHETIC : AccessFlag, ClassAccessFlag, MethodAccessFlag, FieldAccessFlag, ParameterAccessFlag,
+    public data object SYNTHETIC : AccessFlag, SimpleClassAccessFlag, MethodAccessFlag, FieldAccessFlag,
+        ParameterAccessFlag,
         ModuleAccessFlag {
         override fun asInt(): Int = Opcodes.ACC_SYNTHETIC
     }
 
-    public data object DEPRECATED : AccessFlag, ClassAccessFlag, MethodAccessFlag, FieldAccessFlag {
+    public data object DEPRECATED : AccessFlag, SimpleClassAccessFlag, MethodAccessFlag, FieldAccessFlag {
         override fun asInt(): Int = Opcodes.ACC_DEPRECATED
     }
 
-    public data object STATIC : AccessFlag, ClassAccessFlag, MethodAccessFlag, FieldAccessFlag {
+    public data object STATIC : AccessFlag, SimpleClassAccessFlag, MethodAccessFlag, FieldAccessFlag {
         override fun asInt(): Int = Opcodes.ACC_STATIC
     }
 
-    public data object FINAL : AccessFlag, ClassAccessFlag, MethodAccessFlag, FieldAccessFlag, ParameterAccessFlag {
+    public data object FINAL : AccessFlag, SimpleClassAccessFlag, MethodAccessFlag, FieldAccessFlag,
+        ParameterAccessFlag {
         override fun asInt(): Int = Opcodes.ACC_FINAL
     }
 
-    public data object PUBLIC : AccessFlag, ClassAccessFlag, MethodAccessFlag, FieldAccessFlag {
+    public data object PUBLIC : AccessFlag, SimpleClassAccessFlag, MethodAccessFlag, FieldAccessFlag {
         override fun asInt(): Int = Opcodes.ACC_PUBLIC
     }
 
-    public data object PROTECTED : AccessFlag, ClassAccessFlag, MethodAccessFlag, FieldAccessFlag {
+    public data object PROTECTED : AccessFlag, SimpleClassAccessFlag, MethodAccessFlag, FieldAccessFlag {
         override fun asInt(): Int = Opcodes.ACC_PROTECTED
     }
 
-    public data object PRIVATE : AccessFlag, ClassAccessFlag, MethodAccessFlag, FieldAccessFlag {
+    public data object PRIVATE : AccessFlag, SimpleClassAccessFlag, MethodAccessFlag, FieldAccessFlag {
         override fun asInt(): Int = Opcodes.ACC_PRIVATE
     }
 
@@ -134,6 +145,9 @@ public sealed interface AccessFlag {
 // TODO: InnerClass?
 
 public sealed interface ClassAccessFlag : AccessFlag
+
+// TODO: better name
+public sealed interface SimpleClassAccessFlag : ClassAccessFlag
 
 public sealed interface MethodAccessFlag : AccessFlag
 

@@ -28,9 +28,9 @@ public class MethodTypeDesc private constructor(private val delegate: AsmType) :
     /**
      * The size of the [argument types][argumentTypes] and [return type][returnType] of the method.
      *
-     * For more information on how the size of a type is calculated, see [ReturnableTypeDesc.size].
+     * For more information on how the size of a type is calculated, see [ReturnableTypeDesc.slotSize].
      */
-    override val size: Int
+    override val slotSize: Int
         get() = delegate.argumentsAndReturnSizes
 
     /**
@@ -79,7 +79,7 @@ public class MethodTypeDesc private constructor(private val delegate: AsmType) :
         public fun generic(
             arity: Int,
             finalArray: Boolean = false,
-            returnType: FieldTypeDesc = ReferenceTypeDesc.OBJECT,
+            returnType: FieldTypeDesc = ClassDesc.OBJECT,
         ): MethodTypeDesc {
             require(arity >= 0) { "arity ($arity) < 0" }
             val size = if (finalArray) arity + 1 else arity

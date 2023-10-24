@@ -61,7 +61,7 @@ public class ArrayTypeDesc private constructor(private val delegate: AsmType) : 
     @AsmKtReflection
     public fun getOrLoadClass(loader: ClassLoader): Class<*> {
         val loadedClass = when (elementType) {
-            is ReferenceTypeDesc -> elementType.getOrLoadClass(loader)
+            is ClassDesc -> elementType.getOrLoadClass(loader)
             else -> elementType.getOrLoadClass()
         }
         return ArrayReflection.newInstance(loadedClass, dimensions).javaClass
@@ -79,36 +79,37 @@ public class ArrayTypeDesc private constructor(private val delegate: AsmType) : 
     override fun toString(): String = "ArrayTypeDesc(elementType=$elementType, dimensions=$dimensions)"
 
     public companion object {
-        // -- PRIMITIVES -- \\
-        public val VOID: ArrayTypeDesc = constant("[V")
-        public val BOOLEAN: ArrayTypeDesc = constant("[Z")
-        public val CHAR: ArrayTypeDesc = constant("[C")
-        public val BYTE: ArrayTypeDesc = constant("[B")
-        public val SHORT: ArrayTypeDesc = constant("[S")
-        public val INT: ArrayTypeDesc = constant("[I")
-        public val LONG: ArrayTypeDesc = constant("[J")
-        public val FLOAT: ArrayTypeDesc = constant("[F")
-        public val DOUBLE: ArrayTypeDesc = constant("[D")
-
-        // -- PRIMITIVE WRAPPERS -- \\
-        public val VOID_WRAPPER: ArrayTypeDesc = constant("[Ljava/lang/Void;")
-        public val BOOLEAN_WRAPPER: ArrayTypeDesc = constant("[Ljava/lang/Boolean;")
-        public val CHAR_WRAPPER: ArrayTypeDesc = constant("[Ljava/lang/Character;")
-        public val BYTE_WRAPPER: ArrayTypeDesc = constant("[Ljava/lang/Byte;")
-        public val SHORT_WRAPPER: ArrayTypeDesc = constant("[Ljava/lang/Short;")
-        public val INT_WRAPPER: ArrayTypeDesc = constant("[Ljava/lang/Integer;")
-        public val LONG_WRAPPER: ArrayTypeDesc = constant("[Ljava/lang/Long;")
-        public val FLOAT_WRAPPER: ArrayTypeDesc = constant("[Ljava/lang/Float;")
-        public val DOUBLE_WRAPPER: ArrayTypeDesc = constant("[Ljava/lang/Double;")
-
-        // -- OTHERS -- \\
-        public val OBJECT: ArrayTypeDesc = constant("[Ljava/lang/Object;")
-        public val STRING: ArrayTypeDesc = constant("[Ljava/lang/String;")
-        public val NUMBER: ArrayTypeDesc = constant("[Ljava/lang/Number;")
-
+        // needs to be declared before the constants, or we'll get a NPE
         private val constants = hashMapOf<String, ArrayTypeDesc>()
 
-        private fun constant(descriptor: String): ArrayTypeDesc {
+        // -- PRIMITIVES -- \\
+        public val VOID: ArrayTypeDesc = create("[V")
+        public val BOOLEAN: ArrayTypeDesc = create("[Z")
+        public val CHAR: ArrayTypeDesc = create("[C")
+        public val BYTE: ArrayTypeDesc = create("[B")
+        public val SHORT: ArrayTypeDesc = create("[S")
+        public val INT: ArrayTypeDesc = create("[I")
+        public val LONG: ArrayTypeDesc = create("[J")
+        public val FLOAT: ArrayTypeDesc = create("[F")
+        public val DOUBLE: ArrayTypeDesc = create("[D")
+
+        // -- PRIMITIVE WRAPPERS -- \\
+        public val VOID_WRAPPER: ArrayTypeDesc = create("[Ljava/lang/Void;")
+        public val BOOLEAN_WRAPPER: ArrayTypeDesc = create("[Ljava/lang/Boolean;")
+        public val CHAR_WRAPPER: ArrayTypeDesc = create("[Ljava/lang/Character;")
+        public val BYTE_WRAPPER: ArrayTypeDesc = create("[Ljava/lang/Byte;")
+        public val SHORT_WRAPPER: ArrayTypeDesc = create("[Ljava/lang/Short;")
+        public val INT_WRAPPER: ArrayTypeDesc = create("[Ljava/lang/Integer;")
+        public val LONG_WRAPPER: ArrayTypeDesc = create("[Ljava/lang/Long;")
+        public val FLOAT_WRAPPER: ArrayTypeDesc = create("[Ljava/lang/Float;")
+        public val DOUBLE_WRAPPER: ArrayTypeDesc = create("[Ljava/lang/Double;")
+
+        // -- OTHERS -- \\
+        public val OBJECT: ArrayTypeDesc = create("[Ljava/lang/Object;")
+        public val STRING: ArrayTypeDesc = create("[Ljava/lang/String;")
+        public val NUMBER: ArrayTypeDesc = create("[Ljava/lang/Number;")
+
+        private fun create(descriptor: String): ArrayTypeDesc {
             val type = ArrayTypeDesc(AsmType.getType(descriptor))
             constants[descriptor] = type
             return type
@@ -125,13 +126,13 @@ public class ArrayTypeDesc private constructor(private val delegate: AsmType) : 
         public fun fromInternal(internalName: String): ArrayTypeDesc =
             copyOf(AsmType.getObjectType(internalName))
 
-        public fun of(clz: Class<*>, dimensions: Int): ArrayTypeDesc {
+        public fun fromClass(clz: Class<*>, dimensions: Int): ArrayTypeDesc {
             require(dimensions > 0) { "Dimensions ($dimensions) < 0" }
             val descriptor = "${"[".repeat(dimensions)}${AsmType.getDescriptor(clz)}"
             return fromDescriptor(descriptor)
         }
 
-        public fun of(clz: Class<*>): ArrayTypeDesc = when {
+        public fun fromClass(clz: Class<*>): ArrayTypeDesc = when {
             clz.isArray -> copyOf(AsmType.getType(clz))
             else -> copyOf(AsmType.getType("[${AsmType.getDescriptor(clz)}"))
         }
@@ -156,6 +157,6 @@ public fun ArrayTypeDesc(elementType: FieldTypeDesc, dimensions: Int): ArrayType
 public fun ArrayTypeDesc(elementType: FieldTypeDesc): ArrayTypeDesc = ArrayTypeDesc.of(elementType)
 
 public inline fun <reified T : Any> ArrayTypeDesc(dimensions: Int): ArrayTypeDesc =
-    ArrayTypeDesc.of(T::class.java, dimensions)
+    ArrayTypeDesc.fromClass(T::class.java, dimensions)
 
-public inline fun <reified T : Any> ArrayTypeDesc(): ArrayTypeDesc = ArrayTypeDesc.of(T::class.java)
+public inline fun <reified T : Any> ArrayTypeDesc(): ArrayTypeDesc = ArrayTypeDesc.fromClass(T::class.java)

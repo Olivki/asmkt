@@ -28,10 +28,10 @@ mavenCentralPublish {
 tasks {
     compileKotlin {
         kotlinOptions {
-            jvmTarget = "17"
-            freeCompilerArgs = freeCompilerArgs + listOf(
-                "-opt-in=kotlin.contracts.ExperimentalContracts",
-            )
+            jvmTarget = "1.8"
+            freeCompilerArgs += "-opt-in=kotlin.contracts.ExperimentalContracts"
+            freeCompilerArgs += "-Xcontext-receivers"
+            freeCompilerArgs += "-Xjvm-default=all"
         }
     }
 }

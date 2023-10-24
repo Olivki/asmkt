@@ -18,8 +18,7 @@ package net.ormr.asmkt.type
 
 import net.ormr.asmkt.AsmKtReflection
 
-public class ReferenceTypeDesc private constructor(private val delegate: AsmType) : FieldTypeDesc,
-    TypeDescWithInternalName {
+public class ClassDesc private constructor(private val delegate: AsmType) : FieldTypeDesc, TypeDescWithInternalName {
     override val descriptor: String = delegate.descriptor
 
     /**
@@ -41,7 +40,7 @@ public class ReferenceTypeDesc private constructor(private val delegate: AsmType
     /**
      * Returns the unboxed type of this type, or `null` if this type is not a boxed type.
      *
-     * For example, if this type is [ReferenceTypeDesc.BOOLEAN], then this method will return [BooleanTypeDesc].
+     * For example, if this type is [ClassDesc.BOOLEAN], then this method will return [BooleanTypeDesc].
      *
      * @see [PrimitiveTypeDesc.box]
      */
@@ -80,7 +79,7 @@ public class ReferenceTypeDesc private constructor(private val delegate: AsmType
 
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
-        other !is ReferenceTypeDesc -> false
+        other !is ClassDesc -> false
         delegate != other.delegate -> false
         else -> true
     }
@@ -90,50 +89,55 @@ public class ReferenceTypeDesc private constructor(private val delegate: AsmType
     override fun toString(): String = "ReferenceTypeDesc(name='$name')"
 
     public companion object {
+        // needs to be declared before the constants, or we'll get a NPE
+        private val constants = hashMapOf<String, ClassDesc>()
+
         // -- PRIMITIVES -- \\
-        public val VOID: ReferenceTypeDesc = constant("Ljava/lang/Void;")
-        public val BOOLEAN: ReferenceTypeDesc = constant("Ljava/lang/Boolean;")
-        public val CHAR: ReferenceTypeDesc = constant("Ljava/lang/Character;")
-        public val BYTE: ReferenceTypeDesc = constant("Ljava/lang/Byte;")
-        public val SHORT: ReferenceTypeDesc = constant("Ljava/lang/Short;")
-        public val INT: ReferenceTypeDesc = constant("Ljava/lang/Integer;")
-        public val LONG: ReferenceTypeDesc = constant("Ljava/lang/Long;")
-        public val FLOAT: ReferenceTypeDesc = constant("Ljava/lang/Float;")
-        public val DOUBLE: ReferenceTypeDesc = constant("Ljava/lang/Double;")
+        public val VOID: ClassDesc = create("Ljava/lang/Void;")
+        public val BOOLEAN: ClassDesc = create("Ljava/lang/Boolean;")
+        public val CHAR: ClassDesc = create("Ljava/lang/Character;")
+        public val BYTE: ClassDesc = create("Ljava/lang/Byte;")
+        public val SHORT: ClassDesc = create("Ljava/lang/Short;")
+        public val INT: ClassDesc = create("Ljava/lang/Integer;")
+        public val LONG: ClassDesc = create("Ljava/lang/Long;")
+        public val FLOAT: ClassDesc = create("Ljava/lang/Float;")
+        public val DOUBLE: ClassDesc = create("Ljava/lang/Double;")
 
         // -- OTHERS -- \\
-        public val OBJECT: ReferenceTypeDesc = constant("Ljava/lang/Object;")
-        public val CLASS: ReferenceTypeDesc = constant("Ljava/lang/Class;")
-        public val STRING: ReferenceTypeDesc = constant("Ljava/lang/String;")
-        public val STRING_BUILDER: ReferenceTypeDesc = constant("Ljava/lang/StringBuilder;")
-        public val OBJECTS: ReferenceTypeDesc = constant("Ljava/util/Objects;")
-        public val NUMBER: ReferenceTypeDesc = constant("Ljava/lang/Number;")
-        public val ENUM: ReferenceTypeDesc = constant("Ljava/lang/Enum;")
-        public val RECORD: ReferenceTypeDesc = constant("Ljava/lang/Record;")
-        public val METHOD_TYPE: ReferenceTypeDesc = constant("Ljava/lang/invoke/MethodType;")
-        public val METHOD_HANDLES_LOOKUP: ReferenceTypeDesc = constant("Ljava/lang/invoke/MethodHandles\$Lookup;")
-        public val CALL_SITE: ReferenceTypeDesc = constant("Ljava/lang/invoke/CallSite;")
+        public val OBJECT: ClassDesc = create("Ljava/lang/Object;")
+        public val CLASS: ClassDesc = create("Ljava/lang/Class;")
+        public val STRING: ClassDesc = create("Ljava/lang/String;")
+        public val STRING_BUILDER: ClassDesc = create("Ljava/lang/StringBuilder;")
+        public val OBJECTS: ClassDesc = create("Ljava/util/Objects;")
+        public val NUMBER: ClassDesc = create("Ljava/lang/Number;")
+        public val ENUM: ClassDesc = create("Ljava/lang/Enum;")
+        public val RECORD: ClassDesc = create("Ljava/lang/Record;")
+        public val METHOD_TYPE: ClassDesc = create("Ljava/lang/invoke/MethodType;")
+        public val METHOD_HANDLES_LOOKUP: ClassDesc = create("Ljava/lang/invoke/MethodHandles\$Lookup;")
+        public val CALL_SITE: ClassDesc = create("Ljava/lang/invoke/CallSite;")
 
-        private val constants = hashMapOf<String, ReferenceTypeDesc>()
-
-        private fun constant(descriptor: String): ReferenceTypeDesc {
-            val type = ReferenceTypeDesc(AsmType.getType(descriptor))
+        private fun create(descriptor: String): ClassDesc {
+            val delegate = AsmType.getType(descriptor)
+            val type = ClassDesc(delegate)
             constants[descriptor] = type
             return type
         }
 
-        public fun copyOf(type: AsmType): ReferenceTypeDesc {
+        public fun copyOf(type: AsmType): ClassDesc {
             require(type.isObject) { "Type (${type.asString()}) is not an object type" }
-            return constants[type.descriptor] ?: ReferenceTypeDesc(type)
+            return constants[type.descriptor] ?: ClassDesc(type)
         }
 
-        public fun fromDescriptor(descriptor: String): ReferenceTypeDesc =
+        public fun fromDescriptor(descriptor: String): ClassDesc =
             constants[descriptor] ?: copyOf(AsmType.getType(descriptor))
 
-        public fun fromInternal(internalName: String): ReferenceTypeDesc = fromDescriptor("L$internalName;")
+        public fun fromInternal(internalName: String): ClassDesc = copyOf(AsmType.getObjectType(internalName))
 
-        public fun of(clz: Class<*>): ReferenceTypeDesc = fromDescriptor(AsmType.getDescriptor(clz))
+        public fun fromClass(clz: Class<*>): ClassDesc = fromDescriptor(AsmType.getDescriptor(clz))
     }
 }
 
-public inline fun <reified T : Any> ReferenceTypeDesc(): ReferenceTypeDesc = ReferenceTypeDesc.of(T::class.java)
+// TODO: document that the internal name is like 'java/lang/String' and not 'java.lang.String'
+public fun ClassDesc(internalName: String): ClassDesc = ClassDesc.fromInternal(internalName)
+
+public inline fun <reified T : Any> ClassDesc(): ClassDesc = ClassDesc.fromClass(T::class.java)

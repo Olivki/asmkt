@@ -14,6 +14,20 @@
  * limitations under the License.
  */
 
-package net.ormr.asmkt.type
+package net.ormr.asmkt
 
-public sealed interface FieldTypeDesc : ReturnableTypeDesc
+import org.objectweb.asm.Opcodes.*
+
+public enum class HandleKind(private val code: Int) {
+    GET_FIELD(H_GETFIELD),
+    GET_STATIC(H_GETSTATIC),
+    PUT_FIELD(H_PUTFIELD),
+    PUT_STATIC(H_PUTSTATIC),
+    INVOKE_VIRTUAL(H_INVOKEVIRTUAL),
+    INVOKE_STATIC(H_INVOKESTATIC),
+    INVOKE_SPECIAL(H_INVOKESPECIAL),
+    NEW_INVOKE_SPECIAL(H_NEWINVOKESPECIAL),
+    INVOKE_INTERFACE(H_INVOKEINTERFACE);
+
+    public fun asInt(): Int = code
+}

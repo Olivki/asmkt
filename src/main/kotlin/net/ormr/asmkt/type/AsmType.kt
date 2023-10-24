@@ -75,7 +75,7 @@ public fun AsmType.toFieldTypeDesc(): FieldTypeDesc = when {
 
 public fun AsmType.toPrimitiveTypeDesc(): PrimitiveTypeDesc = PrimitiveTypeDesc.copyOf(this)
 
-public fun AsmType.toReferenceTypeDesc(): ReferenceTypeDesc = ReferenceTypeDesc.copyOf(this)
+public fun AsmType.toReferenceTypeDesc(): ClassDesc = ClassDesc.copyOf(this)
 
 public fun AsmType.toArrayTypeDesc(): ArrayTypeDesc = ArrayTypeDesc.copyOf(this)
 

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
-package net.ormr.asmkt.type
+package net.ormr.asmkt
 
-public sealed interface FieldTypeDesc : ReturnableTypeDesc
+public sealed interface ElementWithFlags<Flag : AccessFlag> : ElementModel {
+    public val flags: AccessFlags<Flag>
+}

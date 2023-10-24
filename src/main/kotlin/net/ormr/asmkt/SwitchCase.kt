@@ -14,6 +14,14 @@
  * limitations under the License.
  */
 
-package net.ormr.asmkt.type
+package net.ormr.asmkt
 
-public sealed interface FieldTypeDesc : ReturnableTypeDesc
+import org.objectweb.asm.Label
+
+/**
+ * Represents a case in a switch statement.
+ *
+ * @property [value] the value of the case
+ * @property [label] the label to jump to if the case is matched
+ */
+public data class SwitchCase(public val value: Int, public val label: Label)
