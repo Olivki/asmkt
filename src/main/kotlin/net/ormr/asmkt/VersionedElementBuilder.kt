@@ -16,6 +16,13 @@
 
 package net.ormr.asmkt
 
-public sealed interface ElementWithFlags<Flag : AccessFlag> : ElementBuilder {
-    public val flags: AccessFlags<Flag>
+public sealed interface VersionedElementBuilder : ElementBuilder {
+    /**
+     * The JVM class version the element is set to compile to.
+     */
+    public val version: ClassFileVersion
+}
+
+internal inline fun VersionedElementBuilder.requireMinVersion(version: ClassFileVersion, feature: () -> String) {
+    require(this.version >= version) { "$${feature()} requires at least version $version, but class version is set to ${this.version}." }
 }

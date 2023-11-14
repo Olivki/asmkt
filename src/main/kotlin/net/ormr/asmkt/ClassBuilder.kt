@@ -33,7 +33,7 @@ public class ClassBuilder(
     public val permittedSubtypes: List<ReferenceType> = emptyList(),
     public val sourceFile: String? = null,
     public val sourceDebug: String? = null,
-) : ElementBuilder, ElementWithFlags<SimpleClassAccessFlag>, ElementWithVersion, AnnotatableElementBuilder,
+) : ElementBuilder, FlaggableElementBuilder<SimpleClassAccessFlag>, VersionedElementBuilder, AnnotatableElementBuilder,
     AnnotatableElementTypeBuilder {
     /**
      * The method that the class belongs to, or `null` if the class does not belong to a method.

@@ -28,7 +28,7 @@ import kotlin.contracts.contract
 
 @AsmKtDsl
 public class MethodBodyBuilder internal constructor(public val method: MethodBuilder) : ElementBuilder,
-    ElementWithVersion {
+    VersionedElementBuilder {
     public val code: CodeBuilder = CodeBuilder(this)
 
     override val version: ClassFileVersion

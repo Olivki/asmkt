@@ -20,155 +20,155 @@ import net.ormr.asmkt.AccessFlag.*
 
 // -- Class Access Flags -- \\
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [SUPER], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [SUPER], otherwise `false`.
  */
-public val ElementWithFlags<in SUPER>.isSuper: Boolean
+public val FlaggableElementBuilder<in SUPER>.isSuper: Boolean
     get() = SUPER in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [INTERFACE], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [INTERFACE], otherwise `false`.
  */
-public val ElementWithFlags<in INTERFACE>.isInterface: Boolean
+public val FlaggableElementBuilder<in INTERFACE>.isInterface: Boolean
     get() = INTERFACE in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [ANNOTATION], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [ANNOTATION], otherwise `false`.
  */
-public val ElementWithFlags<in ANNOTATION>.isAnnotation: Boolean
+public val FlaggableElementBuilder<in ANNOTATION>.isAnnotation: Boolean
     get() = ANNOTATION in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [MODULE], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [MODULE], otherwise `false`.
  */
-public val ElementWithFlags<in MODULE>.isModule: Boolean
+public val FlaggableElementBuilder<in MODULE>.isModule: Boolean
     get() = MODULE in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [RECORD], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [RECORD], otherwise `false`.
  */
-public val ElementWithFlags<in RECORD>.isRecord: Boolean
+public val FlaggableElementBuilder<in RECORD>.isRecord: Boolean
     get() = RECORD in flags
 
 // -- Method Access Flags -- \\
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [SYNCHRONIZED], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [SYNCHRONIZED], otherwise `false`.
  */
-public val ElementWithFlags<in SYNCHRONIZED>.isSynchronized: Boolean
+public val FlaggableElementBuilder<in SYNCHRONIZED>.isSynchronized: Boolean
     get() = SYNCHRONIZED in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [BRIDGE], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [BRIDGE], otherwise `false`.
  */
-public val ElementWithFlags<in BRIDGE>.isBridge: Boolean
+public val FlaggableElementBuilder<in BRIDGE>.isBridge: Boolean
     get() = BRIDGE in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [VARARGS], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [VARARGS], otherwise `false`.
  */
-public val ElementWithFlags<in VARARGS>.isVarargs: Boolean
+public val FlaggableElementBuilder<in VARARGS>.isVarargs: Boolean
     get() = VARARGS in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [TRANSIENT], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [TRANSIENT], otherwise `false`.
  */
-public val ElementWithFlags<in TRANSIENT>.isTransient: Boolean
+public val FlaggableElementBuilder<in TRANSIENT>.isTransient: Boolean
     get() = TRANSIENT in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [NATIVE], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [NATIVE], otherwise `false`.
  */
-public val ElementWithFlags<in NATIVE>.isNative: Boolean
+public val FlaggableElementBuilder<in NATIVE>.isNative: Boolean
     get() = NATIVE in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [INTERFACE], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [INTERFACE], otherwise `false`.
  */
-public val ElementWithFlags<in STRICT>.isStrict: Boolean
+public val FlaggableElementBuilder<in STRICT>.isStrict: Boolean
     get() = STRICT in flags
 
 // -- Field Access Flags -- \\
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [VOLATILE], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [VOLATILE], otherwise `false`.
  */
-public val ElementWithFlags<in VOLATILE>.isVolatile: Boolean
+public val FlaggableElementBuilder<in VOLATILE>.isVolatile: Boolean
     get() = VOLATILE in flags
 
 // -- Module Access Flags -- \\
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [OPEN], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [OPEN], otherwise `false`.
  */
-public val ElementWithFlags<in OPEN>.isOpen: Boolean
+public val FlaggableElementBuilder<in OPEN>.isOpen: Boolean
     get() = OPEN in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [STATIC_PHASE], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [STATIC_PHASE], otherwise `false`.
  */
-public val ElementWithFlags<in STATIC_PHASE>.isStaticPhase: Boolean
+public val FlaggableElementBuilder<in STATIC_PHASE>.isStaticPhase: Boolean
     get() = STATIC_PHASE in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [TRANSITIVE], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [TRANSITIVE], otherwise `false`.
  */
-public val ElementWithFlags<in TRANSITIVE>.isTransitive: Boolean
+public val FlaggableElementBuilder<in TRANSITIVE>.isTransitive: Boolean
     get() = TRANSITIVE in flags
 
 // -- Mixed Access Flags -- \\
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [ENUM], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [ENUM], otherwise `false`.
  */
-public val ElementWithFlags<in ENUM>.isEnum: Boolean
+public val FlaggableElementBuilder<in ENUM>.isEnum: Boolean
     get() = ENUM in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [MANDATED], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [MANDATED], otherwise `false`.
  */
-public val ElementWithFlags<in MANDATED>.isMandated: Boolean
+public val FlaggableElementBuilder<in MANDATED>.isMandated: Boolean
     get() = MANDATED in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [SYNTHETIC], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [SYNTHETIC], otherwise `false`.
  */
-public val ElementWithFlags<in SYNTHETIC>.isSynthetic: Boolean
+public val FlaggableElementBuilder<in SYNTHETIC>.isSynthetic: Boolean
     get() = SYNTHETIC in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [DEPRECATED], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [DEPRECATED], otherwise `false`.
  */
-public val ElementWithFlags<in DEPRECATED>.isDeprecated: Boolean
+public val FlaggableElementBuilder<in DEPRECATED>.isDeprecated: Boolean
     get() = DEPRECATED in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [STATIC], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [STATIC], otherwise `false`.
  */
-public val ElementWithFlags<in STATIC>.isStatic: Boolean
+public val FlaggableElementBuilder<in STATIC>.isStatic: Boolean
     get() = STATIC in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [FINAL], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [FINAL], otherwise `false`.
  */
-public val ElementWithFlags<in FINAL>.isFinal: Boolean
+public val FlaggableElementBuilder<in FINAL>.isFinal: Boolean
     get() = FINAL in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [PUBLIC], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [PUBLIC], otherwise `false`.
  */
-public val ElementWithFlags<in PUBLIC>.isPublic: Boolean
+public val FlaggableElementBuilder<in PUBLIC>.isPublic: Boolean
     get() = PUBLIC in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [PROTECTED], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [PROTECTED], otherwise `false`.
  */
-public val ElementWithFlags<in PROTECTED>.isProtected: Boolean
+public val FlaggableElementBuilder<in PROTECTED>.isProtected: Boolean
     get() = PROTECTED in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [PRIVATE], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [PRIVATE], otherwise `false`.
  */
-public val ElementWithFlags<in PRIVATE>.isPrivate: Boolean
+public val FlaggableElementBuilder<in PRIVATE>.isPrivate: Boolean
     get() = PRIVATE in flags
 
 /**
- * Returns `true` if `this` elements [flags][ElementWithFlags.flags] contains [ABSTRACT], otherwise `false`.
+ * Returns `true` if `this` elements [flags][FlaggableElementBuilder.flags] contains [ABSTRACT], otherwise `false`.
  */
-public val ElementWithFlags<in ABSTRACT>.isAbstract: Boolean
+public val FlaggableElementBuilder<in ABSTRACT>.isAbstract: Boolean
     get() = ABSTRACT in flags

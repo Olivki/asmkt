@@ -44,7 +44,8 @@ public class MethodBuilder internal constructor(
     public val type: MethodType,
     public val signature: String?,
     public val exceptions: List<ReferenceType>,
-) : ElementBuilder, ElementWithFlags<MethodAccessFlag>, ElementWithVersion, AnnotationValueConversionContext {
+) : ElementBuilder, FlaggableElementBuilder<MethodAccessFlag>, VersionedElementBuilder,
+    AnnotationValueConversionContext {
     public val body: MethodBodyBuilder = MethodBodyBuilder(this)
 
     override val version: ClassFileVersion

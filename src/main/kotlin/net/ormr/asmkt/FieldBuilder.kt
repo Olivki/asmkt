@@ -28,6 +28,6 @@ public class FieldBuilder internal constructor(
     override val flags: AccessFlags<FieldAccessFlag>,
     public val type: FieldType,
     public val signature: String?,
-) : ElementBuilder, ElementWithFlags<FieldAccessFlag> {
+) : ElementBuilder, FlaggableElementBuilder<FieldAccessFlag> {
     // TODO: annotations
 }
