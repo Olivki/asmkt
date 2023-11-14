@@ -18,37 +18,36 @@ package net.ormr.asmkt
 
 import net.ormr.asmkt.type.ReferenceType
 
-internal fun <B : AnnotationBuilder<*>> addAnnotation(
-    builder: B,
+internal fun <B : AbstractAnnotationElement<*>> addAnnotation(
+    element: B,
     visible: MutableList<B>,
     invisible: MutableList<B>,
     isVisible: Boolean,
     allowRepeats: Boolean,
-): B {
-    val type = builder.type
+) {
+    val type = element.type
 
     if (isVisible) {
         visible += when {
             visible.containsType(type) -> when {
-                allowRepeats -> builder
+                allowRepeats -> element
                 else -> disallowedRepeatingAnnotation(type)
             }
-            else -> builder
+            else -> element
         }
     } else {
         invisible += when {
             invisible.containsType(type) -> when {
-                allowRepeats -> builder
+                allowRepeats -> element
                 else -> disallowedRepeatingAnnotation(type)
             }
-            else -> builder
+            else -> element
         }
     }
-
-    return builder
 }
 
 internal fun disallowedRepeatingAnnotation(type: ReferenceType): Nothing =
     throw IllegalArgumentException("Element is already annotated with annotation of type (${type.asString()})")
 
-internal fun List<AnnotationBuilder<*>>.containsType(type: ReferenceType): Boolean = any { it.type == type }
+internal fun List<AbstractAnnotationElement<*>>.containsType(type: ReferenceType): Boolean =
+    any { it.type == type }

@@ -44,7 +44,7 @@ public class MethodElementBuilder internal constructor(
     public val type: MethodType,
     public val signature: String?,
     public val exceptions: List<ReferenceType>,
-) : ElementBuilder, FlaggableElement<MethodAccessFlag>, VersionedElementBuilder,
+) : ElementBuilder, Flaggable<MethodAccessFlag>, VersionedElementBuilder,
     AnnotationValueConversionContext {
     public val body: MethodBodyBuilder = MethodBodyBuilder(this)
 
@@ -77,7 +77,7 @@ public class MethodElementBuilder internal constructor(
      *
      * @throws [IllegalArgumentException] *(on set)* if the [owner] of the method is not an annotation
      */
-    public var defaultAnnotationValue: AnnotationDefaultValue? = null
+    public var defaultAnnotationValue: AnnotationElementDefaultValue? = null
         set(value) {
             if (value != null) {
                 require(owner.isAnnotation) { "Owner ($owner) of method ($this) is not an annotation" }

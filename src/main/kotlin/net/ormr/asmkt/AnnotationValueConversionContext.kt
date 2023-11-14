@@ -16,7 +16,7 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.AnnotationValue.*
+import net.ormr.asmkt.AnnotationElementValue.*
 import net.ormr.asmkt.type.TypeWithInternalName
 import net.ormr.asmkt.type.toReferenceType
 
@@ -60,6 +60,9 @@ public fun TypeWithInternalName.asValue(): ForClass = ForClass(this)
 context(AnnotationValueConversionContext)
 public fun <E : Enum<E>> E.asValue(): ForEnum<E> = ForEnum(type = javaClass.toReferenceType(), entryName = name)
 
+context(AnnotationValueConversionContext)
+public fun ChildAnnotationElement.asValue(): ForAnnotation = ForAnnotation(this)
+
 // -- ARRAYS -- \\
 context(AnnotationValueConversionContext)
 @JvmName("stringArrayToArrayValue")
@@ -71,67 +74,67 @@ public fun Iterable<String>.toArrayValue(): ForArray<ForString> = ForArray(map {
 
 context(AnnotationValueConversionContext)
 @JvmName("booleanArrayToArrayValue")
-public fun BooleanArray.toArrayValue(): ForArray<ForBoolean> = ForArray(map { it.asValue() })
+public fun BooleanArray.toArrayValue(): ForBooleanArray = ForBooleanArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("booleanIterableToArrayValue")
-public fun Iterable<Boolean>.toArrayValue(): ForArray<ForBoolean> = ForArray(map { it.asValue() })
+public fun Iterable<Boolean>.toArrayValue(): ForBooleanArray = ForBooleanArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("charArrayToArrayValue")
-public fun CharArray.toArrayValue(): ForArray<ForChar> = ForArray(map { it.asValue() })
+public fun CharArray.toArrayValue(): ForCharArray = ForCharArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("charIterableToArrayValue")
-public fun Iterable<Char>.toArrayValue(): ForArray<ForChar> = ForArray(map { it.asValue() })
+public fun Iterable<Char>.toArrayValue(): ForCharArray = ForCharArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("byteArrayToArrayValue")
-public fun ByteArray.toArrayValue(): ForArray<ForByte> = ForArray(map { it.asValue() })
+public fun ByteArray.toArrayValue(): ForByteArray = ForByteArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("byteIterableToArrayValue")
-public fun Iterable<Byte>.toArrayValue(): ForArray<ForByte> = ForArray(map { it.asValue() })
+public fun Iterable<Byte>.toArrayValue(): ForByteArray = ForByteArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("shortArrayToArrayValue")
-public fun ShortArray.toArrayValue(): ForArray<ForShort> = ForArray(map { it.asValue() })
+public fun ShortArray.toArrayValue(): ForShortArray = ForShortArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("shortIterableToArrayValue")
-public fun Iterable<Short>.toArrayValue(): ForArray<ForShort> = ForArray(map { it.asValue() })
+public fun Iterable<Short>.toArrayValue(): ForShortArray = ForShortArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("intArrayToArrayValue")
-public fun IntArray.toArrayValue(): ForArray<ForInt> = ForArray(map { it.asValue() })
+public fun IntArray.toArrayValue(): ForIntArray = ForIntArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("intIterableToArrayValue")
-public fun Iterable<Int>.toArrayValue(): ForArray<ForInt> = ForArray(map { it.asValue() })
+public fun Iterable<Int>.toArrayValue(): ForIntArray = ForIntArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("longArrayToArrayValue")
-public fun LongArray.toArrayValue(): ForArray<ForLong> = ForArray(map { it.asValue() })
+public fun LongArray.toArrayValue(): ForLongArray = ForLongArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("longIterableToArrayValue")
-public fun Iterable<Long>.toArrayValue(): ForArray<ForLong> = ForArray(map { it.asValue() })
+public fun Iterable<Long>.toArrayValue(): ForLongArray = ForLongArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("floatArrayToArrayValue")
-public fun FloatArray.toArrayValue(): ForArray<ForFloat> = ForArray(map { it.asValue() })
+public fun FloatArray.toArrayValue(): ForFloatArray = ForFloatArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("floatIterableToArrayValue")
-public fun Iterable<Float>.toArrayValue(): ForArray<ForFloat> = ForArray(map { it.asValue() })
+public fun Iterable<Float>.toArrayValue(): ForFloatArray = ForFloatArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("doubleArrayToArrayValue")
-public fun DoubleArray.toArrayValue(): ForArray<ForDouble> = ForArray(map { it.asValue() })
+public fun DoubleArray.toArrayValue(): ForDoubleArray = ForDoubleArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("doubleIterableToArrayValue")
-public fun Iterable<Double>.toArrayValue(): ForArray<ForDouble> = ForArray(map { it.asValue() })
+public fun Iterable<Double>.toArrayValue(): ForDoubleArray = ForDoubleArray(map { it })
 
 context(AnnotationValueConversionContext)
 @JvmName("classArrayToArrayValue")
@@ -148,3 +151,11 @@ public fun <E : Enum<E>> Array<E>.toArrayValue(): ForArray<ForEnum<E>> = ForArra
 context(AnnotationValueConversionContext)
 @JvmName("enumIterableToArrayValue")
 public fun <E : Enum<E>> Iterable<E>.toArrayValue(): ForArray<ForEnum<E>> = ForArray(map { it.asValue() })
+
+context(AnnotationValueConversionContext)
+@JvmName("annotationArrayToArrayValue")
+public fun Array<ChildAnnotationElement>.toArrayValue(): ForArray<ForAnnotation> = ForArray(map { it.asValue() })
+
+context(AnnotationValueConversionContext)
+@JvmName("annotationIterableToArrayValue")
+public fun Iterable<ChildAnnotationElement>.toArrayValue(): ForArray<ForAnnotation> = ForArray(map { it.asValue() })

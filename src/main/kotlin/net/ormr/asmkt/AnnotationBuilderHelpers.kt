@@ -16,74 +16,64 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.AnnotationValue.*
+import net.ormr.asmkt.AnnotationElementValue.*
 import net.ormr.asmkt.type.toReferenceType
 import org.objectweb.asm.TypePath
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredMemberProperties
 
 @AsmKtReflection
-internal fun <A : Annotation> createTypeAnnotationBuilder(
-    typeRef: Int,
-    typePath: TypePath?,
-    annotation: A,
-): ElementTypeAnnotationBuilder = populateBuilderWith(
-    ElementTypeAnnotationBuilder(
-        typeRef = typeRef,
-        typePath = typePath,
-        type = annotation::class.toReferenceType(),
-    ),
-    annotation,
-)
-
-@AsmKtReflection
-internal fun <A : Annotation> createElementAnnotationBuilder(annotation: A): ElementAnnotationBuilder =
-    populateBuilderWith(ElementAnnotationBuilder(annotation::class.toReferenceType()), annotation)
+internal fun <A : Annotation> createChildElementAnnotation(annotation: A): ChildAnnotationElement =
+    ChildAnnotationElementBuilder(annotation.annotationClass.toReferenceType())
+        .populateWith(annotation)
+        .build()
 
 // here be dragons
 @Suppress("UNCHECKED_CAST")
 @AsmKtReflection
-internal fun <B : AnnotationBuilder<*>, A : Annotation> populateBuilderWith(builder: B, annotation: A): B {
+internal fun <B : AbstractAnnotationElementBuilder<*>, A : Annotation> B.populateWith(
+    annotation: A,
+): B {
     val annotationClass = annotation.annotationClass
     for (property in annotationClass.declaredMemberProperties) {
         val name = property.name
         when (val value = property.getter.call(annotation)) {
-            is String -> builder.value(name, value)
-            is Boolean -> builder.value(name, value)
-            is Char -> builder.value(name, value)
-            is Byte -> builder.value(name, value)
-            is Short -> builder.value(name, value)
-            is Int -> builder.value(name, value)
-            is Long -> builder.value(name, value)
-            is Float -> builder.value(name, value)
-            is Double -> builder.value(name, value)
-            is Class<*> -> builder.value(name, value.toReferenceType())
-            is KClass<*> -> builder.value(name, value.toReferenceType())
-            is Enum<*> -> builder.value(name, ForEnum(value.javaClass.toReferenceType(), value.name))
-            is Annotation -> builder.value(name, ForBuilder(createElementAnnotationBuilder(value)))
-            is BooleanArray -> builder.value(name, value)
-            is CharArray -> builder.value(name, value)
-            is ByteArray -> builder.value(name, value)
-            is ShortArray -> builder.value(name, value)
-            is IntArray -> builder.value(name, value)
-            is LongArray -> builder.value(name, value)
-            is FloatArray -> builder.value(name, value)
-            is DoubleArray -> builder.value(name, value)
+            is String -> value(name, value)
+            is Boolean -> value(name, value)
+            is Char -> value(name, value)
+            is Byte -> value(name, value)
+            is Short -> value(name, value)
+            is Int -> value(name, value)
+            is Long -> value(name, value)
+            is Float -> value(name, value)
+            is Double -> value(name, value)
+            is Class<*> -> value(name, value.toReferenceType())
+            is KClass<*> -> value(name, value.toReferenceType())
+            is Enum<*> -> value(name, ForEnum(value.javaClass.toReferenceType(), value.name))
+            is Annotation -> value(name, ForAnnotation(createChildElementAnnotation(value)))
+            is BooleanArray -> value(name, value)
+            is CharArray -> value(name, value)
+            is ByteArray -> value(name, value)
+            is ShortArray -> value(name, value)
+            is IntArray -> value(name, value)
+            is LongArray -> value(name, value)
+            is FloatArray -> value(name, value)
+            is DoubleArray -> value(name, value)
             is Array<*> -> when {
-                value.isArrayOf<String>() -> builder.value(name, value as Array<String>)
-                value.isArrayOf<Annotation>() -> builder.value(
+                value.isArrayOf<String>() -> value(name, value as Array<String>)
+                value.isArrayOf<Annotation>() -> value(
                     name,
-                    ForArray((value as Array<out Annotation>).map { ForBuilder(createElementAnnotationBuilder(it)) }),
+                    ForArray((value as Array<out Annotation>).map { ForAnnotation(createChildElementAnnotation(it)) }),
                 )
-                value.isArrayOf<Class<*>>() -> builder.value(
+                value.isArrayOf<Class<*>>() -> value(
                     name,
                     (value as Array<out Class<*>>).map { it.toReferenceType() },
                 )
-                value.isArrayOf<KClass<*>>() -> builder.value(
+                value.isArrayOf<KClass<*>>() -> value(
                     name,
                     (value as Array<out KClass<*>>).map { it.toReferenceType() },
                 )
-                value.isArrayOf<Enum<*>>() -> builder.value(
+                value.isArrayOf<Enum<*>>() -> value(
                     name,
                     ForArray((value as Array<out Enum<*>>).map { ForEnum(it.javaClass.toReferenceType(), it.name) }),
                 )
@@ -92,10 +82,10 @@ internal fun <B : AnnotationBuilder<*>, A : Annotation> populateBuilderWith(buil
             else -> throw IllegalArgumentException("Property '$name' has unsupported value: ${value?.let { "$it :: ${it::class}" } ?: "null"}")
         }
     }
-    return builder
+    return this
 }
 
-internal fun AnnotationArrayValue.getValue(): Any = when (this) {
+internal fun AnnotationElementArrayValue.getValue(): Any = when (this) {
     is ForString -> value
     is ForBoolean -> value
     is ForChar -> value
@@ -107,10 +97,10 @@ internal fun AnnotationArrayValue.getValue(): Any = when (this) {
     is ForDouble -> value
     is ForClass -> value.asAsmType()
     is ForEnum<*> -> arrayOf(type.descriptor, entryName)
-    is ForBuilder -> value.buildNode()
+    is ForAnnotation -> value.toAsmNode()
 }
 
-internal fun AnnotationDefaultValue.getDefaultValue(): Any = when (this) {
-    is AnnotationArrayValue -> (this as AnnotationArrayValue).getValue()
-    is ForArray<*> -> value.map(AnnotationArrayValue::getValue)
+internal fun AnnotationElementDefaultValue.getDefaultValue(): Any = when (this) {
+    is AnnotationElementArrayValue -> (this as AnnotationElementArrayValue).getValue()
+    is ForArray<*> -> value.map(AnnotationElementArrayValue::getValue)
 }

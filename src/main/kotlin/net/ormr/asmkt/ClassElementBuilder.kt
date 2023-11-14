@@ -19,7 +19,6 @@ package net.ormr.asmkt
 import net.ormr.asmkt.type.FieldType
 import net.ormr.asmkt.type.MethodType
 import net.ormr.asmkt.type.ReferenceType
-import org.objectweb.asm.TypePath
 
 @AsmKtDsl
 public class ClassElementBuilder(
@@ -33,7 +32,7 @@ public class ClassElementBuilder(
     public val permittedSubtypes: List<ReferenceType> = emptyList(),
     public val sourceFile: String? = null,
     public val sourceDebug: String? = null,
-) : ElementBuilder, FlaggableElement<SimpleClassAccessFlag>, VersionedElementBuilder, AnnotatableElementBuilder,
+) : ElementBuilder, Flaggable<SimpleClassAccessFlag>, VersionedElementBuilder, AnnotatableElementBuilder,
     AnnotatableElementTypeBuilder {
     /**
      * The method that the class belongs to, or `null` if the class does not belong to a method.
@@ -51,47 +50,35 @@ public class ClassElementBuilder(
     public var treatSuperSpecially: Boolean = true
 
     internal val nestMembers = mutableListOf<ClassElementBuilder>()
-    internal val innerClasses = mutableListOf<InnerClassWrapper>()
+    internal val innerClasses = mutableListOf<InnerClassElement>()
     internal val methods = mutableSetOf<MethodElementBuilder>()
     internal val fields = mutableMapOf<String, FieldElementBuilder>()
-    internal val visibleAnnotations = mutableListOf<ElementAnnotationBuilder>()
-    internal val invisibleAnnotations = mutableListOf<ElementAnnotationBuilder>()
-    internal val visibleTypeAnnotations = mutableListOf<ElementTypeAnnotationBuilder>()
-    internal val invisibleTypeAnnotations = mutableListOf<ElementTypeAnnotationBuilder>()
+    internal val visibleAnnotations = mutableListOf<AnnotationElement>()
+    internal val invisibleAnnotations = mutableListOf<AnnotationElement>()
+    internal val visibleTypeAnnotations = mutableListOf<TypeAnnotationElement>()
+    internal val invisibleTypeAnnotations = mutableListOf<TypeAnnotationElement>()
 
     init {
         verifyState()
     }
 
-    override fun annotation(
-        type: ReferenceType,
-        isVisibleAtRuntime: Boolean,
-        allowRepeats: Boolean,
-    ): ElementAnnotationBuilder {
-        val builder = ElementAnnotationBuilder(type)
-        return addAnnotation(
-            builder = builder,
+    override fun annotation(element: AnnotationElement) {
+        addAnnotation(
+            element = element,
             visible = visibleAnnotations,
             invisible = invisibleAnnotations,
-            isVisible = isVisibleAtRuntime,
-            allowRepeats = allowRepeats,
+            isVisible = element.isVisibleAtRuntime,
+            allowRepeats = element.allowRepeats,
         )
     }
 
-    override fun typeAnnotation(
-        typeRef: Int,
-        typePath: TypePath?,
-        type: ReferenceType,
-        isVisibleAtRuntime: Boolean,
-        allowRepeats: Boolean,
-    ): ElementTypeAnnotationBuilder {
-        val builder = ElementTypeAnnotationBuilder(typeRef, typePath, type)
-        return addAnnotation(
-            builder = builder,
+    override fun typeAnnotation(element: TypeAnnotationElement) {
+        addAnnotation(
+            element = element,
             visible = visibleTypeAnnotations,
             invisible = invisibleTypeAnnotations,
-            isVisible = isVisibleAtRuntime,
-            allowRepeats = allowRepeats,
+            isVisible = element.isVisibleAtRuntime,
+            allowRepeats = element.allowRepeats,
         )
     }
 

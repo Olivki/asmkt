@@ -34,8 +34,6 @@ import kotlin.contracts.contract
  * @param [isVisibleAtRuntime] whether or not the annotation should be visible at runtime *(via reflection)*
  * @param [allowRepeats] whether or not multiple annotations of the same [type] are allowed on the element
  *
- * @return a new [ElementAnnotationBuilder] instance used to build an annotation of type [type]
- *
  * @throws [IllegalArgumentException] if [allowRepeats] is `false` and the element is already annotated with an
  * annotation of the same type as [type]
  */
@@ -44,13 +42,19 @@ public inline fun AnnotatableElementBuilder.annotation(
     type: ReferenceType,
     isVisibleAtRuntime: Boolean = true,
     allowRepeats: Boolean = false,
-    builder: ElementAnnotationBuilder.() -> Unit = {},
-): ElementAnnotationBuilder {
+    builder: AnnotationElementBuilder.() -> Unit,
+) {
     contract {
         callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
     }
 
-    return annotation(type, isVisibleAtRuntime, allowRepeats).apply(builder)
+    annotation(
+        buildAnnotationElement(
+            type = type,
+            isVisibleAtRuntime = isVisibleAtRuntime,
+            allowRepeats = allowRepeats
+        )
+    )
 }
 
 /**
@@ -64,8 +68,6 @@ public inline fun AnnotatableElementBuilder.annotation(
  * @param [isVisibleAtRuntime] whether or not the annotation should be visible at runtime *(via reflection)*
  * @param [allowRepeats] whether or not multiple annotations of the same type as [instance] are allowed on the element
  *
- * @return a new [ElementAnnotationBuilder] instance used to build an annotation of type [instance]
- *
  * @throws [IllegalArgumentException] if [allowRepeats] is `false` and the element is already annotated with an
  * annotation of the same type as [instance]
  */
@@ -75,12 +77,9 @@ public fun AnnotatableElementBuilder.annotation(
     instance: Annotation,
     isVisibleAtRuntime: Boolean = true,
     allowRepeats: Boolean = false,
-): ElementAnnotationBuilder {
+) {
     val type = instance.annotationClass.toReferenceType()
-    val builder = annotation(
-        type = type,
-        isVisibleAtRuntime = isVisibleAtRuntime,
-        allowRepeats = allowRepeats,
-    )
-    return populateBuilderWith(builder, instance)
+    annotation(type = type, isVisibleAtRuntime = isVisibleAtRuntime, allowRepeats = allowRepeats) {
+        populateWith(instance)
+    }
 }

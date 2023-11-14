@@ -16,6 +16,6 @@
 
 package net.ormr.asmkt
 
-public sealed interface FlaggableElement<Flag : AccessFlag> {
+public sealed interface Flaggable<Flag : AccessFlag> {
     public val flags: AccessFlags<Flag>
 }

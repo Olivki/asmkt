@@ -16,27 +16,16 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.ReferenceType
-
 public sealed interface AnnotatableElementBuilder : ElementBuilder {
     /**
-     * Adds an annotation of type [type] to the element.
+     * Adds the given annotation [element] to the element.
      *
-     * Note that no validation is done to ensure that the annotation is valid for the element, nor that the `type` is
-     * a valid annotation type.
+     * Note that no validation is done to ensure that the annotation is valid for the element.
      *
-     * @param [type] the type of the desired annotation
-     * @param [isVisibleAtRuntime] whether or not the annotation should be visible at runtime *(via reflection)*
-     * @param [allowRepeats] whether or not multiple annotations of the same [type] are allowed on the element
+     * @param [element] the annotation to add
      *
-     * @return a new [ElementAnnotationBuilder] instance used to build an annotation of type [type]
-     *
-     * @throws [IllegalArgumentException] if [allowRepeats] is `false` and the element is already annotated with an
-     * annotation of the same type as [type]
+     * @throws [IllegalArgumentException] if [allowRepeats][AnnotationElement.allowRepeats] is `false` and the
+     * element is already annotated with an annotation of the same type as [type][AnnotationElement.type]
      */
-    public fun annotation(
-        type: ReferenceType,
-        isVisibleAtRuntime: Boolean = true,
-        allowRepeats: Boolean = false,
-    ): ElementAnnotationBuilder
+    public fun annotation(element: AnnotationElement)
 }
