@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-package net.ormr.asmkt.type
+package net.ormr.asmkt
 
-/**
- * Represents a type that has an internal name.
- *
- * The only types that have an internal name are [ReferenceType] and [ArrayType].
- */
-public sealed interface TypeWithInternalName : Type {
-    /**
-     * The internal name of the type.
-     *
-     * The internal name for a type is the fully qualified name of the type, with `.` replaced with `/`. For example,
-     * the internal name for `java.lang.String` is `java/lang/String`.
-     */
-    public val internalName: String
-}
+public sealed interface ElementBuilder

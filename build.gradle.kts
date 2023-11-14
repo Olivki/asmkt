@@ -13,6 +13,7 @@ repositories {
 
 dependencies {
     api("org.ow2.asm:asm-commons:9.6")
+    implementation(kotlin("reflect"))
 }
 
 mavenCentralPublish {

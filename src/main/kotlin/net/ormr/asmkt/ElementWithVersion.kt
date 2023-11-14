@@ -16,7 +16,7 @@
 
 package net.ormr.asmkt
 
-public sealed interface ElementWithVersion : ElementModel {
+public sealed interface ElementWithVersion : ElementBuilder {
     /**
      * The JVM class version the element is set to compile to.
      */

@@ -37,48 +37,48 @@ public fun not() {
 context(MethodBodyBuilder)
 @AsmKtDsl
 public fun invokeSelfStatic(name: String, type: MethodType) {
-    invokeStatic(method.parentType, name, type)
+    invokeStatic(method.ownerType, name, type)
 }
 
 context(MethodBodyBuilder)
 @AsmKtDsl
 public fun invokeSelfSpecial(name: String, type: MethodType) {
-    invokeSpecial(method.parentType, name, type)
+    invokeSpecial(method.ownerType, name, type)
 }
 
 context(MethodBodyBuilder)
 @AsmKtDsl
 public fun invokeSelfVirtual(name: String, type: MethodType) {
-    invokeVirtual(method.parentType, name, type)
+    invokeVirtual(method.ownerType, name, type)
 }
 
 context(MethodBodyBuilder)
 @AsmKtDsl
 public fun invokeSelfInterface(name: String, type: MethodType) {
-    invokeInterface(method.parentType, name, type)
+    invokeInterface(method.ownerType, name, type)
 }
 
 // -- SELF FIELD -- \\
 context(MethodBodyBuilder)
 @AsmKtDsl
 public fun getSelfStaticField(name: String, type: FieldType) {
-    getStaticField(method.parentType, name, type)
+    getStaticField(method.ownerType, name, type)
 }
 
 context(MethodBodyBuilder)
 @AsmKtDsl
 public fun setSelfStaticField(name: String, type: FieldType) {
-    setStaticField(method.parentType, name, type)
+    setStaticField(method.ownerType, name, type)
 }
 
 context(MethodBodyBuilder)
 @AsmKtDsl
 public fun getSelfField(name: String, type: FieldType) {
-    getField(method.parentType, name, type)
+    getField(method.ownerType, name, type)
 }
 
 context(MethodBodyBuilder)
 @AsmKtDsl
 public fun setSelfField(name: String, type: FieldType) {
-    setField(method.parentType, name, type)
+    setField(method.ownerType, name, type)
 }

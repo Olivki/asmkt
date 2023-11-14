@@ -17,6 +17,8 @@
 package net.ormr.asmkt.type
 
 import net.ormr.asmkt.AsmKtReflection
+import net.ormr.asmkt.ClassFileVersion
+import kotlin.reflect.KClass
 
 /**
  * Represents a reference type.
@@ -98,27 +100,175 @@ public class ReferenceType private constructor(private val delegate: AsmType) : 
         private val constants = hashMapOf<String, ReferenceType>()
 
         // -- PRIMITIVES -- \\
+        /**
+         * The `java.lang.Void` type.
+         *
+         * Descriptor: `Ljava/lang/Void;`
+         *
+         * @see [VoidType]
+         */
         public val VOID: ReferenceType = create("Ljava/lang/Void;")
+
+        /**
+         * The `java.lang.Boolean` type.
+         *
+         * Descriptor: `Ljava/lang/Boolean;`
+         *
+         * @see [BooleanType]
+         */
         public val BOOLEAN: ReferenceType = create("Ljava/lang/Boolean;")
+
+        /**
+         * The `java.lang.Character` type.
+         *
+         * Descriptor: `Ljava/lang/Character;`
+         *
+         * @see [CharType]
+         */
         public val CHAR: ReferenceType = create("Ljava/lang/Character;")
+
+        /**
+         * The `java.lang.Byte` type.
+         *
+         * Descriptor: `Ljava/lang/Byte;`
+         *
+         * @see [ByteType]
+         */
         public val BYTE: ReferenceType = create("Ljava/lang/Byte;")
+
+        /**
+         * The `java.lang.Short` type.
+         *
+         * Descriptor: `Ljava/lang/Short;`
+         *
+         * @see [ShortType]
+         */
         public val SHORT: ReferenceType = create("Ljava/lang/Short;")
+
+        /**
+         * The `java.lang.Integer` type.
+         *
+         * Descriptor: `Ljava/lang/Integer;`
+         *
+         * @see [IntType]
+         */
         public val INT: ReferenceType = create("Ljava/lang/Integer;")
+
+        /**
+         * The `java.lang.Long` type.
+         *
+         * Descriptor: `Ljava/lang/Long;`
+         *
+         * @see [LongType]
+         */
         public val LONG: ReferenceType = create("Ljava/lang/Long;")
+
+        /**
+         * The `java.lang.Float` type.
+         *
+         * Descriptor: `Ljava/lang/Float;`
+         *
+         * @see [FloatType]
+         */
         public val FLOAT: ReferenceType = create("Ljava/lang/Float;")
+
+        /**
+         * The `java.lang.Double` type.
+         *
+         * Descriptor: `Ljava/lang/Double;`
+         *
+         * @see [DoubleType]
+         */
         public val DOUBLE: ReferenceType = create("Ljava/lang/Double;")
 
         // -- OTHERS -- \\
+        /**
+         * The `java.lang.Object` type.
+         *
+         * Descriptor: `Ljava/lang/Object;`
+         */
         public val OBJECT: ReferenceType = create("Ljava/lang/Object;")
+
+        /**
+         * The `java.lang.Class` type.
+         *
+         * Descriptor: `Ljava/lang/Class;`
+         */
         public val CLASS: ReferenceType = create("Ljava/lang/Class;")
+
+        /**
+         * The `java.lang.String` type.
+         *
+         * Descriptor: `Ljava/lang/String;`
+         */
         public val STRING: ReferenceType = create("Ljava/lang/String;")
+
+        /**
+         * The `java.lang.Throwable` type.
+         *
+         * Descriptor: `Ljava/lang/Throwable;`
+         */
         public val STRING_BUILDER: ReferenceType = create("Ljava/lang/StringBuilder;")
+
+        /**
+         * The `java.lang.Objects` type.
+         *
+         * Descriptor: `Ljava/lang/Objects;`
+         *
+         * Note that this type is only available on [Java 7][ClassFileVersion.RELEASE_7] and above.
+         */
         public val OBJECTS: ReferenceType = create("Ljava/util/Objects;")
+
+        /**
+         * The `java.lang.Number` type.
+         *
+         * Descriptor: `Ljava/lang/Number;`
+         */
         public val NUMBER: ReferenceType = create("Ljava/lang/Number;")
+
+        /**
+         * The `java.lang.Enum` type.
+         *
+         * Descriptor: `Ljava/lang/Enum;`
+         *
+         * Note that this type is only available on [Java 5][ClassFileVersion.RELEASE_5] and above.
+         */
         public val ENUM: ReferenceType = create("Ljava/lang/Enum;")
+
+        /**
+         * The `java.lang.Record` type.
+         *
+         * Descriptor: `Ljava/lang/Record;`
+         *
+         * Note that this type is only available on [Java 14][ClassFileVersion.RELEASE_14] and above.
+         */
         public val RECORD: ReferenceType = create("Ljava/lang/Record;")
+
+        /**
+         * The `java.lang.Module` type.
+         *
+         * Descriptor: `Ljava/lang/Module;`
+         *
+         * Note that this type is only available on [Java 7][ClassFileVersion.RELEASE_9] and above.
+         */
         public val METHOD_TYPE: ReferenceType = create("Ljava/lang/invoke/MethodType;")
+
+        /**
+         * The `java.lang.MethodHandle` type.
+         *
+         * Descriptor: `Ljava/lang/invoke/MethodHandle;`
+         *
+         * Note that this type is only available on [Java 7][ClassFileVersion.RELEASE_7] and above.
+         */
         public val METHOD_HANDLES_LOOKUP: ReferenceType = create("Ljava/lang/invoke/MethodHandles\$Lookup;")
+
+        /**
+         * The `java.lang.MethodHandle` type.
+         *
+         * Descriptor: `Ljava/lang/invoke/MethodHandle;`
+         *
+         * Note that this type is only available on [Java 7][ClassFileVersion.RELEASE_7] and above.
+         */
         public val CALL_SITE: ReferenceType = create("Ljava/lang/invoke/CallSite;")
 
         private fun create(descriptor: String): ReferenceType {
@@ -201,3 +351,17 @@ public fun ReferenceType(internalName: String): ReferenceType = ReferenceType.fr
  * @see [ReferenceType.fromClass]
  */
 public inline fun <reified T : Any> ReferenceType(): ReferenceType = ReferenceType.fromClass(T::class.java)
+
+/**
+ * Returns a [ReferenceType] based on `this` class.
+ *
+ * @throws [IllegalArgumentException] if `this` class is not a reference type
+ */
+public fun Class<*>.toReferenceType(): ReferenceType = ReferenceType.fromClass(this)
+
+/**
+ * Returns a [ReferenceType] based on `this` class.
+ *
+ * @throws [IllegalArgumentException] if `this` class is not a reference type
+ */
+public fun KClass<*>.toReferenceType(): ReferenceType = ReferenceType.fromClass(java)

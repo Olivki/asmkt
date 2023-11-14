@@ -27,7 +27,8 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 @AsmKtDsl
-public class MethodBodyBuilder internal constructor(public val method: MethodModel) : ElementModel, ElementWithVersion {
+public class MethodBodyBuilder internal constructor(public val method: MethodBuilder) : ElementBuilder,
+    ElementWithVersion {
     public val code: CodeBuilder = CodeBuilder(this)
 
     override val version: ClassFileVersion
@@ -458,7 +459,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodMod
 
     // -- RETURN INSTRUCTIONS -- \\
     /**
-     * Pushes the appropriate return instruction based on the [returnType][MethodModel.returnType] of [method].
+     * Pushes the appropriate return instruction based on the [returnType][MethodBuilder.returnType] of [method].
      */
     @AsmKtDsl
     public fun returnValue() {

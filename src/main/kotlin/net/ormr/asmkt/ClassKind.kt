@@ -32,7 +32,7 @@ public enum class ClassKind(public val flag: ClassAccessFlag?, public val flagNa
         internal val INHERITABLE: Set<ClassKind> = EnumSet.of(CLASS, ABSTRACT_CLASS, INTERFACE)
 
         @JvmField
-        internal val NO_FIELDS: Set<ClassKind> = EnumSet.of(INTERFACE, ANNOTATION, MODULE)
+        internal val NO_FIELDS: Set<ClassKind> = EnumSet.of(ANNOTATION, MODULE)
 
         @JvmField
         internal val NO_METHODS: Set<ClassKind> = EnumSet.of(MODULE)

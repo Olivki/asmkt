@@ -26,29 +26,63 @@ import org.objectweb.asm.tree.TryCatchBlockNode
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
+/**
+ * Represents a method.
+ *
+ * @property [owner] The class that owns the method.
+ * @property [name] The name of the method.
+ * @property [flags] The access flags of the method.
+ * @property [type] The type of the method.
+ * @property [signature] The generic signature of the method, or `null` if the method does not have a signature.
+ * @property [exceptions] The exceptions that the method can throw.
+ */
 @AsmKtDsl
-public class MethodModel(
-    public val parent: ClassModel,
+public class MethodBuilder internal constructor(
+    public val owner: ClassBuilder,
     public val name: String,
     override val flags: MethodAccessFlags,
     public val type: MethodType,
     public val signature: String?,
     public val exceptions: List<ReferenceType>,
-) : ElementModel, ElementWithFlags<MethodAccessFlag>, ElementWithVersion {
+) : ElementBuilder, ElementWithFlags<MethodAccessFlag>, ElementWithVersion, AnnotationValueConversionContext {
     public val body: MethodBodyBuilder = MethodBodyBuilder(this)
 
     override val version: ClassFileVersion
-        get() = parent.version
+        get() = owner.version
 
-    public val parentType: ReferenceType
-        get() = parent.type
+    /**
+     * The type of the class that owns the method.
+     *
+     * @see [owner]
+     */
+    public val ownerType: ReferenceType
+        get() = owner.type
 
+    /**
+     * The return type of the method.
+     *
+     * @see [type]
+     */
     public val returnType: ReturnableType
         get() = type.returnType
 
     private val tryCatchBlocks = mutableListOf<TryCatchBlockNode>()
     private val localVariables = mutableListOf<LocalVariableNode>()
     private val parameters = mutableListOf<ParameterNode>()
+
+    /**
+     * The default value for the annotation property, or `null` if the method is not an annotation property, or if
+     * the annotation property does not have a default value.
+     *
+     * @throws [IllegalArgumentException] *(on set)* if the [owner] of the method is not an annotation
+     */
+    public var defaultAnnotationValue: AnnotationDefaultValue? = null
+        set(value) {
+            if (value != null) {
+                require(owner.isAnnotation) { "Owner ($owner) of method ($this) is not an annotation" }
+            }
+            field = value
+        }
 
     /**
      * Sets the access flags for the parameter with the given [name] to the given [flag].

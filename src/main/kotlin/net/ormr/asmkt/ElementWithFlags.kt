@@ -16,6 +16,6 @@
 
 package net.ormr.asmkt
 
-public sealed interface ElementWithFlags<Flag : AccessFlag> : ElementModel {
+public sealed interface ElementWithFlags<Flag : AccessFlag> : ElementBuilder {
     public val flags: AccessFlags<Flag>
 }

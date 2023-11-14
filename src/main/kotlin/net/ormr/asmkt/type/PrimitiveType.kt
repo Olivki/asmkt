@@ -112,6 +112,8 @@ public sealed interface PrimitiveFieldType : PrimitiveType, FieldType
 
 /**
  * Represents the `void` primitive type.
+ *
+ * @see [ReferenceType.VOID]
  */
 public data object VoidType : PrimitiveType {
     override val descriptor: String
@@ -130,6 +132,8 @@ public data object VoidType : PrimitiveType {
 
 /**
  * Represents the `boolean` primitive type.
+ *
+ * @see [ReferenceType.BOOLEAN]
  */
 public data object BooleanType : PrimitiveFieldType {
     override val descriptor: String
@@ -148,6 +152,8 @@ public data object BooleanType : PrimitiveFieldType {
 
 /**
  * Represents the `char` primitive type.
+ *
+ * @see [ReferenceType.CHAR]
  */
 public data object CharType : PrimitiveFieldType {
     override val descriptor: String
@@ -166,6 +172,8 @@ public data object CharType : PrimitiveFieldType {
 
 /**
  * Represents the `byte` primitive type.
+ *
+ * @see [ReferenceType.BYTE]
  */
 public data object ByteType : PrimitiveFieldType {
     override val descriptor: String
@@ -184,6 +192,8 @@ public data object ByteType : PrimitiveFieldType {
 
 /**
  * Represents the `short` primitive type.
+ *
+ * @see [ReferenceType.SHORT]
  */
 public data object ShortType : PrimitiveFieldType {
     override val descriptor: String
@@ -202,6 +212,8 @@ public data object ShortType : PrimitiveFieldType {
 
 /**
  * Represents the `int` primitive type.
+ *
+ * @see [ReferenceType.INT]
  */
 public data object IntType : PrimitiveFieldType {
     override val descriptor: String
@@ -220,6 +232,8 @@ public data object IntType : PrimitiveFieldType {
 
 /**
  * Represents the `long` primitive type.
+ *
+ * @see [ReferenceType.LONG]
  */
 public data object LongType : PrimitiveFieldType {
     override val descriptor: String
@@ -238,6 +252,8 @@ public data object LongType : PrimitiveFieldType {
 
 /**
  * Represents the `float` primitive type.
+ *
+ * @see [ReferenceType.FLOAT]
  */
 public data object FloatType : PrimitiveFieldType {
     override val descriptor: String
@@ -256,6 +272,8 @@ public data object FloatType : PrimitiveFieldType {
 
 /**
  * Represents the `double` primitive type.
+ *
+ * @see [ReferenceType.DOUBLE]
  */
 public data object DoubleType : PrimitiveFieldType {
     override val descriptor: String
