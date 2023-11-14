@@ -19,7 +19,7 @@ package net.ormr.asmkt
 import net.ormr.asmkt.type.ReferenceType
 import org.objectweb.asm.TypePath
 
-public sealed interface ElementWithTypeAnnotation : ElementBuilder {
+public sealed interface AnnotatableElementTypeBuilder : ElementBuilder {
     /**
      * Adds an annotation of type [type] to the `type` of the element.
      *

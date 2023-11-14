@@ -18,7 +18,7 @@ package net.ormr.asmkt
 
 import net.ormr.asmkt.type.ReferenceType
 
-public sealed interface ElementWithAnnotation : ElementBuilder {
+public sealed interface AnnotatableElementBuilder : ElementBuilder {
     /**
      * Adds an annotation of type [type] to the element.
      *

@@ -25,7 +25,7 @@ import kotlin.contracts.contract
 /**
  * Adds an annotation of type [type] to the `type` of the element.
  *
- * This function is a shorthand for [annotation][ElementWithTypeAnnotation.typeAnnotation] that allows for a builder to
+ * This function is a shorthand for [annotation][AnnotatableElementTypeBuilder.typeAnnotation] that allows for a builder to
  * be passed in.
  *
  * Note that no validation is done to ensure that the annotation is valid for the element, nor that the `type` is
@@ -43,7 +43,7 @@ import kotlin.contracts.contract
  * annotation of the same type as [type]
  */
 @AsmKtDsl
-public inline fun ElementWithTypeAnnotation.typeAnnotation(
+public inline fun AnnotatableElementTypeBuilder.typeAnnotation(
     typeRef: Int,
     typePath: TypePath?,
     type: ReferenceType,
@@ -78,7 +78,7 @@ public inline fun ElementWithTypeAnnotation.typeAnnotation(
  */
 @AsmKtDsl
 @AsmKtReflection
-public fun ElementWithTypeAnnotation.typeAnnotation(
+public fun AnnotatableElementTypeBuilder.typeAnnotation(
     typeRef: Int,
     typePath: TypePath?,
     instance: Annotation,
