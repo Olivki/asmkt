@@ -18,7 +18,7 @@ package net.ormr.asmkt
 
 import net.ormr.asmkt.type.ReferenceType
 
-context(ClassBuilder)
+context(ClassElementBuilder)
 internal fun verifyState() {
     checkFlags()
     if (isEnum) requireSuperType(ReferenceType.ENUM) { "Enum classes" }
@@ -33,7 +33,7 @@ internal fun verifyState() {
     }
 }
 
-context(ClassBuilder)
+context(ClassElementBuilder)
 private fun checkFlags() {
     val kind = ClassKind.fromFlagsOrNull(flags)
     if (kind != null) {
@@ -41,32 +41,32 @@ private fun checkFlags() {
     }
 }
 
-context(ClassBuilder)
+context(ClassElementBuilder)
 internal inline fun requireSuperType(otherSuperType: ReferenceType, feature: () -> String) {
     require(superType == otherSuperType) { "${feature()} requires super type to be ${otherSuperType.asString()}, but super type was ${superType.asString()}." }
 }
 
-context(ClassBuilder)
+context(ClassElementBuilder)
 internal inline fun requireKind(otherKind: ClassKind, feature: () -> String) {
     require(kind == otherKind) { "Only a class of kind $otherKind can use ${feature()}, but current kind is $kind" }
 }
 
-context(ClassBuilder)
+context(ClassElementBuilder)
 internal inline fun requireOneKindOf(kinds: Set<ClassKind>, feature: () -> String) {
     require(kind in kinds) { "Only classes of kind ${kinds.listOut()} are allowed to have ${feature()}, but current kind is $kind" }
 }
 
-context(ClassBuilder)
+context(ClassElementBuilder)
 internal inline fun requireNotKind(otherKind: ClassKind, feature: () -> String) {
     require(kind != otherKind) { "Classes of kind $otherKind are not allowed to have ${feature()}" }
 }
 
-context(ClassBuilder)
+context(ClassElementBuilder)
 internal inline fun requireNotOneKindOf(kinds: Set<ClassKind>, feature: () -> String) {
     require(kind !in kinds) { "Classes of kind $kind are not allowed to have ${feature()}" }
 }
 
-context(ClassBuilder)
+context(ClassElementBuilder)
 internal fun checkInterfaceFields() {
     if (isInterface) {
         for ((name, field) in fields) {
@@ -74,6 +74,15 @@ internal fun checkInterfaceFields() {
             require(field.isStatic) { "Interface fields must be static, but field '$name' is not." }
             require(field.isFinal) { "Interface fields must be final, but field '$name' is not." }
         }
+    }
+}
+
+context(ClassElementBuilder)
+internal fun checkInterfaceField(field: FieldElementBuilder) {
+    if (isInterface) {
+        require(field.isPublic) { "Interface fields must be public, but field '${field.name}' is not." }
+        require(field.isStatic) { "Interface fields must be static, but field '${field.name}' is not." }
+        require(field.isFinal) { "Interface fields must be final, but field '${field.name}' is not." }
     }
 }
 

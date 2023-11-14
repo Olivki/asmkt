@@ -27,7 +27,7 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 @AsmKtDsl
-public class MethodBodyBuilder internal constructor(public val method: MethodBuilder) : ElementBuilder,
+public class MethodBodyBuilder internal constructor(public val method: MethodElementBuilder) : ElementBuilder,
     VersionedElementBuilder {
     public val code: CodeBuilder = CodeBuilder(this)
 
@@ -459,7 +459,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodBui
 
     // -- RETURN INSTRUCTIONS -- \\
     /**
-     * Pushes the appropriate return instruction based on the [returnType][MethodBuilder.returnType] of [method].
+     * Pushes the appropriate return instruction based on the [returnType][MethodElementBuilder.returnType] of [method].
      */
     @AsmKtDsl
     public fun returnValue() {

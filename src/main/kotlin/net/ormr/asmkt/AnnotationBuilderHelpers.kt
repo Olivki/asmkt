@@ -27,8 +27,8 @@ internal fun <A : Annotation> createTypeAnnotationBuilder(
     typeRef: Int,
     typePath: TypePath?,
     annotation: A,
-): TypeAnnotationBuilder = populateBuilderWith(
-    TypeAnnotationBuilder(
+): ElementTypeAnnotationBuilder = populateBuilderWith(
+    ElementTypeAnnotationBuilder(
         typeRef = typeRef,
         typePath = typePath,
         type = annotation::class.toReferenceType(),

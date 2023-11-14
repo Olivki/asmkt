@@ -79,7 +79,7 @@ public class ElementAnnotationBuilder @PublishedApi internal constructor(
 }
 
 @AsmKtDsl
-public class TypeAnnotationBuilder @PublishedApi internal constructor(
+public class ElementTypeAnnotationBuilder @PublishedApi internal constructor(
     public val typeRef: Int,
     public val typePath: TypePath?,
     override val type: ReferenceType,

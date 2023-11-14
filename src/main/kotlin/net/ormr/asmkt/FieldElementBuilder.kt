@@ -22,8 +22,8 @@ import net.ormr.asmkt.type.FieldType
 // as it only supports very simple values, and you probably want to set the value in the
 // init / cinit of the class manually anyway
 @AsmKtDsl
-public class FieldBuilder internal constructor(
-    public val owner: ClassBuilder,
+public class FieldElementBuilder internal constructor(
+    public val owner: ClassElementBuilder,
     public val name: String,
     override val flags: AccessFlags<FieldAccessFlag>,
     public val type: FieldType,

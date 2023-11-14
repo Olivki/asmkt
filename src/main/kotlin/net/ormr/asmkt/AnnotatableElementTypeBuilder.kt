@@ -32,7 +32,7 @@ public sealed interface AnnotatableElementTypeBuilder : ElementBuilder {
      * @param [isVisibleAtRuntime] whether or not the annotation should be visible at runtime *(via reflection)*
      * @param [allowRepeats] whether or not multiple annotations of the same [type] are allowed on the element
      *
-     * @return a new [TypeAnnotationBuilder] instance used to build an annotation of type [type]
+     * @return a new [ElementTypeAnnotationBuilder] instance used to build an annotation of type [type]
      *
      * @throws [IllegalArgumentException] if [allowRepeats] is `false` and the element is already annotated with an
      * annotation of the same type as [type]
@@ -43,5 +43,5 @@ public sealed interface AnnotatableElementTypeBuilder : ElementBuilder {
         type: ReferenceType,
         isVisibleAtRuntime: Boolean = true,
         allowRepeats: Boolean = false,
-    ): TypeAnnotationBuilder
+    ): ElementTypeAnnotationBuilder
 }

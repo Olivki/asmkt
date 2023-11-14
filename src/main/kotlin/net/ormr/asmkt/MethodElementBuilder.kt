@@ -37,8 +37,8 @@ import kotlin.contracts.contract
  * @property [exceptions] The exceptions that the method can throw.
  */
 @AsmKtDsl
-public class MethodBuilder internal constructor(
-    public val owner: ClassBuilder,
+public class MethodElementBuilder internal constructor(
+    public val owner: ClassElementBuilder,
     public val name: String,
     override val flags: MethodAccessFlags,
     public val type: MethodType,

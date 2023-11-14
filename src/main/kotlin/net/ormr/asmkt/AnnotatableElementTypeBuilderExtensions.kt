@@ -37,7 +37,7 @@ import kotlin.contracts.contract
  * @param [isVisibleAtRuntime] whether or not the annotation should be visible at runtime *(via reflection)*
  * @param [allowRepeats] whether or not multiple annotations of the same [type] are allowed on the element
  *
- * @return a new [TypeAnnotationBuilder] instance used to build an annotation of type [type]
+ * @return a new [ElementTypeAnnotationBuilder] instance used to build an annotation of type [type]
  *
  * @throws [IllegalArgumentException] if [allowRepeats] is `false` and the element is already annotated with an
  * annotation of the same type as [type]
@@ -49,8 +49,8 @@ public inline fun AnnotatableElementTypeBuilder.typeAnnotation(
     type: ReferenceType,
     isVisibleAtRuntime: Boolean = true,
     allowRepeats: Boolean = false,
-    builder: TypeAnnotationBuilder.() -> Unit = {},
-): TypeAnnotationBuilder {
+    builder: ElementTypeAnnotationBuilder.() -> Unit = {},
+): ElementTypeAnnotationBuilder {
     contract {
         callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
     }
@@ -71,7 +71,7 @@ public inline fun AnnotatableElementTypeBuilder.typeAnnotation(
  * @param [isVisibleAtRuntime] whether or not the annotation should be visible at runtime *(via reflection)*
  * @param [allowRepeats] whether or not multiple annotations of the same [instance] are allowed on the element
  *
- * @return a new [TypeAnnotationBuilder] instance used to build an annotation of type [instance]
+ * @return a new [ElementTypeAnnotationBuilder] instance used to build an annotation of type [instance]
  *
  * @throws [IllegalArgumentException] if [allowRepeats] is `false` and the element is already annotated with an
  * annotation of the same type as [instance]
@@ -84,7 +84,7 @@ public fun AnnotatableElementTypeBuilder.typeAnnotation(
     instance: Annotation,
     isVisibleAtRuntime: Boolean = true,
     allowRepeats: Boolean = false,
-): TypeAnnotationBuilder {
+): ElementTypeAnnotationBuilder {
     val type = instance.annotationClass.toReferenceType()
     val builder = typeAnnotation(
         typeRef = typeRef,

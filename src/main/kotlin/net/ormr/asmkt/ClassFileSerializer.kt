@@ -20,22 +20,22 @@ import org.objectweb.asm.ClassWriter
 import org.objectweb.asm.tree.ClassNode
 
 public sealed interface ClassFileSerializer {
-    public fun encodeToClassNode(model: ClassBuilder): ClassNode
+    public fun encodeToClassNode(model: ClassElementBuilder): ClassNode
 
-    public fun encodeToBytes(model: ClassBuilder): ByteArray
+    public fun encodeToBytes(model: ClassElementBuilder): ByteArray
 
-    public fun encodeToClassFile(model: ClassBuilder): ClassFile = ClassFile(
+    public fun encodeToClassFile(model: ClassElementBuilder): ClassFile = ClassFile(
         version = model.version,
         type = model.type,
         bytes = encodeToBytes(model),
     )
 
     public companion object Default : ClassFileSerializer {
-        override fun encodeToClassNode(model: ClassBuilder): ClassNode {
+        override fun encodeToClassNode(model: ClassElementBuilder): ClassNode {
             TODO("Not yet implemented")
         }
 
-        override fun encodeToBytes(model: ClassBuilder): ByteArray {
+        override fun encodeToBytes(model: ClassElementBuilder): ByteArray {
             val writer = ClassWriter(ClassWriter.COMPUTE_FRAMES)
             val node = encodeToClassNode(model)
             node.accept(writer)

@@ -22,7 +22,7 @@ import net.ormr.asmkt.type.ReferenceType
 import org.objectweb.asm.TypePath
 
 @AsmKtDsl
-public class ClassBuilder(
+public class ClassElementBuilder(
     override val version: ClassFileVersion,
     public val kind: ClassKind,
     public val type: ReferenceType,
@@ -38,24 +38,26 @@ public class ClassBuilder(
     /**
      * The method that the class belongs to, or `null` if the class does not belong to a method.
      */
-    public var enclosingMethod: MethodBuilder? = null
+    public var enclosingMethod: MethodElementBuilder? = null
         internal set
 
     /**
      * Whether `supercall` methods should be treated specially by the `invokespecial` instruction.
      *
      * If this is `true` then the [SUPER][AccessFlag.SUPER] flag is added when the class is serialized to bytecode.
+     *
+     * By default, this is `true`.
      */
     public var treatSuperSpecially: Boolean = true
 
-    internal val nestMembers = mutableListOf<ClassBuilder>()
+    internal val nestMembers = mutableListOf<ClassElementBuilder>()
     internal val innerClasses = mutableListOf<InnerClassWrapper>()
-    internal val methods = mutableSetOf<MethodBuilder>()
-    internal val fields = mutableMapOf<String, FieldBuilder>()
+    internal val methods = mutableSetOf<MethodElementBuilder>()
+    internal val fields = mutableMapOf<String, FieldElementBuilder>()
     internal val visibleAnnotations = mutableListOf<ElementAnnotationBuilder>()
     internal val invisibleAnnotations = mutableListOf<ElementAnnotationBuilder>()
-    internal val visibleTypeAnnotations = mutableListOf<TypeAnnotationBuilder>()
-    internal val invisibleTypeAnnotations = mutableListOf<TypeAnnotationBuilder>()
+    internal val visibleTypeAnnotations = mutableListOf<ElementTypeAnnotationBuilder>()
+    internal val invisibleTypeAnnotations = mutableListOf<ElementTypeAnnotationBuilder>()
 
     init {
         verifyState()
@@ -82,8 +84,8 @@ public class ClassBuilder(
         type: ReferenceType,
         isVisibleAtRuntime: Boolean,
         allowRepeats: Boolean,
-    ): TypeAnnotationBuilder {
-        val builder = TypeAnnotationBuilder(typeRef, typePath, type)
+    ): ElementTypeAnnotationBuilder {
+        val builder = ElementTypeAnnotationBuilder(typeRef, typePath, type)
         return addAnnotation(
             builder = builder,
             visible = visibleTypeAnnotations,
@@ -98,18 +100,18 @@ public class ClassBuilder(
         flags: FieldAccessFlags,
         type: FieldType,
         signature: String? = null,
-    ): FieldBuilder {
+    ): FieldElementBuilder {
         requireNotOneKindOf(ClassKind.NO_FIELDS) { "fields" }
-        checkInterfaceFields()
-        val model = FieldBuilder(
+        val builder = FieldElementBuilder(
             owner = this,
             name = name,
             flags = flags,
             type = type,
             signature = signature,
         )
-        fields[name] = model
-        return model
+        checkInterfaceField(builder)
+        fields[name] = builder
+        return builder
     }
 
     public fun field(
@@ -117,7 +119,7 @@ public class ClassBuilder(
         flag: FieldAccessFlag,
         type: FieldType,
         signature: String? = null,
-    ): FieldBuilder = field(
+    ): FieldElementBuilder = field(
         name = name,
         flags = flag.asAccessFlags(),
         type = type,
@@ -130,9 +132,9 @@ public class ClassBuilder(
         type: MethodType,
         signature: String? = null,
         exceptions: List<ReferenceType> = emptyList(),
-    ): MethodBuilder {
+    ): MethodElementBuilder {
         requireNotOneKindOf(ClassKind.NO_METHODS) { "methods" }
-        val model = MethodBuilder(
+        val builder = MethodElementBuilder(
             owner = this,
             name = name,
             flags = flags,
@@ -140,8 +142,8 @@ public class ClassBuilder(
             signature = signature,
             exceptions = exceptions,
         )
-        methods += model
-        return model
+        methods += builder
+        return builder
     }
 
     public fun method(
@@ -150,7 +152,7 @@ public class ClassBuilder(
         type: MethodType,
         signature: String? = null,
         exceptions: List<ReferenceType> = emptyList(),
-    ): MethodBuilder = method(
+    ): MethodElementBuilder = method(
         name = name,
         flags = flag.asAccessFlags(),
         type = type,

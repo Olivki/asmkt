@@ -16,4 +16,4 @@
 
 package net.ormr.asmkt
 
-internal data class InnerClassWrapper(val name: String?, val model: ClassBuilder)
+internal data class InnerClassWrapper(val name: String?, val model: ClassElementBuilder)
