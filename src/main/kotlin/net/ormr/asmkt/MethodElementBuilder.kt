@@ -16,6 +16,7 @@
 
 package net.ormr.asmkt
 
+import net.ormr.asmkt.type.FieldType
 import net.ormr.asmkt.type.MethodType
 import net.ormr.asmkt.type.ReferenceType
 import net.ormr.asmkt.type.ReturnableType
@@ -87,6 +88,35 @@ public class MethodElementBuilder @PublishedApi internal constructor(
     public fun parameter(element: ParameterElement): ParameterElement {
         parameters.add(element)
         return element
+    }
+
+    /**
+     * Defines the name, type, signature and scope of the local variable stored at the given [index].
+     *
+     * @param [index] the index at which the local variable is stored at
+     * @param [name] the name of the local variable
+     * @param [type] the type of the local variable
+     * @param [signature] the signature of the local variable, or `null` if it does not use any generic types
+     * @param [start] the start of the block in which the variable belongs
+     * @param [end] the end of the block in which the variable belongs
+     */
+    @AsmKtDsl
+    public fun localVariable(
+        index: Int,
+        name: String,
+        type: FieldType,
+        signature: String? = null,
+        start: LabelElement = body.startLabel,
+        end: LabelElement = body.endLabel,
+    ) {
+        localVariables += LocalVariableElement(
+            index = index,
+            name = name,
+            type = type,
+            signature = signature,
+            start = start,
+            end = end,
+        )
     }
 
     // -- SCOPING -- \\

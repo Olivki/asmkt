@@ -1096,36 +1096,6 @@ public class MethodBodyBuilder @PublishedApi internal constructor(public val met
         codeChunk.nop()
     }
 
-    // -- LOCAL VARIABLES -- \\
-    /**
-     * Defines the name, type, signature and scope of the local variable stored at the given [index].
-     *
-     * @param [index] the index at which the local variable is stored at
-     * @param [name] the name of the local variable
-     * @param [type] the type of the local variable
-     * @param [signature] the signature of the local variable, or `null` if it does not use any generic types
-     * @param [start] the start of the block in which the variable belongs
-     * @param [end] the end of the block in which the variable belongs
-     */
-    @AsmKtDsl
-    public fun localVariable(
-        index: Int,
-        name: String,
-        type: FieldType,
-        signature: String? = null,
-        start: LabelElement = startLabel,
-        end: LabelElement = endLabel,
-    ) {
-        method.localVariables += LocalVariableElement(
-            index = index,
-            name = name,
-            type = type,
-            signature = signature,
-            start = start,
-            end = end,
-        )
-    }
-
     public operator fun MethodBody.unaryPlus() {
         addBody(this)
     }
