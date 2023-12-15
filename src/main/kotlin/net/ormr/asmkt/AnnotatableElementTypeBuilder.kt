@@ -17,6 +17,8 @@
 package net.ormr.asmkt
 
 public sealed interface AnnotatableElementTypeBuilder : ElementBuilder {
+    public val typeAnnotations: ElementTypeAnnotationsBuilder
+
     /**
      * Adds the given annotation [element] to the `type` of the element.
      *
@@ -27,5 +29,12 @@ public sealed interface AnnotatableElementTypeBuilder : ElementBuilder {
      * @throws [IllegalArgumentException] if [allowRepeats][TypeAnnotationElement.allowRepeats] is `false` and the
      * element is already annotated with an annotation of the same type as [type][TypeAnnotationElement.type]
      */
-    public fun typeAnnotation(element: TypeAnnotationElement)
+    public fun typeAnnotation(element: TypeAnnotationElement) {
+        addAnnotation(
+            element = element,
+            annotations = typeAnnotations,
+            isVisible = element.isVisibleAtRuntime,
+            allowRepeats = element.allowRepeats,
+        )
+    }
 }

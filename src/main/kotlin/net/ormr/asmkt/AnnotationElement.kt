@@ -62,7 +62,7 @@ public sealed class AbstractAnnotationElement<N : AnnotationNode> {
         return node
     }
 
-    internal abstract fun toAsmNode(): N
+    public abstract fun toAsmNode(): N
 }
 
 public sealed class RootAnnotationElement<N : AnnotationNode> : AbstractAnnotationElement<N>() {

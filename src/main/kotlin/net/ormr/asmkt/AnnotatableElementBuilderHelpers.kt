@@ -18,14 +18,14 @@ package net.ormr.asmkt
 
 import net.ormr.asmkt.type.ReferenceType
 
-internal fun <B : AbstractAnnotationElement<*>> addAnnotation(
-    element: B,
-    visible: MutableList<B>,
-    invisible: MutableList<B>,
+internal fun <A : RootAnnotationElement<*>> addAnnotation(
+    element: A,
+    annotations: RootElementAnnotationsBuilder<*, A>,
     isVisible: Boolean,
     allowRepeats: Boolean,
 ) {
     val type = element.type
+    val (visible, invisible) = annotations
 
     if (isVisible) {
         visible += when {

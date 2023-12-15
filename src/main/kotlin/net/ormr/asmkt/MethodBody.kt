@@ -16,6 +16,12 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.ReferenceType
+public data class MethodBody(
+    public val instructions: InstructionList,
+    public val startLabel: LabelElement,
+    public val endLabel: LabelElement,
+) {
+    public fun isEmpty(): Boolean = instructions.isEmpty()
 
-public data class InnerClassElement(public val name: String?, public val type: ReferenceType)
+    public fun isNotEmpty(): Boolean = instructions.isNotEmpty()
+}

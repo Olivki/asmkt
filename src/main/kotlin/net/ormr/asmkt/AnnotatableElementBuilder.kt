@@ -17,6 +17,8 @@
 package net.ormr.asmkt
 
 public sealed interface AnnotatableElementBuilder : ElementBuilder {
+    public val annotations: ElementAnnotationsBuilder
+
     /**
      * Adds the given annotation [element] to the element.
      *
@@ -27,5 +29,12 @@ public sealed interface AnnotatableElementBuilder : ElementBuilder {
      * @throws [IllegalArgumentException] if [allowRepeats][AnnotationElement.allowRepeats] is `false` and the
      * element is already annotated with an annotation of the same type as [type][AnnotationElement.type]
      */
-    public fun annotation(element: AnnotationElement)
+    public fun annotation(element: AnnotationElement) {
+        addAnnotation(
+            element = element,
+            annotations = annotations,
+            isVisible = element.isVisibleAtRuntime,
+            allowRepeats = element.allowRepeats,
+        )
+    }
 }

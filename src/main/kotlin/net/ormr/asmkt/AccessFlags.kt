@@ -19,6 +19,7 @@ package net.ormr.asmkt
 public typealias ClassAccessFlags = AccessFlags<ClassAccessFlag>
 public typealias SimpleClassAccessFlags = AccessFlags<SimpleClassAccessFlag>
 public typealias MethodAccessFlags = AccessFlags<MethodAccessFlag>
+public typealias ConstructorAccessFlags = AccessFlags<ConstructorAccessFlag>
 public typealias FieldAccessFlags = AccessFlags<FieldAccessFlag>
 public typealias ModuleAccessFlags = AccessFlags<ModuleAccessFlag>
 public typealias ParameterAccessFlags = AccessFlags<ParameterAccessFlag>
@@ -44,6 +45,10 @@ public value class AccessFlags<out Flag : AccessFlag> internal constructor(priva
 
     @OptIn(ExperimentalStdlibApi::class)
     override fun toString(): String = "0x${mask.toHexString(HexFormat.UpperCase)}"
+
+    public companion object {
+        public fun <Flag : AccessFlag> none(): AccessFlags<Flag> = AccessFlags(AccessFlag.NONE.asInt())
+    }
 }
 
 public fun <Flag : AccessFlag> Flag.asAccessFlags(): AccessFlags<Flag> = AccessFlags(asInt())

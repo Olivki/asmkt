@@ -16,10 +16,24 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.FieldType
-import net.ormr.asmkt.type.MethodType
 import net.ormr.asmkt.type.ReferenceType
 
+/**
+ * A builder class for creating [ClassElement] instances.
+ *
+ * @property [version] The version of the class file.
+ * @property [kind] The kind of the class.
+ * @property [type] The reference type of the class.
+ * @property [flags] The access flags of the class.
+ * @property [signature] The *(generic)* signature of the class.
+ * @property [supertype] The super type of the class.
+ * @property [interfaces] The list of interface types implemented by the class.
+ * @property [sourceFile] The source file of the class.
+ * @property [sourceDebug] The debug information of the class.
+ * @property [enclosingClass] The type of the enclosing class of the inner class, or `null` if the class is not an inner
+ * class.
+ * @property [nestHost] The type of the nest host of the class, or `null` if the class isn't a part of a nest.
+ */
 @AsmKtDsl
 public class ClassElementBuilder(
     override val version: ClassFileVersion,
@@ -27,17 +41,18 @@ public class ClassElementBuilder(
     public val type: ReferenceType,
     override val flags: SimpleClassAccessFlags = AccessFlag.PUBLIC.asAccessFlags(),
     public val signature: String? = null,
-    public val superType: ReferenceType = ReferenceType.OBJECT,
+    public val supertype: ReferenceType = ReferenceType.OBJECT,
     public val interfaces: List<ReferenceType> = emptyList(),
-    public val permittedSubtypes: List<ReferenceType> = emptyList(),
     public val sourceFile: String? = null,
     public val sourceDebug: String? = null,
+    public val enclosingClass: ReferenceType? = null,
+    public val nestHost: ReferenceType? = null,
 ) : ElementBuilder, Flaggable<SimpleClassAccessFlag>, VersionedElementBuilder, AnnotatableElementBuilder,
     AnnotatableElementTypeBuilder {
     /**
      * The method that the class belongs to, or `null` if the class does not belong to a method.
      */
-    public var enclosingMethod: MethodElementBuilder? = null
+    public var enclosingMethod: MethodElement? = null
         internal set
 
     /**
@@ -49,101 +64,78 @@ public class ClassElementBuilder(
      */
     public var treatSuperSpecially: Boolean = true
 
-    internal val nestMembers = mutableListOf<ClassElementBuilder>()
-    internal val innerClasses = mutableListOf<InnerClassElement>()
-    internal val methods = mutableSetOf<MethodElementBuilder>()
-    internal val fields = mutableMapOf<String, FieldElementBuilder>()
-    internal val visibleAnnotations = mutableListOf<AnnotationElement>()
-    internal val invisibleAnnotations = mutableListOf<AnnotationElement>()
-    internal val visibleTypeAnnotations = mutableListOf<TypeAnnotationElement>()
-    internal val invisibleTypeAnnotations = mutableListOf<TypeAnnotationElement>()
+    /**
+     * A mutable list of permitted subtypes.
+     *
+     * If this list is *not* empty then the class will be marked as a `sealed` type when serialized to bytecode.
+     */
+    public val permittedSubtypes: MutableList<ReferenceType> = mutableListOf()
+
+    /**
+     * A mutable list of all nest members of the class.
+     *
+     * Note that if the elements of the list do not have their [nestHost] set to the [type] of `this` class then
+     * errors will be encountered at runtime.
+     */
+    public val nestMates: MutableList<ReferenceType> = mutableListOf()
+
+    /**
+     * A mutable list of all inner classes of the class.
+     *
+     * Note that if the elements of the list do not have their [enclosingClass] set to the [type] of `this` class then
+     * faulty metadata will be generated, and errors may be encountered at runtime.
+     */
+    public val innerClasses: MutableList<InnerClassElement> = mutableListOf()
+
+    public val methods: MutableList<MethodElement> = mutableListOf()
+
+    public val fields: MutableMap<String, FieldElement> = mutableMapOf()
+
+    override val annotations: ElementAnnotationsBuilder = ElementAnnotationsBuilder()
+
+    override val typeAnnotations: ElementTypeAnnotationsBuilder = ElementTypeAnnotationsBuilder()
 
     init {
         verifyState()
     }
 
-    override fun annotation(element: AnnotationElement) {
-        addAnnotation(
-            element = element,
-            visible = visibleAnnotations,
-            invisible = invisibleAnnotations,
-            isVisible = element.isVisibleAtRuntime,
-            allowRepeats = element.allowRepeats,
-        )
-    }
-
-    override fun typeAnnotation(element: TypeAnnotationElement) {
-        addAnnotation(
-            element = element,
-            visible = visibleTypeAnnotations,
-            invisible = invisibleTypeAnnotations,
-            isVisible = element.isVisibleAtRuntime,
-            allowRepeats = element.allowRepeats,
-        )
-    }
-
-    public fun field(
-        name: String,
-        flags: FieldAccessFlags,
-        type: FieldType,
-        signature: String? = null,
-    ): FieldElementBuilder {
+    public fun field(field: FieldElement): FieldElement {
         requireNotOneKindOf(ClassKind.NO_FIELDS) { "fields" }
-        val builder = FieldElementBuilder(
-            owner = this,
-            name = name,
-            flags = flags,
-            type = type,
-            signature = signature,
-        )
-        checkInterfaceField(builder)
-        fields[name] = builder
-        return builder
+        checkInterfaceField(field)
+        fields[field.name] = field
+        return field
     }
 
-    public fun field(
-        name: String,
-        flag: FieldAccessFlag,
-        type: FieldType,
-        signature: String? = null,
-    ): FieldElementBuilder = field(
-        name = name,
-        flags = flag.asAccessFlags(),
-        type = type,
-        signature = signature,
-    )
-
-    public fun method(
-        name: String,
-        flags: MethodAccessFlags,
-        type: MethodType,
-        signature: String? = null,
-        exceptions: List<ReferenceType> = emptyList(),
-    ): MethodElementBuilder {
+    public fun method(element: MethodElement): MethodElement {
         requireNotOneKindOf(ClassKind.NO_METHODS) { "methods" }
-        val builder = MethodElementBuilder(
-            owner = this,
-            name = name,
-            flags = flags,
-            type = type,
-            signature = signature,
-            exceptions = exceptions,
-        )
-        methods += builder
-        return builder
+        methods += element
+        return element
     }
 
-    public fun method(
-        name: String,
-        flag: MethodAccessFlag,
-        type: MethodType,
-        signature: String? = null,
-        exceptions: List<ReferenceType> = emptyList(),
-    ): MethodElementBuilder = method(
-        name = name,
-        flags = flag.asAccessFlags(),
-        type = type,
-        signature = signature,
-        exceptions = exceptions,
-    )
+    @PublishedApi
+    internal fun build(): ClassElement {
+        verifyStateBeforeBuild()
+        return ClassElement(
+            version = version,
+            kind = kind,
+            type = type,
+            flags = flags,
+            signature = signature,
+            supertype = supertype,
+            interfaces = interfaces,
+            sourceFile = sourceFile,
+            sourceDebug = sourceDebug,
+            permittedSubtypes = permittedSubtypes.toList(),
+            enclosingMethod = enclosingMethod,
+            enclosingClass = enclosingClass,
+            innerClasses = innerClasses.toList(),
+            nestHost = nestHost,
+            nestMates = nestMates.toList(),
+            fields = fields.toMap(),
+            methods = methods.toList(),
+            treatSuperSpecially = treatSuperSpecially,
+            annotations = annotations.build(),
+            typeAnnotations = typeAnnotations.build(),
+        )
+    }
 }

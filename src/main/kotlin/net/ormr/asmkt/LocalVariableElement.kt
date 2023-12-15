@@ -16,6 +16,16 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.ReferenceType
+import net.ormr.asmkt.type.FieldType
+import org.objectweb.asm.tree.LocalVariableNode
 
-public data class InnerClassElement(public val name: String?, public val type: ReferenceType)
+public data class LocalVariableElement(
+    public val index: Int,
+    public val name: String,
+    public val type: FieldType,
+    public val signature: String?,
+    public val start: LabelElement,
+    public val end: LabelElement,
+) {
+    public fun toAsmNode(): LocalVariableNode = LocalVariableNode(name, type.descriptor, signature, start, end, index)
+}

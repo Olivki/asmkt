@@ -17,8 +17,6 @@
 package net.ormr.asmkt
 
 import net.ormr.asmkt.type.*
-import org.objectweb.asm.ConstantDynamic
-import org.objectweb.asm.Handle
 import org.objectweb.asm.Label
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.LabelNode
@@ -27,39 +25,46 @@ import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
 @AsmKtDsl
-public class MethodBodyBuilder internal constructor(public val method: MethodElementBuilder) : ElementBuilder,
+public class MethodBodyBuilder @PublishedApi internal constructor(public val method: MethodElementBuilder) :
+    ElementBuilder,
     VersionedElementBuilder {
-    public val code: CodeBuilder = CodeBuilder(this)
+    public val codeChunk: CodeChunkBuilder = CodeChunkBuilder(this)
 
     override val version: ClassFileVersion
         get() = method.version
 
     public val returns: Boolean
-        get() = code.returns
+        get() = codeChunk.returns
 
     public val throws: Boolean
-        get() = code.throws
+        get() = codeChunk.throws
+
+    public val startLabel: LabelElement
+        get() = codeChunk.startLabel
+
+    public val endLabel: LabelElement
+        get() = codeChunk.endLabel
 
     /**
-     * Returns a new [Label].
+     * Returns a new [LabelElement].
      *
      * @see [newBoundLabel]
      */
-    public fun newLabel(): Label = code.newLabel()
+    public fun newLabel(): LabelElement = codeChunk.newLabel()
 
     /**
-     * Returns a new [Label] that has been bound to the *next* instruction.
+     * Returns a new [LabelElement] that has been bound to the *next* instruction.
      *
      * @see [newLabel]
      * @see [bindLabel]
      */
-    public fun newBoundLabel(): Label = code.newBoundLabel()
+    public fun newBoundLabel(): LabelElement = codeChunk.newBoundLabel()
 
     // -- LDC INSTRUCTIONS -- \\
     /**
      * Pushes an appropriate instruction for the given [value] onto the stack.
      *
-     * Unlike [ldc][CodeBuilder.ldc] this function accepts a wider variety of types for `value` and it also outputs
+     * Unlike [ldc][CodeChunkBuilder.ldc] this function accepts a wider variety of types for `value` and it also outputs
      * optimized bytecode where possible.
      *
      * For example, `push(3)` pushes the `ICONST_3` instruction onto the stack, and `push(true)` pushes the
@@ -109,19 +114,44 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun pushNull() {
-        code.aconst_null()
+        codeChunk.aconst_null()
+    }
+
+    /**
+     * Pushes the `ICONST_0` instruction onto the stack.
+     *
+     * @see [pushTrue]
+     * @see [pushBoolean]
+     */
+    @AsmKtDsl
+    public fun pushFalse() {
+        codeChunk.iconst_0()
+    }
+
+    /**
+     * Pushes the `ICONST_1` instruction onto the stack.
+     *
+     * @see [pushFalse]
+     * @see [pushBoolean]
+     */
+    @AsmKtDsl
+    public fun pushTrue() {
+        codeChunk.iconst_1()
     }
 
     /**
      * Pushes the `ICONST_1` instruction onto the stack if [value] is `true`, or the `ICONST_0` instruction if `value`
      * is `false`.
+     *
+     * @see [pushFalse]
+     * @see [pushTrue]
      */
     @AsmKtDsl
     public fun pushBoolean(value: Boolean) {
         if (value) {
-            code.iconst_1()
+            pushTrue()
         } else {
-            code.iconst_0()
+            pushFalse()
         }
     }
 
@@ -130,7 +160,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun pushString(value: String) {
-        code.ldc(value)
+        codeChunk.ldc(value)
     }
 
     /**
@@ -186,7 +216,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun pushInt(value: Int) {
-        withCode {
+        withCodeChunk {
             when (value) {
                 in -1..5 -> addInstruction(Opcodes.ICONST_0 + value)
                 in Byte.MIN_VALUE..Byte.MAX_VALUE -> bipush(value)
@@ -204,7 +234,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun pushLong(value: Long) {
-        withCode {
+        withCodeChunk {
             when (value) {
                 0L -> lconst_0()
                 1L -> lconst_1()
@@ -221,7 +251,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun pushFloat(value: Float) {
-        withCode {
+        withCodeChunk {
             when (value.toRawBits()) {
                 0 -> fconst_0()
                 else -> when (value) {
@@ -241,7 +271,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun pushDouble(value: Double) {
-        withCode {
+        withCodeChunk {
             when (value.toRawBits()) {
                 0L -> dconst_0()
                 else -> when (value) {
@@ -271,7 +301,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
                 getStaticField(value.box(), "TYPE", ReferenceType.CLASS)
             }
         } else {
-            code.ldc(value.asAsmType())
+            codeChunk.ldc(value.asAsmType())
         }
     }
 
@@ -280,7 +310,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun pushHandle(value: Handle) {
-        code.ldc(value)
+        codeChunk.ldc(value)
     }
 
     /**
@@ -291,12 +321,12 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
     @AsmKtDsl
     public fun pushConstantDynamic(value: ConstantDynamic) {
         requireMinVersion(ClassFileVersion.RELEASE_11) { "Constant Dynamic" }
-        code.ldc(value)
+        codeChunk.ldc(value)
     }
 
     /**
-     * Pushes a `LDC` instruction for a constant dynamic with the given [name], [type], [bootStrapMethod] and
-     * [bootStrapMethodArguments] onto the stack.
+     * Pushes a `LDC` instruction for a constant dynamic with the given [name], [type], [bootstrapMethod] and
+     * [bootstrapMethodArguments] onto the stack.
      *
      * @throws [IllegalArgumentException] if [version] < [RELEASE_11][ClassFileVersion.RELEASE_11]
      */
@@ -304,43 +334,49 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
     public fun pushConstantDynamic(
         name: String,
         type: FieldType,
-        bootStrapMethod: Handle,
-        bootStrapMethodArguments: List<Any> = emptyList(),
+        bootstrapMethod: Handle,
+        bootstrapMethodArguments: List<Any> = emptyList(),
     ) {
         requireMinVersion(ClassFileVersion.RELEASE_11) { "Constant Dynamic" }
-        val arguments = bootStrapMethodArguments.replaceTypes()
-        pushConstantDynamic(ConstantDynamic(name, type.descriptor, bootStrapMethod, *arguments.toTypedArray()))
+        pushConstantDynamic(
+            ConstantDynamic(
+                name = name,
+                type = type,
+                bootstrapMethod = bootstrapMethod,
+                bootstrapMethodArguments = bootstrapMethodArguments,
+            )
+        )
     }
 
     // -- LOAD INSTRUCTIONS -- \\
     @AsmKtDsl
     public fun loadLocal(index: Int, type: FieldType) {
-        code.addVarInstruction(type.getOpcode(Opcodes.ILOAD), index)
+        codeChunk.addVarInstruction(type.getOpcode(Opcodes.ILOAD), index)
     }
 
     @AsmKtDsl
     public fun arrayLoad(type: FieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.IALOAD))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.IALOAD))
     }
 
     // -- STORE INSTRUCTIONS -- \\
     @AsmKtDsl
     public fun storeLocal(index: Int, type: FieldType) {
-        code.addVarInstruction(type.getOpcode(Opcodes.ISTORE), index)
+        codeChunk.addVarInstruction(type.getOpcode(Opcodes.ISTORE), index)
     }
 
     @AsmKtDsl
     public fun arrayStore(type: FieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.IASTORE))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.IASTORE))
     }
 
     // -- INT INSTRUCTIONS -- \\
     /**
-     * See [ret][CodeBuilder.ret].
+     * See [ret][CodeChunkBuilder.ret].
      */
     @AsmKtDsl
     public fun ret(operand: Int) {
-        code.ret(operand)
+        codeChunk.ret(operand)
     }
 
     // -- ARRAY INSTRUCTIONS -- \\
@@ -352,7 +388,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
     @AsmKtDsl
     public fun newArray(type: FieldType) {
         if (type is TypeWithInternalName) {
-            code.anewarray(type.internalName)
+            codeChunk.anewarray(type.internalName)
             return
         }
 
@@ -369,92 +405,92 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
             else -> throw IllegalStateException("Exhaustive when was not exhaustive for '$type'.")
         }
 
-        code.newarray(arrayType)
+        codeChunk.newarray(arrayType)
     }
 
     @AsmKtDsl
     public fun newMultiArray(type: FieldType, dimensions: Int) {
-        code.multianewarray(type.descriptor, dimensions)
+        codeChunk.multianewarray(type.descriptor, dimensions)
     }
 
     @AsmKtDsl
     public fun arrayLength() {
-        code.arraylength()
+        codeChunk.arraylength()
     }
 
     // -- INVOKE/METHOD INSTRUCTIONS -- \\
     /**
-     * See [invokestatic][CodeBuilder.invokestatic].
+     * See [invokestatic][CodeChunkBuilder.invokestatic].
      */
     @AsmKtDsl
     public fun invokeStatic(owner: ReferenceType, name: String, type: MethodType) {
-        code.invokestatic(owner.internalName, name, type.descriptor)
+        codeChunk.invokestatic(owner.internalName, name, type.descriptor)
     }
 
     /**
-     * See [invokespecial][CodeBuilder.invokespecial].
+     * See [invokespecial][CodeChunkBuilder.invokespecial].
      */
     @AsmKtDsl
     public fun invokeSpecial(owner: ReferenceType, name: String, type: MethodType) {
-        code.invokespecial(owner.internalName, name, type.descriptor)
+        codeChunk.invokespecial(owner.internalName, name, type.descriptor)
     }
 
     /**
-     * See [invokevirtual][CodeBuilder.invokevirtual].
+     * See [invokevirtual][CodeChunkBuilder.invokevirtual].
      */
     @AsmKtDsl
     public fun invokeVirtual(owner: ReferenceType, name: String, type: MethodType) {
-        code.invokevirtual(owner.internalName, name, type.descriptor)
+        codeChunk.invokevirtual(owner.internalName, name, type.descriptor)
     }
 
     /**
-     * See [invokeinterface][CodeBuilder.invokeinterface].
+     * See [invokeinterface][CodeChunkBuilder.invokeinterface].
      */
     @AsmKtDsl
     public fun invokeInterface(owner: ReferenceType, name: String, type: MethodType) {
-        code.invokeinterface(owner.internalName, name, type.descriptor)
+        codeChunk.invokeinterface(owner.internalName, name, type.descriptor)
     }
 
     /**
-     * See [invokedynamic][CodeBuilder.invokedynamic].
+     * See [invokedynamic][CodeChunkBuilder.invokedynamic].
      */
     @AsmKtDsl
     public fun invokeDynamic(name: String, type: MethodType, method: Handle, arguments: List<Any> = emptyList()) {
         requireMinVersion(ClassFileVersion.RELEASE_7) { "Invoke Dynamic" }
-        code.invokedynamic(name, type.descriptor, method, arguments)
+        codeChunk.invokedynamic(name, type.descriptor, method.toAsmHandle(), arguments)
     }
 
     // -- FIELD INSTRUCTIONS -- \\
     /**
-     * See [getstatic][CodeBuilder.getstatic].
+     * See [getstatic][CodeChunkBuilder.getstatic].
      */
     @AsmKtDsl
     public fun getStaticField(owner: ReferenceType, name: String, type: FieldType) {
-        code.getstatic(owner.internalName, name, type.descriptor)
+        codeChunk.getstatic(owner.internalName, name, type.descriptor)
     }
 
     /**
-     * See [putstatic][CodeBuilder.putstatic].
+     * See [putstatic][CodeChunkBuilder.putstatic].
      */
     @AsmKtDsl
     public fun setStaticField(owner: ReferenceType, name: String, type: FieldType) {
-        code.putstatic(owner.internalName, name, type.descriptor)
+        codeChunk.putstatic(owner.internalName, name, type.descriptor)
     }
 
     /**
-     * See [getfield][CodeBuilder.getfield].
+     * See [getfield][CodeChunkBuilder.getfield].
      */
     @AsmKtDsl
     public fun getField(owner: ReferenceType, name: String, type: FieldType) {
-        code.getfield(owner.internalName, name, type.descriptor)
+        codeChunk.getfield(owner.internalName, name, type.descriptor)
     }
 
     /**
-     * See [putfield][CodeBuilder.putfield].
+     * See [putfield][CodeChunkBuilder.putfield].
      */
     @AsmKtDsl
     public fun setField(owner: ReferenceType, name: String, type: FieldType) {
-        code.putfield(owner.internalName, name, type.descriptor)
+        codeChunk.putfield(owner.internalName, name, type.descriptor)
     }
 
     // -- RETURN INSTRUCTIONS -- \\
@@ -463,93 +499,93 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun returnValue() {
-        code.addInstruction(method.returnType.getOpcode(Opcodes.IRETURN))
+        codeChunk.addInstruction(method.returnType.getOpcode(Opcodes.IRETURN))
     }
 
     // -- TYPE INSTRUCTIONS -- \\
     /**
-     * See [new][CodeBuilder.new].
+     * See [new][CodeChunkBuilder.new].
      */
     @AsmKtDsl
     @JvmName("new_")
     public fun new(type: ReferenceType) {
-        code.new(type.internalName)
+        codeChunk.new(type.internalName)
     }
 
     /**
-     * See [instanceof][CodeBuilder.instanceof].
+     * See [instanceof][CodeChunkBuilder.instanceof].
      */
     @AsmKtDsl
     public fun instanceOf(type: ReferenceType) {
-        code.instanceof(type.internalName)
+        codeChunk.instanceof(type.internalName)
     }
 
     /**
-     * See [checkcast][CodeBuilder.checkcast].
+     * See [checkcast][CodeChunkBuilder.checkcast].
      */
     @AsmKtDsl
     public fun checkCast(type: ReferenceType) {
         // there is no point in casting something to 'Object' as everything that isn't a primitive will be extending
         // 'Object' anyway, and we only accept 'ReferenceType' values here anyway, so 'type' can't be a primitive
         if (type != ReferenceType.OBJECT) {
-            code.checkcast(type.internalName)
+            codeChunk.checkcast(type.internalName)
         }
     }
 
     // -- JUMP INSTRUCTIONS -- \\
     /**
-     * See [goto][CodeBuilder.goto].
+     * See [goto][CodeChunkBuilder.goto].
      */
     @AsmKtDsl
-    public fun goto(label: Label) {
-        code.goto(label)
+    public fun goto(label: LabelElement) {
+        codeChunk.goto(label)
     }
 
     /**
-     * See [ifnonnull][CodeBuilder.ifnonnull].
+     * See [ifnonnull][CodeChunkBuilder.ifnonnull].
      */
     @AsmKtDsl
-    public fun ifNonNull(label: Label) {
-        code.ifnonnull(label)
+    public fun ifNonNull(label: LabelElement) {
+        codeChunk.ifnonnull(label)
     }
 
     /**
-     * See [ifnull][CodeBuilder.ifnull].
+     * See [ifnull][CodeChunkBuilder.ifnull].
      */
     @AsmKtDsl
-    public fun ifNull(label: Label) {
-        code.ifnull(label)
+    public fun ifNull(label: LabelElement) {
+        codeChunk.ifnull(label)
     }
 
     /**
-     * See [jsr][CodeBuilder.jsr].
+     * See [jsr][CodeChunkBuilder.jsr].
      */
     @AsmKtDsl
-    public fun jsr(label: Label) {
-        code.jsr(label)
+    public fun jsr(label: LabelElement) {
+        codeChunk.jsr(label)
     }
 
     /**
-     * See [ifeq][CodeBuilder.ifeq].
+     * See [ifeq][CodeChunkBuilder.ifeq].
      */
     @AsmKtDsl
-    public fun ifFalse(label: Label) {
-        code.ifeq(label)
+    public fun ifFalse(label: LabelElement) {
+        codeChunk.ifeq(label)
     }
 
     /**
-     * See [ifne][CodeBuilder.ifne].
+     * See [ifne][CodeChunkBuilder.ifne].
      */
     @AsmKtDsl
-    public fun ifTrue(label: Label) {
-        code.ifne(label)
+    public fun ifTrue(label: LabelElement) {
+        codeChunk.ifne(label)
     }
 
     /**
      * Pushes the appropriate comparison instruction based on the [type] of the values on the stack.
      */
     @AsmKtDsl
-    public fun ifEqual(type: FieldType, label: Label) {
+    public fun ifEqual(type: FieldType, label: LabelElement) {
         ifCmp(type, ComparisonMode.EQUAL, label)
     }
 
@@ -557,7 +593,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      * Pushes the appropriate comparison instruction based on the [type] of the values on the stack.
      */
     @AsmKtDsl
-    public fun ifNotEqual(type: FieldType, label: Label) {
+    public fun ifNotEqual(type: FieldType, label: LabelElement) {
         ifCmp(type, ComparisonMode.NOT_EQUAL, label)
     }
 
@@ -565,7 +601,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      * Pushes the appropriate comparison instruction based on the [type] of the values on the stack.
      */
     @AsmKtDsl
-    public fun ifGreater(type: PrimitiveFieldType, label: Label) {
+    public fun ifGreater(type: PrimitiveFieldType, label: LabelElement) {
         ifCmp(type, ComparisonMode.GREATER, label)
     }
 
@@ -573,7 +609,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      * Pushes the appropriate comparison instruction based on the [type] of the values on the stack.
      */
     @AsmKtDsl
-    public fun ifGreaterOrEqual(type: PrimitiveFieldType, label: Label) {
+    public fun ifGreaterOrEqual(type: PrimitiveFieldType, label: LabelElement) {
         ifCmp(type, ComparisonMode.GREATER_OR_EQUAL, label)
     }
 
@@ -581,7 +617,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      * Pushes the appropriate comparison instruction based on the [type] of the values on the stack.
      */
     @AsmKtDsl
-    public fun ifLess(type: PrimitiveFieldType, label: Label) {
+    public fun ifLess(type: PrimitiveFieldType, label: LabelElement) {
         ifCmp(type, ComparisonMode.LESS, label)
     }
 
@@ -589,7 +625,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      * Pushes the appropriate comparison instruction based on the [type] of the values on the stack.
      */
     @AsmKtDsl
-    public fun ifLessOrEqual(type: PrimitiveFieldType, label: Label) {
+    public fun ifLessOrEqual(type: PrimitiveFieldType, label: LabelElement) {
         ifCmp(type, ComparisonMode.LESS_OR_EQUAL, label)
     }
 
@@ -602,8 +638,8 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
         LESS_OR_EQUAL(Opcodes.IFLE, Opcodes.IF_ICMPLE);
     }
 
-    private fun ifCmp(type: FieldType, mode: ComparisonMode, label: Label) {
-        withCode {
+    private fun ifCmp(type: FieldType, mode: ComparisonMode, label: LabelElement) {
+        withCodeChunk {
             when (type) {
                 LongType -> {
                     addInstruction(Opcodes.LCMP)
@@ -643,7 +679,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun add(type: PrimitiveFieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.IADD))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.IADD))
     }
 
     /**
@@ -653,7 +689,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun sub(type: PrimitiveFieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.ISUB))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.ISUB))
     }
 
     /**
@@ -664,7 +700,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun mul(type: PrimitiveFieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.IMUL))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.IMUL))
     }
 
     /**
@@ -674,7 +710,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun div(type: PrimitiveFieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.IDIV))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.IDIV))
     }
 
     /**
@@ -684,7 +720,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun rem(type: PrimitiveFieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.IREM))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.IREM))
     }
 
     /**
@@ -694,7 +730,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun neg(type: PrimitiveFieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.INEG))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.INEG))
     }
 
     /**
@@ -705,7 +741,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun shl(type: PrimitiveFieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.ISHL))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.ISHL))
     }
 
     /**
@@ -716,7 +752,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun shr(type: PrimitiveFieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.ISHR))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.ISHR))
     }
 
     /**
@@ -727,7 +763,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun ushr(type: PrimitiveFieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.IUSHR))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.IUSHR))
     }
 
     /**
@@ -737,7 +773,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun and(type: PrimitiveFieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.IAND))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.IAND))
     }
 
     /**
@@ -748,7 +784,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun or(type: PrimitiveFieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.IOR))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.IOR))
     }
 
     /**
@@ -759,7 +795,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun xor(type: PrimitiveFieldType) {
-        code.addInstruction(type.getOpcode(Opcodes.IXOR))
+        codeChunk.addInstruction(type.getOpcode(Opcodes.IXOR))
     }
 
     /**
@@ -768,11 +804,11 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      * @param [index] the index of the local variable to increment the value of
      * @param [amount] how much to increment the value of the local variable with
      *
-     * @see [CodeBuilder.iinc]
+     * @see [CodeChunkBuilder.iinc]
      */
     @AsmKtDsl
     public fun inc(index: Int, amount: Int) {
-        code.iinc(index, amount)
+        codeChunk.iinc(index, amount)
     }
 
     // -- PRIMITIVE NUMBER CONVERSION INSTRUCTIONS -- \\
@@ -788,7 +824,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
     @AsmKtDsl
     public fun convert(from: PrimitiveFieldType, to: PrimitiveFieldType) {
         if (from != to) {
-            withCode {
+            withCodeChunk {
                 when (from) {
                     DoubleType -> when (to) {
                         LongType -> d2l()
@@ -831,18 +867,31 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
     // -- TRY CATCH INSTRUCTIONS -- \\
     /**
      * Adds a try catch block starting at [start] and ending at [end] with the handler at [handler] for the given
-     * [exception].
+     * [exceptionType].
      *
-     * If [exception] is `null` then the handler will catch all exceptions, this is used for `finally` blocks.
+     * If [exceptionType] is `null` then the handler will catch all exceptions, this is used for `finally` blocks.
      *
      * @param [start] the start of the try catch block
      * @param [end] the end of the try catch block
      * @param [handler] the handler of the try catch block
-     * @param [exception] the exception to catch, or `null` to catch all exceptions *(for `finally` blocks)*
+     * @param [exceptionType] the exception to catch, or `null` to catch all exceptions *(for `finally` blocks)*
      */
+    // TODO: builder for the type annotations?
     @AsmKtDsl
-    public fun tryCatch(start: Label, end: Label, handler: Label, exception: ReferenceType? = null) {
-        method.addTryCatchBlock(start, end, handler, exception?.internalName)
+    public fun tryCatch(
+        start: LabelElement,
+        end: LabelElement,
+        handler: LabelElement,
+        exceptionType: ReferenceType?,
+        typeAnnotations: ElementTypeAnnotations = ElementTypeAnnotations.EMPTY,
+    ) {
+        method.tryCatchBlocks += TryCatchBlockElement(
+            exceptionType = exceptionType,
+            handler = handler,
+            start = start,
+            end = end,
+            typeAnnotations = typeAnnotations,
+        )
     }
 
     /**
@@ -850,7 +899,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      */
     @AsmKtDsl
     public fun throwException() {
-        code.athrow()
+        codeChunk.athrow()
     }
 
     // -- LABEL INSTRUCTIONS -- \\
@@ -863,8 +912,8 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      * @see [LabelNode]
      */
     @AsmKtDsl
-    public fun bindLabel(label: Label) {
-        code.bindLabel(label)
+    public fun bindLabel(label: LabelElement) {
+        codeChunk.bindLabel(label)
     }
 
     /**
@@ -878,8 +927,8 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      * @see [LineNumberNode]
      */
     @AsmKtDsl
-    public fun lineNumber(line: Int, start: Label = newLabel()) {
-        code.lineNumber(line, start)
+    public fun lineNumber(line: Int, start: LabelElement = newLabel()) {
+        codeChunk.lineNumber(line, start)
     }
 
     // -- SWITCH INSTRUCTIONS -- \\
@@ -889,11 +938,11 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      * @param [default] the label to jump to if no match is found
      * @param [cases] the cases to match against
      *
-     * @see [CodeBuilder.lookupswitch]
+     * @see [CodeChunkBuilder.lookupswitch]
      */
     @AsmKtDsl
-    public fun lookUpSwitch(default: Label, cases: List<SwitchCase>) {
-        code.lookupswitch(
+    public fun lookUpSwitch(default: LabelElement, cases: List<SwitchCase>) {
+        codeChunk.lookupswitch(
             default = default,
             keys = IntArray(cases.size) { cases[it].value },
             labels = cases.map(SwitchCase::label),
@@ -910,16 +959,16 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
      * @param [max] the maximum value to match against, defaults to the maximum value of [cases] or [Int.MAX_VALUE] if
      * `cases` is empty
      *
-     * @see [CodeBuilder.tableswitch]
+     * @see [CodeChunkBuilder.tableswitch]
      */
     @AsmKtDsl
     public fun tableSwitch(
-        default: Label,
+        default: LabelElement,
         cases: List<SwitchCase>,
         min: Int = cases.minOfOrNull { it.value } ?: Int.MIN_VALUE,
         max: Int = cases.maxOfOrNull { it.value } ?: Int.MAX_VALUE,
     ) {
-        code.tableswitch(
+        codeChunk.tableswitch(
             min = min,
             max = max,
             default = default,
@@ -929,68 +978,68 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
 
     // -- MONITOR INSTRUCTIONS -- \\
     /**
-     * See [monitorenter][CodeBuilder.monitorenter].
+     * See [monitorenter][CodeChunkBuilder.monitorenter].
      */
     @AsmKtDsl
     public fun monitorEnter() {
-        code.monitorenter()
+        codeChunk.monitorenter()
     }
 
     /**
-     * See [monitorexit][CodeBuilder.monitorexit].
+     * See [monitorexit][CodeChunkBuilder.monitorexit].
      */
     @AsmKtDsl
     public fun monitorExit() {
-        code.monitorexit()
+        codeChunk.monitorexit()
     }
 
     // -- STACK -- \\
     /**
-     * See [dup][CodeBuilder.dup].
+     * See [dup][CodeChunkBuilder.dup].
      */
     @AsmKtDsl
     public fun dup() {
-        code.dup()
+        codeChunk.dup()
     }
 
     /**
-     * See [dup2][CodeBuilder.dup2].
+     * See [dup2][CodeChunkBuilder.dup2].
      */
     @AsmKtDsl
     public fun dup2() {
-        code.dup2()
+        codeChunk.dup2()
     }
 
     /**
-     * See [dup_x1][CodeBuilder.dup_x1].
+     * See [dup_x1][CodeChunkBuilder.dup_x1].
      */
     @AsmKtDsl
     public fun dupX1() {
-        code.dup_x1()
+        codeChunk.dup_x1()
     }
 
     /**
-     * See [dup_x2][CodeBuilder.dup_x2].
+     * See [dup_x2][CodeChunkBuilder.dup_x2].
      */
     @AsmKtDsl
     public fun dupX2() {
-        code.dup_x2()
+        codeChunk.dup_x2()
     }
 
     /**
-     * See [dup2_x1][CodeBuilder.dup2_x1].
+     * See [dup2_x1][CodeChunkBuilder.dup2_x1].
      */
     @AsmKtDsl
     public fun dup2X1() {
-        code.dup2_x1()
+        codeChunk.dup2_x1()
     }
 
     /**
-     * See [dup2_x2][CodeBuilder.dup2_x2].
+     * See [dup2_x2][CodeChunkBuilder.dup2_x2].
      */
     @AsmKtDsl
     public fun dup2X2() {
-        code.dup2_x2()
+        codeChunk.dup2_x2()
     }
 
     /**
@@ -1004,7 +1053,7 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
     public fun swap(from: ReturnableType, to: ReturnableType) {
         when (to.slotSize) {
             1 -> when (from.slotSize) {
-                1 -> code.swap()
+                1 -> codeChunk.swap()
                 else -> {
                     dupX2()
                     pop()
@@ -1024,27 +1073,27 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
     }
 
     /**
-     * See [pop][CodeBuilder.pop].
+     * See [pop][CodeChunkBuilder.pop].
      */
     @AsmKtDsl
     public fun pop() {
-        code.pop()
+        codeChunk.pop()
     }
 
     /**
-     * See [pop2][CodeBuilder.pop2].
+     * See [pop2][CodeChunkBuilder.pop2].
      */
     @AsmKtDsl
     public fun pop2() {
-        code.pop2()
+        codeChunk.pop2()
     }
 
     /**
-     * See [nop][CodeBuilder.nop].
+     * See [nop][CodeChunkBuilder.nop].
      */
     @AsmKtDsl
     public fun nop() {
-        code.nop()
+        codeChunk.nop()
     }
 
     // -- LOCAL VARIABLES -- \\
@@ -1064,50 +1113,62 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
         name: String,
         type: FieldType,
         signature: String? = null,
-        start: Label,
-        end: Label,
+        start: LabelElement = startLabel,
+        end: LabelElement = endLabel,
     ) {
-        method.addLocalVariable(name, type.descriptor, signature, start, end, index)
+        method.localVariables += LocalVariableElement(
+            index = index,
+            name = name,
+            type = type,
+            signature = signature,
+            start = start,
+            end = end,
+        )
+    }
+
+    public operator fun MethodBody.unaryPlus() {
+        addBody(this)
     }
 
     // -- MISC -- \\
-    public inline fun withCode(block: CodeBuilder.() -> Unit) {
+    public inline fun withCodeChunk(block: CodeChunkBuilder.() -> Unit) {
         contract {
             callsInPlace(block, InvocationKind.EXACTLY_ONCE)
         }
 
-        block(code)
+        block(codeChunk)
     }
 
-    // -- HELPERS -- \\
+    @PublishedApi
+    internal fun markStart() {
+        codeChunk.markStart()
+    }
 
-    /*private fun MutableMap<Int, MutableList<BytecodeAnnotation>>.add(
-        index: Int,
-        annotation: BytecodeAnnotation,
-        allowRepeats: Boolean,
-    ) {
-        val entries = getOrPut(index, ::mutableListOf)
+    @PublishedApi
+    internal fun markEnd() {
+        codeChunk.markEnd()
+    }
 
-        entries += when {
-            entries.containsType(annotation.type) -> when {
-                allowRepeats -> annotation
-                else -> disallowedRepeatingAnnotation(this, annotation.type)
-            }
-            else -> annotation
+    @PublishedApi
+    @OptIn(UnsafeAsmKt::class)
+    internal fun addBody(body: MethodBody) {
+        withCodeChunk {
+            instructions.add(body.instructions.getBackingInsnList())
         }
-    }*/
-
-    private fun fixAnnotationValue(value: Any?): Any? = when (value) {
-        null -> null
-        is ReturnableType -> value.asAsmType()
-        //is BytecodeAnnotation -> value.node
-        is List<*> -> value.mapTo(mutableListOf(), this::fixAnnotationValue)
-        is Array<*> -> TODO("or an two elements String array (for enumeration values)")
-        else -> value
     }
+
+    @PublishedApi
+    internal fun build(): MethodBody = MethodBody(
+        instructions = codeChunk.instructions.asInstructionList(),
+        startLabel = startLabel,
+        endLabel = endLabel,
+    )
+
+    @PublishedApi
+    internal fun newChild(): MethodBodyBuilder = MethodBodyBuilder(method)
 
     private companion object {
-        private val primitiveClassHandle: Handle = InvokeStaticHandle(
+        private val primitiveClassHandle = InvokeStaticHandle(
             owner = ReferenceType("java/lang/invoke/ConstantBootstraps"),
             name = "primitiveClass",
             type = MethodType(
@@ -1118,4 +1179,20 @@ public class MethodBodyBuilder internal constructor(public val method: MethodEle
             ),
         )
     }
+}
+
+@AsmKtDsl
+public inline fun buildMethodBody(
+    method: MethodElementBuilder,
+    builder: MethodBodyBuilder.() -> Unit,
+): MethodBody {
+    contract {
+        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
+    }
+
+    val body = MethodBodyBuilder(method)
+    body.markStart()
+    builder(body)
+    body.markEnd()
+    return body.build()
 }

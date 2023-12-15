@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
+@file:Suppress("NOTHING_TO_INLINE")
+
 package net.ormr.asmkt
 
 import net.ormr.asmkt.type.ReferenceType
 
-context(ClassElementBuilder)
-internal fun verifyState() {
+internal inline fun ClassElementBuilder.verifyState() {
     checkFlags()
     if (isEnum) requireSuperType(ReferenceType.ENUM) { "Enum classes" }
     if (isModule) requireMinVersion(ClassFileVersion.RELEASE_9) { "Module" }
@@ -27,9 +28,38 @@ internal fun verifyState() {
         requireMinVersion(ClassFileVersion.RELEASE_14) { "Record classes" }
         requireSuperType(ReferenceType.RECORD) { "Record classes" }
     }
+}
+
+internal inline fun ClassElementBuilder.verifyStateBeforeBuild() {
     if (permittedSubtypes.isNotEmpty()) {
         requireMinVersion(ClassFileVersion.RELEASE_16) { "Permitted subtypes" }
         requireOneKindOf(ClassKind.INHERITABLE) { "permitted subtypes" }
+    }
+
+    if (fields.isNotEmpty()) {
+        requireNotOneKindOf(ClassKind.NO_FIELDS) { "fields" }
+
+        for ((_, field) in fields) {
+            checkInterfaceField(field)
+        }
+    }
+
+    if (methods.isNotEmpty()) {
+        requireNotOneKindOf(ClassKind.NO_METHODS) { "methods" }
+
+        for (method in methods) {
+            if (method.isAbstract && !(isAbstract || isInterface)) {
+                requireOneKindOf(ClassKind.WITH_ABSTRACT_METHODS) { "abstract methods" }
+            }
+
+            if (method.body.isEmpty() && !method.isAbstract) {
+                throw IllegalArgumentException("No instructions defined for non-abstract method (${method.asString()}) in ${type.asString()}.")
+            }
+
+            if (method.body.isNotEmpty() && method.isAbstract) {
+                throw IllegalArgumentException("Abstract method (${method.asString()}) in ${type.asString()} contains instructions")
+            }
+        }
     }
 }
 
@@ -43,7 +73,7 @@ private fun checkFlags() {
 
 context(ClassElementBuilder)
 internal inline fun requireSuperType(otherSuperType: ReferenceType, feature: () -> String) {
-    require(superType == otherSuperType) { "${feature()} requires super type to be ${otherSuperType.asString()}, but super type was ${superType.asString()}." }
+    require(supertype == otherSuperType) { "${feature()} requires super type to be ${otherSuperType.asString()}, but super type was ${supertype.asString()}." }
 }
 
 context(ClassElementBuilder)
@@ -66,19 +96,7 @@ internal inline fun requireNotOneKindOf(kinds: Set<ClassKind>, feature: () -> St
     require(kind !in kinds) { "Classes of kind $kind are not allowed to have ${feature()}" }
 }
 
-context(ClassElementBuilder)
-internal fun checkInterfaceFields() {
-    if (isInterface) {
-        for ((name, field) in fields) {
-            require(field.isPublic) { "Interface fields must be public, but field '$name' is not." }
-            require(field.isStatic) { "Interface fields must be static, but field '$name' is not." }
-            require(field.isFinal) { "Interface fields must be final, but field '$name' is not." }
-        }
-    }
-}
-
-context(ClassElementBuilder)
-internal fun checkInterfaceField(field: FieldElementBuilder) {
+internal fun ClassElementBuilder.checkInterfaceField(field: FieldElement) {
     if (isInterface) {
         require(field.isPublic) { "Interface fields must be public, but field '${field.name}' is not." }
         require(field.isStatic) { "Interface fields must be static, but field '${field.name}' is not." }

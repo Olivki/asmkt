@@ -19,9 +19,9 @@ package net.ormr.asmkt
 /**
  * Returns `true` if any instructions have been added to `this` block, otherwise `false`.
  */
-public fun CodeBuilder.isNotEmpty(): Boolean = !(isEmpty())
+public fun CodeChunkBuilder.isNotEmpty(): Boolean = !(isEmpty())
 
 /**
  * Returns `true` if no instructions have been added to `this` block, otherwise `false`.
  */
-public fun CodeBuilder.isEmpty(): Boolean = instructions.size() == 0
+public fun CodeChunkBuilder.isEmpty(): Boolean = instructions.size() == 0

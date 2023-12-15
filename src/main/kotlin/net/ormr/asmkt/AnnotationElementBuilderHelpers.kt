@@ -18,7 +18,6 @@ package net.ormr.asmkt
 
 import net.ormr.asmkt.AnnotationElementValue.*
 import net.ormr.asmkt.type.toReferenceType
-import org.objectweb.asm.TypePath
 import kotlin.reflect.KClass
 import kotlin.reflect.full.declaredMemberProperties
 
@@ -87,6 +86,13 @@ internal fun <B : AbstractAnnotationElementBuilder<*>, A : Annotation> B.populat
 
 internal fun AnnotationElementArrayValue.getValue(): Any = when (this) {
     is ForString -> value
+    is ForClass -> value.asAsmType()
+    is ForEnum<*> -> arrayOf(type.descriptor, entryName)
+    is ForAnnotation -> value.toAsmNode()
+}
+
+internal fun AnnotationElementDefaultValue.getDefaultValue(): Any = when (this) {
+    is AnnotationElementArrayValue -> (this as AnnotationElementArrayValue).getValue()
     is ForBoolean -> value
     is ForChar -> value
     is ForByte -> value
@@ -95,12 +101,13 @@ internal fun AnnotationElementArrayValue.getValue(): Any = when (this) {
     is ForLong -> value
     is ForFloat -> value
     is ForDouble -> value
-    is ForClass -> value.asAsmType()
-    is ForEnum<*> -> arrayOf(type.descriptor, entryName)
-    is ForAnnotation -> value.toAsmNode()
-}
-
-internal fun AnnotationElementDefaultValue.getDefaultValue(): Any = when (this) {
-    is AnnotationElementArrayValue -> (this as AnnotationElementArrayValue).getValue()
     is ForArray<*> -> value.map(AnnotationElementArrayValue::getValue)
+    is ForBooleanArray -> value.toBooleanArray()
+    is ForByteArray -> value.toByteArray()
+    is ForCharArray -> value.toCharArray()
+    is ForDoubleArray -> value.toDoubleArray()
+    is ForFloatArray -> value.toFloatArray()
+    is ForIntArray -> value.toIntArray()
+    is ForLongArray -> value.toLongArray()
+    is ForShortArray -> value.toShortArray()
 }

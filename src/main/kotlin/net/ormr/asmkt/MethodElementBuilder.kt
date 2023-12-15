@@ -19,10 +19,6 @@ package net.ormr.asmkt
 import net.ormr.asmkt.type.MethodType
 import net.ormr.asmkt.type.ReferenceType
 import net.ormr.asmkt.type.ReturnableType
-import org.objectweb.asm.Label
-import org.objectweb.asm.tree.LocalVariableNode
-import org.objectweb.asm.tree.ParameterNode
-import org.objectweb.asm.tree.TryCatchBlockNode
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
@@ -37,7 +33,7 @@ import kotlin.contracts.contract
  * @property [exceptions] The exceptions that the method can throw.
  */
 @AsmKtDsl
-public class MethodElementBuilder internal constructor(
+public class MethodElementBuilder @PublishedApi internal constructor(
     public val owner: ClassElementBuilder,
     public val name: String,
     override val flags: MethodAccessFlags,
@@ -45,8 +41,11 @@ public class MethodElementBuilder internal constructor(
     public val signature: String?,
     public val exceptions: List<ReferenceType>,
 ) : ElementBuilder, Flaggable<MethodAccessFlag>, VersionedElementBuilder,
-    AnnotationValueConversionContext {
+    AnnotationValueConversionContext, AnnotatableElementBuilder, AnnotatableElementTypeBuilder {
     public val body: MethodBodyBuilder = MethodBodyBuilder(this)
+
+    override val annotations: ElementAnnotationsBuilder = ElementAnnotationsBuilder()
+    override val typeAnnotations: ElementTypeAnnotationsBuilder = ElementTypeAnnotationsBuilder()
 
     override val version: ClassFileVersion
         get() = owner.version
@@ -67,9 +66,9 @@ public class MethodElementBuilder internal constructor(
     public val returnType: ReturnableType
         get() = type.returnType
 
-    private val tryCatchBlocks = mutableListOf<TryCatchBlockNode>()
-    private val localVariables = mutableListOf<LocalVariableNode>()
-    private val parameters = mutableListOf<ParameterNode>()
+    public val tryCatchBlocks: MutableList<TryCatchBlockElement> = mutableListOf()
+    public val localVariables: MutableList<LocalVariableElement> = mutableListOf()
+    public val parameters: MutableList<ParameterElement> = mutableListOf()
 
     /**
      * The default value for the annotation property, or `null` if the method is not an annotation property, or if
@@ -85,26 +84,9 @@ public class MethodElementBuilder internal constructor(
             field = value
         }
 
-    /**
-     * Sets the access flags for the parameter with the given [name] to the given [flag].
-     *
-     * @param [name] the name of the parameter to set the flags for
-     * @param [flag] the flag to set for the parameter
-     */
-    @AsmKtDsl
-    public fun parameterFlag(name: String, flag: ParameterAccessFlag) {
-        parameterFlag(name, flag.asAccessFlags())
-    }
-
-    /**
-     * Sets the access flags for the parameter with the given [name] to the given [flags].
-     *
-     * @param [name] the name of the parameter to set the flags for
-     * @param [flags] the flags to set for the parameter
-     */
-    @AsmKtDsl
-    public fun parameterFlag(name: String, flags: ParameterAccessFlags) {
-        parameters.add(ParameterNode(name, flags.asInt()))
+    public fun parameter(element: ParameterElement): ParameterElement {
+        parameters.add(element)
+        return element
     }
 
     // -- SCOPING -- \\
@@ -116,43 +98,28 @@ public class MethodElementBuilder internal constructor(
         block(body)
     }
 
-    public inline fun withCode(block: CodeBuilder.() -> Unit) {
+    public inline fun withCodeChunk(block: CodeChunkBuilder.() -> Unit) {
         contract {
             callsInPlace(block, InvocationKind.EXACTLY_ONCE)
         }
 
-        block(body.code)
+        block(body.codeChunk)
     }
 
-    // -- INTERNALS -- \\
-    internal fun addTryCatchBlock(start: Label, end: Label, handler: Label, exceptionInternalName: String?) {
-        tryCatchBlocks.add(
-            TryCatchBlockNode(
-                start.asLabelNode(),
-                end.asLabelNode(),
-                handler.asLabelNode(),
-                exceptionInternalName,
-            )
-        )
-    }
-
-    internal fun addLocalVariable(
-        name: String,
-        descriptor: String,
-        signature: String?,
-        start: Label,
-        end: Label,
-        index: Int,
-    ) {
-        localVariables.add(
-            LocalVariableNode(
-                name,
-                descriptor,
-                signature,
-                start.asLabelNode(),
-                end.asLabelNode(),
-                index,
-            )
-        )
-    }
+    @PublishedApi
+    internal fun build(): MethodElement = MethodElement(
+        owner = owner.type,
+        name = name,
+        flags = flags,
+        type = type,
+        signature = signature,
+        exceptions = exceptions,
+        parameters = parameters.toList(),
+        localVariables = localVariables.toList(),
+        tryCatchBlocks = tryCatchBlocks.toList(),
+        defaultAnnotationValue = defaultAnnotationValue,
+        annotations = annotations.build(),
+        typeAnnotations = typeAnnotations.build(),
+        body = body.build(),
+    )
 }

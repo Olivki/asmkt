@@ -16,6 +16,14 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.ReferenceType
+import org.objectweb.asm.tree.ParameterNode
 
-public data class InnerClassElement(public val name: String?, public val type: ReferenceType)
+public data class ParameterElement(
+    public val index: Int,
+    public val name: String,
+    override val flags: ParameterAccessFlags,
+    public val annotations: ElementAnnotations,
+    public val typeAnnotations: ElementTypeAnnotations,
+) : Flaggable<ParameterAccessFlag> {
+    public fun toAsmNode(): ParameterNode = ParameterNode(name, flags.asInt())
+}

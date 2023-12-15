@@ -20,17 +20,29 @@ import net.ormr.asmkt.type.Type
 import org.objectweb.asm.Label
 import org.objectweb.asm.tree.LabelNode
 
-internal inline fun <K, V> Map<K, List<V>>.doEach(action: (K, V) -> Unit) {
-    for ((i, entries) in this) {
-        for (entry in entries) {
-            action(i, entry)
-        }
+internal fun Any?.isValidInitialFieldValue(): Boolean = when (this) {
+    null, is Int, is Long, is Float, is Double, is String -> true
+    else -> false
+}
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun checkInitialFieldValue(value: Any?) {
+    require(value.isValidInitialFieldValue()) {
+        val name = value?.let { "$it :: ${it::class}" } ?: "null"
+        "Value ($name) is not a valid initial field value"
     }
+}
+
+internal fun Any.convertToAsmConstant(): Any = when (this) {
+    is Type -> asAsmType()
+    is Handle -> toAsmHandle()
+    is ConstantDynamic -> toAsmConstantDynamic()
+    else -> this
 }
 
 internal fun List<Any>.replaceTypes(): List<Any> = when {
     isEmpty() -> this
-    any { it is Type } -> map { if (it is Type) it.asAsmType() else it }
+    any { it is Type } -> map { convertToAsmConstant() }
     else -> this
 }
 
@@ -45,6 +57,4 @@ internal fun Array<out Any>.replaceTypes(): Array<out Any> = when {
 
 internal fun Label.asLabelNode(): LabelNode = LabelNode(this)
 
-internal fun Array<out Label>.toNodeArray(): Array<out LabelNode> = Array(size) { this[it].asLabelNode() }
-
-internal fun List<Label>.toNodeArray(): Array<out LabelNode> = Array(size) { this[it].asLabelNode() }
+internal fun List<LabelElement>.toNodeArray(): Array<out LabelElement> = toTypedArray()

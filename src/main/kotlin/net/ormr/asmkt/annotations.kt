@@ -21,3 +21,6 @@ public annotation class AsmKtReflection
 
 @DslMarker
 public annotation class AsmKtDsl
+
+@RequiresOptIn
+public annotation class UnsafeAsmKt

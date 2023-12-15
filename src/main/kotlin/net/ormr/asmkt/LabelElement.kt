@@ -16,6 +16,6 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.ReferenceType
+import org.objectweb.asm.tree.LabelNode
 
-public data class InnerClassElement(public val name: String?, public val type: ReferenceType)
+public typealias LabelElement = LabelNode

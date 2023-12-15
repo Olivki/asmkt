@@ -18,16 +18,17 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.Type
-import org.objectweb.asm.Handle
 import org.objectweb.asm.Label
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes.*
 import org.objectweb.asm.tree.*
 
 @AsmKtDsl
-public class CodeBuilder internal constructor(public val body: MethodBodyBuilder) {
+public class CodeChunkBuilder internal constructor(public val body: MethodBodyBuilder) {
     internal val instructions: InsnList = InsnList()
+
+    public val startLabel: LabelElement = newLabel()
+    public val endLabel: LabelElement = newLabel()
 
     /**
      * Whether a `return` instruction has been defined in the code.
@@ -41,23 +42,23 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
     public var throws: Boolean = false
         private set
 
-    internal var isReachable: Boolean = true
+    public var isReachable: Boolean = true
         private set
 
     /**
-     * Returns a new [Label].
+     * Returns a new [LabelElement].
      *
      * @see [newBoundLabel]
      */
-    public fun newLabel(): Label = Label()
+    public fun newLabel(): LabelElement = LabelElement()
 
     /**
-     * Returns a new [Label] that has been bound to the *next* instruction.
+     * Returns a new [LabelElement] that has been bound to the *next* instruction.
      *
      * @see [newLabel]
      * @see [bindLabel]
      */
-    public fun newBoundLabel(): Label {
+    public fun newBoundLabel(): LabelElement {
         val label = newLabel()
         bindLabel(label)
         return label
@@ -72,7 +73,8 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      */
     @AsmKtDsl
     public fun ldc(value: Any) {
-        addLdcInstruction(if (value is Type) value.asAsmType() else value)
+        val fixedValue = value.convertToAsmConstant()
+        addLdcInstruction(fixedValue)
     }
 
     // -- CONSTANTS -- \\
@@ -971,7 +973,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [ifnonnull](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.ifnonnull).
      */
     @AsmKtDsl
-    public fun ifnonnull(label: Label) {
+    public fun ifnonnull(label: LabelElement) {
         addJumpInstruction(IFNONNULL, label)
     }
 
@@ -979,7 +981,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [ifnull](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.ifnull).
      */
     @AsmKtDsl
-    public fun ifnull(label: Label) {
+    public fun ifnull(label: LabelElement) {
         addJumpInstruction(IFNULL, label)
     }
 
@@ -987,7 +989,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [ifeq](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.ifeq).
      */
     @AsmKtDsl
-    public fun ifeq(label: Label) {
+    public fun ifeq(label: LabelElement) {
         addJumpInstruction(IFEQ, label)
     }
 
@@ -995,7 +997,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [ifne](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.ifne).
      */
     @AsmKtDsl
-    public fun ifne(label: Label) {
+    public fun ifne(label: LabelElement) {
         addJumpInstruction(IFNE, label)
     }
 
@@ -1003,7 +1005,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [iflt](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.iflt).
      */
     @AsmKtDsl
-    public fun iflt(label: Label) {
+    public fun iflt(label: LabelElement) {
         addJumpInstruction(IFLT, label)
     }
 
@@ -1011,7 +1013,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [ifge](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.ifge).
      */
     @AsmKtDsl
-    public fun ifge(label: Label) {
+    public fun ifge(label: LabelElement) {
         addJumpInstruction(IFGE, label)
     }
 
@@ -1019,7 +1021,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [ifgt](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.ifgt).
      */
     @AsmKtDsl
-    public fun ifgt(label: Label) {
+    public fun ifgt(label: LabelElement) {
         addJumpInstruction(IFGT, label)
     }
 
@@ -1027,7 +1029,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [ifle](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.ifle).
      */
     @AsmKtDsl
-    public fun ifle(label: Label) {
+    public fun ifle(label: LabelElement) {
         addJumpInstruction(IFLE, label)
     }
 
@@ -1035,7 +1037,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [if_icmpeq](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.if_icmpeq).
      */
     @AsmKtDsl
-    public fun if_icmpeq(label: Label) {
+    public fun if_icmpeq(label: LabelElement) {
         addJumpInstruction(IF_ICMPEQ, label)
     }
 
@@ -1043,7 +1045,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [if_icmpne](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.if_icmpne).
      */
     @AsmKtDsl
-    public fun if_icmpne(label: Label) {
+    public fun if_icmpne(label: LabelElement) {
         addJumpInstruction(IF_ICMPNE, label)
     }
 
@@ -1051,7 +1053,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [if_icmplt](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.if_icmplt).
      */
     @AsmKtDsl
-    public fun if_icmplt(label: Label) {
+    public fun if_icmplt(label: LabelElement) {
         addJumpInstruction(IF_ICMPLT, label)
     }
 
@@ -1059,7 +1061,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [if_icmpge](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.if_icmpge).
      */
     @AsmKtDsl
-    public fun if_icmpge(label: Label) {
+    public fun if_icmpge(label: LabelElement) {
         addJumpInstruction(IF_ICMPGE, label)
     }
 
@@ -1067,7 +1069,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [if_icmpgt](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.if_icmpgt).
      */
     @AsmKtDsl
-    public fun if_icmpgt(label: Label) {
+    public fun if_icmpgt(label: LabelElement) {
         addJumpInstruction(IF_ICMPGT, label)
     }
 
@@ -1075,7 +1077,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [if_icmple](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.if_icmple).
      */
     @AsmKtDsl
-    public fun if_icmple(label: Label) {
+    public fun if_icmple(label: LabelElement) {
         addJumpInstruction(IF_ICMPLE, label)
     }
 
@@ -1083,7 +1085,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [if_acmpeq](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.if_acmpeq).
      */
     @AsmKtDsl
-    public fun if_acmpeq(label: Label) {
+    public fun if_acmpeq(label: LabelElement) {
         addJumpInstruction(IF_ACMPEQ, label)
     }
 
@@ -1091,7 +1093,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [if_acmpne](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.if_acmpne).
      */
     @AsmKtDsl
-    public fun if_acmpne(label: Label) {
+    public fun if_acmpne(label: LabelElement) {
         addJumpInstruction(IF_ACMPNE, label)
     }
 
@@ -1102,7 +1104,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      */
     @JvmName("goto_")
     @AsmKtDsl
-    public fun goto(label: Label) {
+    public fun goto(label: LabelElement) {
         addJumpInstruction(GOTO, label)
     }
 
@@ -1110,7 +1112,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [jsr](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.jsr).
      */
     @AsmKtDsl
-    public fun jsr(label: Label) {
+    public fun jsr(label: LabelElement) {
         addJumpInstruction(JSR, label)
     }
 
@@ -1128,7 +1130,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [tableswitch](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.tableswitch).
      */
     @AsmKtDsl
-    public fun tableswitch(min: Int, max: Int, default: Label, labels: List<Label>) {
+    public fun tableswitch(min: Int, max: Int, default: LabelElement, labels: List<LabelElement>) {
         addTableSwitchInstruction(min, max, default, labels)
     }
 
@@ -1138,7 +1140,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * @throws [IllegalArgumentException] if the size of [keys] and [labels] is not the same
      */
     @AsmKtDsl
-    public fun lookupswitch(default: Label, keys: IntArray, labels: List<Label>) {
+    public fun lookupswitch(default: LabelElement, keys: IntArray, labels: List<LabelElement>) {
         require(keys.size == labels.size) { "keys (${keys.size}) and labels (${labels.size}) must have the same size" }
         addLookupSwitchInstruction(default, keys, labels)
     }
@@ -1288,7 +1290,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * See [label](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.label).
      */
     @AsmKtDsl
-    public fun label(label: Label = Label()) {
+    public fun label(label: LabelElement = LabelElement()) {
         addLabel(label)
     }
 
@@ -1332,7 +1334,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
     public fun invokedynamic(
         name: String,
         descriptor: String,
-        method: Handle,
+        method: AsmHandle,
         arguments: List<Any> = emptyList(),
     ) {
         addInstruction(
@@ -1388,7 +1390,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * @see [LabelNode]
      */
     @AsmKtDsl
-    public fun bindLabel(label: Label) {
+    public fun bindLabel(label: LabelElement) {
         addLabel(label)
     }
 
@@ -1403,7 +1405,7 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
      * @see [LineNumberNode]
      */
     @AsmKtDsl
-    public fun lineNumber(line: Int, start: Label = newBoundLabel()) {
+    public fun lineNumber(line: Int, start: LabelElement = newBoundLabel()) {
         addLineNumber(line, start)
     }
 
@@ -1452,11 +1454,6 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
         instructions.add(instruction)
     }
 
-    internal fun insertInstructionBeforeLast(instruction: AbstractInsnNode) {
-        checkInstruction(instruction)
-        instructions.insertBefore(instructions.last, instruction)
-    }
-
     internal fun addInstruction(opcode: Int) {
         addInstruction(InsnNode(opcode))
     }
@@ -1492,12 +1489,12 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
         addInstruction(MethodInsnNode(opcode, owner, name, descriptor, isInterface))
     }
 
-    internal fun addJumpInstruction(opcode: Int, label: Label) {
-        addInstruction(JumpInsnNode(opcode, label.asLabelNode()))
+    internal fun addJumpInstruction(opcode: Int, label: LabelElement) {
+        addInstruction(JumpInsnNode(opcode, label))
     }
 
-    private fun addLabel(label: Label) {
-        addInstruction(LabelNode(label))
+    private fun addLabel(label: LabelElement) {
+        addInstruction(label)
     }
 
     private fun addLdcInstruction(value: Any) {
@@ -1508,20 +1505,30 @@ public class CodeBuilder internal constructor(public val body: MethodBodyBuilder
         addInstruction(IincInsnNode(index, increment))
     }
 
-    private fun addTableSwitchInstruction(min: Int, max: Int, default: Label, labels: List<Label>) {
-        addInstruction(TableSwitchInsnNode(min, max, default.asLabelNode(), *labels.toNodeArray()))
+    private fun addTableSwitchInstruction(min: Int, max: Int, default: LabelElement, labels: List<LabelElement>) {
+        addInstruction(TableSwitchInsnNode(min, max, default, *labels.toNodeArray()))
     }
 
-    private fun addLookupSwitchInstruction(default: Label, keys: IntArray, labels: List<Label>) {
-        addInstruction(LookupSwitchInsnNode(default.asLabelNode(), keys, labels.toNodeArray()))
+    private fun addLookupSwitchInstruction(default: LabelElement, keys: IntArray, labels: List<LabelElement>) {
+        addInstruction(LookupSwitchInsnNode(default, keys, labels.toNodeArray()))
     }
 
     private fun addMultiANewArrayInstruction(descriptor: String, numDimensions: Int) {
         addInstruction(MultiANewArrayInsnNode(descriptor, numDimensions))
     }
 
-    private fun addLineNumber(line: Int, start: Label) {
-        addInstruction(LineNumberNode(line, start.asLabelNode()))
+    private fun addLineNumber(line: Int, start: LabelElement) {
+        addInstruction(LineNumberNode(line, start))
+    }
+
+    @PublishedApi
+    internal fun markStart() {
+        bindLabel(startLabel)
+    }
+
+    @PublishedApi
+    internal fun markEnd() {
+        bindLabel(endLabel)
     }
 
     private fun Array<out Any>.replaceLabels(): Array<out Any> = Array(size) {

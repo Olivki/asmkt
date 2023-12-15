@@ -17,17 +17,71 @@
 package net.ormr.asmkt
 
 import net.ormr.asmkt.type.FieldType
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
-// for now we're not exposing the 'value' property, as it's basically a trap for the unwary
-// as it only supports very simple values, and you probably want to set the value in the
-// init / cinit of the class manually anyway
+/**
+ * A builder class for creating instances of [FieldElement].
+ *
+ * @property [owner] The [ClassElementBuilder] that owns this field.
+ * @property [name] The name of the field.
+ * @property [flags] The access flags of the field.
+ * @property [type] The type of the field.
+ * @property [signature] The optional signature of the field.
+ */
 @AsmKtDsl
-public class FieldElementBuilder internal constructor(
+public class FieldElementBuilder @PublishedApi internal constructor(
     public val owner: ClassElementBuilder,
     public val name: String,
-    override val flags: AccessFlags<FieldAccessFlag>,
+    override val flags: FieldAccessFlags,
     public val type: FieldType,
     public val signature: String?,
-) : ElementBuilder, Flaggable<FieldAccessFlag> {
-    // TODO: annotations
+) : ElementBuilder, Flaggable<FieldAccessFlag>, AnnotatableElementBuilder, AnnotatableElementTypeBuilder {
+    override val annotations: ElementAnnotationsBuilder = ElementAnnotationsBuilder()
+    override val typeAnnotations: ElementTypeAnnotationsBuilder = ElementTypeAnnotationsBuilder()
+
+    /**
+     * The initial value of the field, or `null` if the field has no initial value.
+     *
+     * This must be one of the following types: `Int`, `Long`, `Float`, `Double` or `String`.
+     */
+    public var initialValue: Any? = null
+        set(value) {
+            checkInitialFieldValue(value)
+            field = value
+        }
+
+    @PublishedApi
+    internal fun build(): FieldElement = FieldElement(
+        owner = owner.type,
+        name = name,
+        flags = flags,
+        type = type,
+        initialValue = initialValue,
+        signature = signature,
+        annotations = annotations.build(),
+        typeAnnotations = typeAnnotations.build(),
+    )
+}
+
+@AsmKtDsl
+public inline fun buildFieldElement(
+    owner: ClassElementBuilder,
+    name: String,
+    flags: FieldAccessFlags,
+    type: FieldType,
+    signature: String? = null,
+    builder: FieldElementBuilder.() -> Unit = {},
+): FieldElement {
+    contract {
+        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return FieldElementBuilder(
+        owner = owner,
+        name = name,
+        flags = flags,
+        type = type,
+        signature = signature,
+    ).apply(builder).build()
 }

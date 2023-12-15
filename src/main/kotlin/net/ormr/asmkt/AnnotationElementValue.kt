@@ -40,8 +40,7 @@ public sealed interface AnnotationElementValue {
      *
      * @property [value] The boolean value.
      */
-    public data class ForBoolean(val value: Boolean) : AnnotationElementValue, AnnotationElementArrayValue,
-        AnnotationElementDefaultValue {
+    public data class ForBoolean(val value: Boolean) : AnnotationElementValue, AnnotationElementDefaultValue {
         override fun asString(): String = value.toString()
     }
 
@@ -50,8 +49,7 @@ public sealed interface AnnotationElementValue {
      *
      * @property [value] The char value.
      */
-    public data class ForChar(val value: Char) : AnnotationElementValue, AnnotationElementArrayValue,
-        AnnotationElementDefaultValue {
+    public data class ForChar(val value: Char) : AnnotationElementValue, AnnotationElementDefaultValue {
         override fun asString(): String = "'$value'"
     }
 
@@ -60,8 +58,7 @@ public sealed interface AnnotationElementValue {
      *
      * @property [value] The byte value.
      */
-    public data class ForByte(val value: Byte) : AnnotationElementValue, AnnotationElementArrayValue,
-        AnnotationElementDefaultValue {
+    public data class ForByte(val value: Byte) : AnnotationElementValue, AnnotationElementDefaultValue {
         override fun asString(): String = "${value}B"
     }
 
@@ -70,8 +67,7 @@ public sealed interface AnnotationElementValue {
      *
      * @property [value] The short value.
      */
-    public data class ForShort(val value: Short) : AnnotationElementValue, AnnotationElementArrayValue,
-        AnnotationElementDefaultValue {
+    public data class ForShort(val value: Short) : AnnotationElementValue, AnnotationElementDefaultValue {
         override fun asString(): String = "${value}S"
     }
 
@@ -80,8 +76,7 @@ public sealed interface AnnotationElementValue {
      *
      * @property [value] The int value.
      */
-    public data class ForInt(val value: Int) : AnnotationElementValue, AnnotationElementArrayValue,
-        AnnotationElementDefaultValue {
+    public data class ForInt(val value: Int) : AnnotationElementValue, AnnotationElementDefaultValue {
         override fun asString(): String = value.toString()
     }
 
@@ -90,8 +85,7 @@ public sealed interface AnnotationElementValue {
      *
      * @property [value] The long value.
      */
-    public data class ForLong(val value: Long) : AnnotationElementValue, AnnotationElementArrayValue,
-        AnnotationElementDefaultValue {
+    public data class ForLong(val value: Long) : AnnotationElementValue, AnnotationElementDefaultValue {
         override fun asString(): String = "${value}L"
     }
 
@@ -100,8 +94,7 @@ public sealed interface AnnotationElementValue {
      *
      * @property [value] The float value.
      */
-    public data class ForFloat(val value: Float) : AnnotationElementValue, AnnotationElementArrayValue,
-        AnnotationElementDefaultValue {
+    public data class ForFloat(val value: Float) : AnnotationElementValue, AnnotationElementDefaultValue {
         override fun asString(): String = "${value}F"
     }
 
@@ -110,8 +103,7 @@ public sealed interface AnnotationElementValue {
      *
      * @property [value] The double value.
      */
-    public data class ForDouble(val value: Double) : AnnotationElementValue, AnnotationElementArrayValue,
-        AnnotationElementDefaultValue {
+    public data class ForDouble(val value: Double) : AnnotationElementValue, AnnotationElementDefaultValue {
         override fun asString(): String = "${value}D"
     }
 
