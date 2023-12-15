@@ -19,6 +19,7 @@
 package net.ormr.asmkt
 
 import net.ormr.asmkt.type.ReferenceType
+import org.objectweb.asm.tree.LabelNode
 
 internal inline fun ClassElementBuilder.verifyState() {
     checkFlags()
@@ -57,7 +58,9 @@ internal inline fun ClassElementBuilder.verifyStateBeforeBuild() {
             }
 
             if (method.body.isNotEmpty() && method.isAbstract) {
-                throw IllegalArgumentException("Abstract method (${method.asString()}) in ${type.asString()} contains instructions")
+                if (!method.body.instructions.all { it is LabelNode }) {
+                    throw IllegalArgumentException("Abstract method (${method.asString()}) in ${type.asString()} contains instructions")
+                }
             }
         }
     }
