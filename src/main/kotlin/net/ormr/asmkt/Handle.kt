@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 Oliver Berg
+ * Copyright 2023 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,90 +14,113 @@
  * limitations under the License.
  */
 
-@file:Suppress("FunctionName", "NOTHING_TO_INLINE")
-
 package net.ormr.asmkt
 
-import net.ormr.asmkt.types.MethodType
-import net.ormr.asmkt.types.ReferenceType
-import net.ormr.asmkt.types.requireNotVoid
-import org.objectweb.asm.Handle
+import net.ormr.asmkt.type.MethodType
+import net.ormr.asmkt.type.ReferenceType
+
+
+public typealias AsmHandle = org.objectweb.asm.Handle
 
 /**
- * Returns a new [Handle] based on the given arguments.
- *
- * This function is more type-safe than creating a [Handle] directly.
+ * A type-safe wrapper around [AsmHandle][org.objectweb.asm.Handle].
  */
-public fun Handle(
-    kind: HandleKind,
-    owner: ReferenceType,
-    name: String,
-    type: MethodType,
-    isInterface: Boolean = false,
-): Handle {
-    requireNotVoid(type)
-    return Handle(kind.asInt(), owner.internalName, name, type.descriptor, isInterface)
+public sealed interface Handle {
+    public val tag: HandleTag
+    public val owner: ReferenceType
+    public val name: String
+    public val type: MethodType
+    public val isInterface: Boolean
+
+    public fun toAsmHandle(): AsmHandle = AsmHandle(tag.asInt(), owner.internalName, name, type.descriptor, isInterface)
 }
 
-public inline fun GetFieldHandle(
-    owner: ReferenceType,
-    name: String,
-    type: MethodType,
-    isInterface: Boolean = false,
-): Handle = Handle(HandleKind.GET_FIELD, owner, name, type, isInterface)
+public data class GetFieldHandle(
+    override val owner: ReferenceType,
+    override val name: String,
+    override val type: MethodType,
+    override val isInterface: Boolean = false,
+) : Handle {
+    override val tag: HandleTag
+        get() = HandleTag.GET_FIELD
+}
 
-public inline fun GetStaticHandle(
-    owner: ReferenceType,
-    name: String,
-    type: MethodType,
-    isInterface: Boolean = false,
-): Handle = Handle(HandleKind.GET_STATIC, owner, name, type, isInterface)
+public data class GetStaticHandle(
+    override val owner: ReferenceType,
+    override val name: String,
+    override val type: MethodType,
+    override val isInterface: Boolean = false,
+) : Handle {
+    override val tag: HandleTag
+        get() = HandleTag.GET_STATIC
+}
 
-public inline fun PutFieldHandle(
-    owner: ReferenceType,
-    name: String,
-    type: MethodType,
-    isInterface: Boolean = false,
-): Handle = Handle(HandleKind.PUT_FIELD, owner, name, type, isInterface)
+public data class PutFieldHandle(
+    override val owner: ReferenceType,
+    override val name: String,
+    override val type: MethodType,
+    override val isInterface: Boolean = false,
+) : Handle {
+    override val tag: HandleTag
+        get() = HandleTag.PUT_FIELD
+}
 
-public inline fun PutStaticHandle(
-    owner: ReferenceType,
-    name: String,
-    type: MethodType,
-    isInterface: Boolean = false,
-): Handle = Handle(HandleKind.PUT_STATIC, owner, name, type, isInterface)
+public data class PutStaticHandle(
+    override val owner: ReferenceType,
+    override val name: String,
+    override val type: MethodType,
+    override val isInterface: Boolean = false,
+) : Handle {
+    override val tag: HandleTag
+        get() = HandleTag.PUT_STATIC
+}
 
-public inline fun InvokeVirtualHandle(
-    owner: ReferenceType,
-    name: String,
-    type: MethodType,
-    isInterface: Boolean = false,
-): Handle = Handle(HandleKind.INVOKE_VIRTUAL, owner, name, type, isInterface)
+public data class InvokeVirtualHandle(
+    override val owner: ReferenceType,
+    override val name: String,
+    override val type: MethodType,
+    override val isInterface: Boolean = false,
+) : Handle {
+    override val tag: HandleTag
+        get() = HandleTag.INVOKE_VIRTUAL
+}
 
-public inline fun InvokeStaticHandle(
-    owner: ReferenceType,
-    name: String,
-    type: MethodType,
-    isInterface: Boolean = false,
-): Handle = Handle(HandleKind.INVOKE_STATIC, owner, name, type, isInterface)
+public data class InvokeStaticHandle(
+    override val owner: ReferenceType,
+    override val name: String,
+    override val type: MethodType,
+    override val isInterface: Boolean = false,
+) : Handle {
+    override val tag: HandleTag
+        get() = HandleTag.INVOKE_STATIC
+}
 
-public inline fun InvokeSpecialHandle(
-    owner: ReferenceType,
-    name: String,
-    type: MethodType,
-    isInterface: Boolean = false,
-): Handle = Handle(HandleKind.INVOKE_SPECIAL, owner, name, type, isInterface)
+public data class InvokeSpecialHandle(
+    override val owner: ReferenceType,
+    override val name: String,
+    override val type: MethodType,
+    override val isInterface: Boolean = false,
+) : Handle {
+    override val tag: HandleTag
+        get() = HandleTag.INVOKE_SPECIAL
+}
 
-public inline fun NewInvokeSpecialHandle(
-    owner: ReferenceType,
-    name: String,
-    type: MethodType,
-    isInterface: Boolean = false,
-): Handle = Handle(HandleKind.NEW_INVOKE_SPECIAL, owner, name, type, isInterface)
+public data class NewInvokeSpecialHandle(
+    override val owner: ReferenceType,
+    override val name: String,
+    override val type: MethodType,
+    override val isInterface: Boolean = false,
+) : Handle {
+    override val tag: HandleTag
+        get() = HandleTag.NEW_INVOKE_SPECIAL
+}
 
-public inline fun InvokeInterfaceHandle(
-    owner: ReferenceType,
-    name: String,
-    type: MethodType,
-    isInterface: Boolean = false,
-): Handle = Handle(HandleKind.INVOKE_INTERFACE, owner, name, type, isInterface)
+public data class InvokeInterfaceHandle(
+    override val owner: ReferenceType,
+    override val name: String,
+    override val type: MethodType,
+    override val isInterface: Boolean = true,
+) : Handle {
+    override val tag: HandleTag
+        get() = HandleTag.INVOKE_INTERFACE
+}
