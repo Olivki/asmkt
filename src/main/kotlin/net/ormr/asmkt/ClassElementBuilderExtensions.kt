@@ -95,7 +95,7 @@ public inline fun ClassElementBuilder.field(
 @AsmKtDsl
 public inline fun ClassElementBuilder.field(
     name: String,
-    flag: FieldAccessFlag,
+    flags: FieldAccessFlag,
     type: FieldType,
     signature: String? = null,
     builder: FieldElementBuilder.() -> Unit = {},
@@ -104,7 +104,7 @@ public inline fun ClassElementBuilder.field(
         callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
     }
 
-    return field(name, flag.asAccessFlags(), type, signature, builder)
+    return field(name, flags.asAccessFlags(), type, signature, builder)
 }
 
 // -- METHODS -- \\
@@ -136,7 +136,7 @@ public inline fun ClassElementBuilder.method(
 @AsmKtDsl
 public inline fun ClassElementBuilder.method(
     name: String,
-    flag: MethodAccessFlag,
+    flags: MethodAccessFlag,
     type: MethodType,
     signature: String? = null,
     exceptions: List<ReferenceType> = emptyList(),
@@ -148,7 +148,7 @@ public inline fun ClassElementBuilder.method(
 
     return method(
         name = name,
-        flags = flag.asAccessFlags(),
+        flags = flags.asAccessFlags(),
         type = type,
         signature = signature,
         exceptions = exceptions,
@@ -183,7 +183,7 @@ public inline fun ClassElementBuilder.constructor(
 
 @AsmKtDsl
 public inline fun ClassElementBuilder.constructor(
-    flag: ConstructorAccessFlag,
+    flags: ConstructorAccessFlag,
     type: MethodType,
     signature: String? = null,
     exceptions: List<ReferenceType> = emptyList(),
@@ -194,7 +194,7 @@ public inline fun ClassElementBuilder.constructor(
     }
 
     return constructor(
-        flags = flag.asAccessFlags(),
+        flags = flags.asAccessFlags(),
         type = type,
         signature = signature,
         exceptions = exceptions,
@@ -214,8 +214,8 @@ public fun ClassElementBuilder.defaultConstructor(flags: ConstructorAccessFlags)
 
 @AsmKtDsl
 public fun ClassElementBuilder.defaultConstructor(
-    flag: ConstructorAccessFlag = PUBLIC,
-): MethodElement = defaultConstructor(flag.asAccessFlags())
+    flags: ConstructorAccessFlag = PUBLIC,
+): MethodElement = defaultConstructor(flags.asAccessFlags())
 
 // -- STATIC -- \\
 @AsmKtDsl
@@ -228,7 +228,7 @@ public inline fun ClassElementBuilder.staticInit(
 
     return method(
         name = "<clinit>",
-        flag = STATIC,
+        flags = STATIC,
         type = MethodType(VoidType),
         builder = builder,
     )

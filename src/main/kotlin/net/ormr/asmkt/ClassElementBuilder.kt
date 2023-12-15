@@ -17,6 +17,8 @@
 package net.ormr.asmkt
 
 import net.ormr.asmkt.type.ReferenceType
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * A builder class for creating [ClassElement] instances.
@@ -35,18 +37,18 @@ import net.ormr.asmkt.type.ReferenceType
  * @property [nestHost] The type of the nest host of the class, or `null` if the class isn't a part of a nest.
  */
 @AsmKtDsl
-public class ClassElementBuilder(
+public class ClassElementBuilder @PublishedApi internal constructor(
     override val version: ClassFileVersion,
-    public val kind: ClassKind,
     public val type: ReferenceType,
-    override val flags: SimpleClassAccessFlags = AccessFlag.PUBLIC.asAccessFlags(),
-    public val signature: String? = null,
-    public val supertype: ReferenceType = ReferenceType.OBJECT,
-    public val interfaces: List<ReferenceType> = emptyList(),
-    public val sourceFile: String? = null,
-    public val sourceDebug: String? = null,
-    public val enclosingClass: ReferenceType? = null,
-    public val nestHost: ReferenceType? = null,
+    override val flags: SimpleClassAccessFlags,
+    public val kind: ClassKind,
+    public val signature: String?,
+    public val supertype: ReferenceType,
+    public val interfaces: List<ReferenceType>,
+    public val sourceFile: String?,
+    public val sourceDebug: String?,
+    public val enclosingClass: ReferenceType?,
+    public val nestHost: ReferenceType?,
 ) : ElementBuilder, Flaggable<SimpleClassAccessFlag>, VersionedElementBuilder, AnnotatableElementBuilder,
     AnnotatableElementTypeBuilder {
     /**
@@ -138,4 +140,73 @@ public class ClassElementBuilder(
             typeAnnotations = typeAnnotations.build(),
         )
     }
+}
+
+@AsmKtDsl
+public inline fun buildClassElement(
+    version: ClassFileVersion,
+    type: ReferenceType,
+    flags: SimpleClassAccessFlags = AccessFlag.PUBLIC.asAccessFlags(),
+    kind: ClassKind = ClassKind.CLASS,
+    signature: String? = null,
+    supertype: ReferenceType = ReferenceType.OBJECT,
+    interfaces: List<ReferenceType> = emptyList(),
+    sourceFile: String? = null,
+    sourceDebug: String? = null,
+    enclosingClass: ReferenceType? = null,
+    nestHost: ReferenceType? = null,
+    builder: ClassElementBuilder.() -> Unit = {},
+): ClassElement {
+    contract {
+        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return ClassElementBuilder(
+        version = version,
+        type = type,
+        flags = flags,
+        kind = kind,
+        signature = signature,
+        supertype = supertype,
+        interfaces = interfaces,
+        sourceFile = sourceFile,
+        sourceDebug = sourceDebug,
+        enclosingClass = enclosingClass,
+        nestHost = nestHost
+    ).apply(builder).build()
+}
+
+@AsmKtDsl
+public inline fun buildClassElement(
+    version: ClassFileVersion,
+    type: ReferenceType,
+    flags: SimpleClassAccessFlag,
+    kind: ClassKind = ClassKind.CLASS,
+    signature: String? = null,
+    supertype: ReferenceType = ReferenceType.OBJECT,
+    interfaces: List<ReferenceType> = emptyList(),
+    sourceFile: String? = null,
+    sourceDebug: String? = null,
+    enclosingClass: ReferenceType? = null,
+    nestHost: ReferenceType? = null,
+    builder: ClassElementBuilder.() -> Unit = {},
+): ClassElement {
+    contract {
+        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
+    }
+
+    return buildClassElement(
+        version = version,
+        type = type,
+        flags = flags.asAccessFlags(),
+        kind = kind,
+        signature = signature,
+        supertype = supertype,
+        interfaces = interfaces,
+        sourceFile = sourceFile,
+        sourceDebug = sourceDebug,
+        enclosingClass = enclosingClass,
+        nestHost = nestHost,
+        builder = builder,
+    )
 }
