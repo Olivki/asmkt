@@ -45,6 +45,14 @@ internal inline fun ClassElementBuilder.verifyStateBeforeBuild() {
         }
     }
 
+    if (kind == ClassKind.INTERFACE) {
+        require(hasDefaultSupertype) { "Supertype (${supertype.asString()}) of interface (${type.asString()}) must be 'java.lang.Object'" }
+    }
+
+    if (kind == ClassKind.RECORD) {
+        require(supertype == ReferenceType.RECORD) { "Supertype (${supertype.asString()}) of record (${type.asString()}) must be 'java.lang.Record'" }
+    }
+
     if (methods.isNotEmpty()) {
         requireNotOneKindOf(ClassKind.NO_METHODS) { "methods" }
 

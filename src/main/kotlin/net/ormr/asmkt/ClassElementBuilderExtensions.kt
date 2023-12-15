@@ -73,7 +73,7 @@ public val ClassElementBuilder.isSealed: Boolean
  * Returns `true` if the [superType][ClassElementBuilder.supertype] of the class is [OBJECT][ReferenceType.OBJECT], otherwise
  * `false`.
  */
-public val ClassElementBuilder.hasDefaultSuperType: Boolean
+public val ClassElementBuilder.hasDefaultSupertype: Boolean
     get() = supertype == ReferenceType.OBJECT
 
 // -- FIELDS -- \\
