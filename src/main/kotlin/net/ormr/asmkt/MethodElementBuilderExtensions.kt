@@ -37,12 +37,12 @@ public inline fun MethodElementBuilder.parameter(
 public inline fun MethodElementBuilder.parameter(
     index: Int,
     name: String,
-    flag: ParameterAccessFlag,
+    flags: ParameterAccessFlag,
     builder: ParameterElementBuilder.() -> Unit = {},
 ): ParameterElement {
     contract {
         callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
     }
 
-    return parameter(index, name, flag.asAccessFlags(), builder)
+    return parameter(index, name, flags.asAccessFlags(), builder)
 }
