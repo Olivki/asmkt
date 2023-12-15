@@ -17,27 +17,23 @@
 package net.ormr.asmkt
 
 import org.objectweb.asm.ClassWriter
-import org.objectweb.asm.tree.ClassNode
 
-public sealed interface ClassFileSerializer {
-    public fun encodeToClassNode(model: ClassElementBuilder): ClassNode
+public sealed interface ClassElementCompiler {
+    /**
+     * Returns a [ByteArray] containing the JVM bytecode for the given [element].
+     */
+    public fun compileToBytes(element: ClassElement): ByteArray
 
-    public fun encodeToBytes(model: ClassElementBuilder): ByteArray
-
-    public fun encodeToClassFile(model: ClassElementBuilder): ClassFile = ClassFile(
-        version = model.version,
-        type = model.type,
-        bytes = encodeToBytes(model),
+    public fun compileToClassFile(element: ClassElement): ClassFile = ClassFile(
+        version = element.version,
+        type = element.type,
+        bytes = compileToBytes(element),
     )
 
-    public companion object Default : ClassFileSerializer {
-        override fun encodeToClassNode(model: ClassElementBuilder): ClassNode {
-            TODO("Not yet implemented")
-        }
-
-        override fun encodeToBytes(model: ClassElementBuilder): ByteArray {
+    public companion object Default : ClassElementCompiler {
+        override fun compileToBytes(element: ClassElement): ByteArray {
             val writer = ClassWriter(ClassWriter.COMPUTE_FRAMES)
-            val node = encodeToClassNode(model)
+            val node = element.toAsmNode()
             node.accept(writer)
             return writer.toByteArray()
         }
