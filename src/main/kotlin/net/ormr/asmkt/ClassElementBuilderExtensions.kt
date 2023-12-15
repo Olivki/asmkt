@@ -207,7 +207,7 @@ public fun ClassElementBuilder.defaultConstructor(flags: ConstructorAccessFlags)
     constructor(flags = flags, type = MethodType(VoidType)) {
         withBody {
             loadThis()
-            invokeConstructor(method.ownerType, MethodType(VoidType))
+            invokeConstructor(method.owner.supertype, MethodType(VoidType))
             returnValue()
         }
     }
