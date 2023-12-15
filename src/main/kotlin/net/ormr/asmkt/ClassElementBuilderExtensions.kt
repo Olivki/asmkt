@@ -203,14 +203,16 @@ public inline fun ClassElementBuilder.constructor(
 }
 
 @AsmKtDsl
-public fun ClassElementBuilder.defaultConstructor(flags: ConstructorAccessFlags): MethodElement =
-    constructor(flags = flags, type = MethodType(VoidType)) {
+public fun ClassElementBuilder.defaultConstructor(flags: ConstructorAccessFlags): MethodElement {
+    require(hasDefaultSupertype) { "Expected supertype (java/lang/Object) but got (${supertype.asString()}) in (${type.asString()}) for default constructor" }
+    return constructor(flags = flags, type = MethodType(VoidType)) {
         withBody {
             loadThis()
             invokeConstructor(method.owner.supertype, MethodType(VoidType))
             returnValue()
         }
     }
+}
 
 @AsmKtDsl
 public fun ClassElementBuilder.defaultConstructor(
