@@ -44,8 +44,17 @@ public sealed interface BlockBuilderContext {
 @PublishedApi
 internal class BlockBuilderContextImpl(override val exitLabel: LabelElement) : BlockBuilderContext
 
+// TODO: re-enable inlining of the builders once context receivers are more stable
+//       right now there's an issue when inlining the functions where the order of the
+//       function parameters gets put in the wrong order, aka
+//       "context(BlockBuilderContext) MethodBodyBuilder.() -> Unit" should accept parameters
+//       in the order "(MethodBodyBuilder, BlockBuilderContext)" but it's expecting them as
+//       "(BlockBuilderContext, MethodBodyBuilder)" when it gets compiled for the JVM
+//       which means we fail with a ClassCastException at runtime.
+//       They work fine if we do not inline.
+
 @AsmKtDsl
-public inline fun MethodBodyBuilder.block(
+public /*inline*/ fun MethodBodyBuilder.block(
     blockBuilder: context(BlockBuilderContext) MethodBodyBuilder.() -> Unit,
 ) {
     contract {
@@ -60,7 +69,7 @@ public inline fun MethodBodyBuilder.block(
 }
 
 @AsmKtDsl
-public inline fun MethodBodyBuilder.ifThen(
+public /*inline*/ fun MethodBodyBuilder.ifThen(
     thenBuilder: context(BlockBuilderContext) MethodBodyBuilder.() -> Unit,
 ) {
     contract {
@@ -76,7 +85,7 @@ public inline fun MethodBodyBuilder.ifThen(
 }
 
 @AsmKtDsl
-public inline fun MethodBodyBuilder.ifThenElse(
+public /*inline*/ fun MethodBodyBuilder.ifThenElse(
     thenBuilder: context(BlockBuilderContext) MethodBodyBuilder.() -> Unit,
     elseBuilder: context(BlockBuilderContext) MethodBodyBuilder.() -> Unit,
 ) {
@@ -195,7 +204,7 @@ internal class TryingBuilderContextImpl(
 }
 
 @AsmKtDsl
-public inline fun MethodBodyBuilder.trying(
+public /*inline*/ fun MethodBodyBuilder.trying(
     tryBuilder: context(BlockBuilderContext) MethodBodyBuilder.() -> Unit,
     catchesBuilder: TryingBuilderContext.() -> Unit,
 ) {
