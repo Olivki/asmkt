@@ -16,8 +16,6 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.AccessFlag.NONE
-import net.ormr.asmkt.AccessFlag.SUPER
 import net.ormr.asmkt.type.ReferenceType
 import org.objectweb.asm.tree.ClassNode
 
@@ -47,7 +45,7 @@ public data class ClassElement(
         val node = ClassNode()
 
         node.version = version.opcode
-        node.access = ((kind + flags) + if (treatSuperSpecially) SUPER else NONE).asInt()
+        node.access = kind.fold(flags, treatSuperSpecially)
         node.name = type.internalName
         node.superName = supertype.internalName
         node.interfaces = interfaces.mapTo(mutableListOf()) { it.internalName }

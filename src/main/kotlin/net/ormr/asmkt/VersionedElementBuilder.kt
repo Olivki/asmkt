@@ -24,5 +24,5 @@ public sealed interface VersionedElementBuilder : ElementBuilder {
 }
 
 internal inline fun VersionedElementBuilder.requireMinVersion(version: ClassFileVersion, feature: () -> String) {
-    require(this.version >= version) { "$${feature()} requires at least version $version, but class version is set to ${this.version}." }
+    require(this.version >= version) { "${feature()} requires at least version $version, but class version is set to ${this.version}." }
 }

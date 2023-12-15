@@ -18,14 +18,21 @@ package net.ormr.asmkt
 
 import java.util.*
 
-public enum class ClassKind(public val flag: ClassAccessFlag?, public val flagName: String) {
+public enum class ClassKind(public val flags: ClassAccessFlags?, public val flagName: String) {
     CLASS(flag = null, "class"),
     ABSTRACT_CLASS(AccessFlag.ABSTRACT, "abstract"),
-    INTERFACE(AccessFlag.INTERFACE, "interface"),
-    ANNOTATION(AccessFlag.ANNOTATION, "annotation"),
+    INTERFACE(AccessFlag.INTERFACE + AccessFlag.ABSTRACT, "interface"),
+    ANNOTATION(AccessFlag.ANNOTATION + AccessFlag.ABSTRACT + AccessFlag.INTERFACE, "annotation"),
     ENUM(AccessFlag.ENUM, "enum"),
     RECORD(AccessFlag.RECORD, "record"),
     MODULE(AccessFlag.MODULE, "module");
+
+    constructor(flag: ClassAccessFlag?, flagName: String) : this(flag?.asAccessFlags(), flagName)
+
+    internal fun fold(flags: ClassAccessFlags, treatSuperSpecially: Boolean): Int = when (this) {
+        RECORD, ABSTRACT_CLASS, CLASS, ENUM -> ((this + flags) + if (treatSuperSpecially) AccessFlag.SUPER else AccessFlag.NONE).asInt()
+        MODULE, ANNOTATION, INTERFACE -> (this + flags).asInt()
+    }
 
     internal companion object {
         @JvmField
@@ -42,7 +49,7 @@ public enum class ClassKind(public val flag: ClassAccessFlag?, public val flagNa
 
         internal fun fromFlagsOrNull(flags: ClassAccessFlags): ClassKind? {
             for (entry in entries) {
-                val flag = entry.flag ?: continue
+                val flag = entry.flags ?: continue
                 if (flag in flags) return entry
             }
             return null
@@ -50,7 +57,8 @@ public enum class ClassKind(public val flag: ClassAccessFlag?, public val flagNa
     }
 }
 
-internal operator fun ClassKind.plus(flags: ClassAccessFlags): ClassAccessFlags = this.flag?.let { it + flags } ?: flags
+internal operator fun ClassKind.plus(flags: ClassAccessFlags): ClassAccessFlags =
+    this.flags?.let { it + flags } ?: flags
 
 public val ClassKind.isInheritable: Boolean
     get() = this in ClassKind.INHERITABLE
