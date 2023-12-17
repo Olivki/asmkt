@@ -64,11 +64,9 @@ We could write something like this:
 
 ```kotlin
 val element = buildClassElement(
-    // Sets the minimum JDK version required to 
-    // load the class to JDK 8
+    // Sets the minimum JDK version required to load the class to JDK 8
     version = ClassFileVersion.RELEASE_8,
-    // Defines a class located in the package 'foo.bar'
-    // with the name 'HelloWorld' 
+    // Defines a class located in the package 'foo.bar' with the name 'HelloWorld' 
     type = ReferenceType("foo/bar/HelloWorld"),
     // Sets the modifiers of the class to 'public' and 'final'
     flags = AccessFlag.PUBLIC + AccessFlag.FINAL,
@@ -76,21 +74,17 @@ val element = buildClassElement(
     // public static void main(final String[] args)
     method(
         name = "main",
-        // A method with return type of 'void', that
-        // accepts 1 argument of type 'String[]'
+        // A method with return type of 'void', that accepts 1 argument of type 'String[]'
         type = MethodType(VoidType, ArrayType.STRING),
         flags = AccessFlag.PUBLIC + AccessFlag.STATIC,
     ) {
         // Sets the name of the parameter at index 0 to 'args'
-        // We can optionally also pass in a block here if we want to add annotations
-        // to the parameter
+        // We can optionally also pass in a block here if we want to add annotations to the parameter
         parameter(index = 0, name = "args", flags = AccessFlag.FINAL)
-        // Scopes us into the higher level instruction
-        // builder, 'withCodeChunk' can be used to access
+        // Scopes us into the higher level instruction builder, 'withCodeChunk' can be used to access
         // a more low level instruction builder DSL
         withBody {
-            // Pushes a 'getstatic' instruction for the
-            // 'System.out' field onto the stack
+            // Pushes a 'getstatic' instruction for the 'System.out' field onto the stack
             getStaticField(
                 owner = ReferenceType<System>(),
                 name = "out",
@@ -100,8 +94,7 @@ val element = buildClassElement(
             pushString("Hello, World!")
             // Pushes a 'invokevirtual' instruction onto the stack
             // this will pop the top-most value on the stack
-            // as the pointer to the instance to invoke on
-            // which is our 'System.out' field
+            // as the pointer to the instance to invoke on which is our 'System.out' field
             // and then it will pop our string constant off the stack
             // as we gave it a MethodType expecting 1 argument
             invokeVirtual(
@@ -112,8 +105,7 @@ val element = buildClassElement(
             )
             // return an appropriately typed value
             // all methods need to end with a `RETURN` instruction
-            // or some other non-branching instruction,
-            // even 'void' methods
+            // or some other non-branching instruction, even 'void' methods
             returnValue()
         }
     }
@@ -217,8 +209,7 @@ val element = buildClassElement(
     interfaces = listOf(ReferenceType<IfTest>()),
 ) {
     // Generate a default no arguments constructor
-    // If we didn't generate one, we would not be able to properly
-    // create an instance of 'IfTestImpl'
+    // If we didn't generate one, we would not be able to properly create an instance of 'IfTestImpl'
     defaultConstructor()
     method(
         name = "test",
