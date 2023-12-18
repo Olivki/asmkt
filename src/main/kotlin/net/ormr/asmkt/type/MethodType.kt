@@ -21,7 +21,7 @@ import java.lang.reflect.Method
 import java.util.*
 import java.lang.invoke.MethodType as JMethodType
 
-public class MethodType private constructor(private val delegate: AsmType) : Type {
+public class MethodType private constructor(private val delegate: AsmType) : Type, HandleType {
     override val descriptor: String = delegate.descriptor
 
     /**

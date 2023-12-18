@@ -16,9 +16,4 @@
 
 package net.ormr.asmkt.type
 
-/**
- * Represents a type that can be used for fields.
- *
- * This includes all types that are not [method type][MethodType]s, or [void][VoidType].
- */
-public sealed interface FieldType : ReturnableType, HandleType
+public sealed interface HandleType : Type

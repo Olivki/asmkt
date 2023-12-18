@@ -16,7 +16,7 @@
 
 package net.ormr.asmkt
 
-import net.ormr.asmkt.type.MethodType
+import net.ormr.asmkt.type.HandleType
 import net.ormr.asmkt.type.ReferenceType
 
 
@@ -29,8 +29,10 @@ public sealed interface Handle {
     public val tag: HandleTag
     public val owner: ReferenceType
     public val name: String
-    public val type: MethodType
+    public val type: HandleType
+
     public val isInterface: Boolean
+        get() = false
 
     public fun toAsmHandle(): AsmHandle = AsmHandle(tag.asInt(), owner.internalName, name, type.descriptor, isInterface)
 }
@@ -38,8 +40,7 @@ public sealed interface Handle {
 public data class GetFieldHandle(
     override val owner: ReferenceType,
     override val name: String,
-    override val type: MethodType,
-    override val isInterface: Boolean = false,
+    override val type: HandleType,
 ) : Handle {
     override val tag: HandleTag
         get() = HandleTag.GET_FIELD
@@ -48,8 +49,7 @@ public data class GetFieldHandle(
 public data class GetStaticHandle(
     override val owner: ReferenceType,
     override val name: String,
-    override val type: MethodType,
-    override val isInterface: Boolean = false,
+    override val type: HandleType,
 ) : Handle {
     override val tag: HandleTag
         get() = HandleTag.GET_STATIC
@@ -58,8 +58,7 @@ public data class GetStaticHandle(
 public data class PutFieldHandle(
     override val owner: ReferenceType,
     override val name: String,
-    override val type: MethodType,
-    override val isInterface: Boolean = false,
+    override val type: HandleType,
 ) : Handle {
     override val tag: HandleTag
         get() = HandleTag.PUT_FIELD
@@ -68,8 +67,7 @@ public data class PutFieldHandle(
 public data class PutStaticHandle(
     override val owner: ReferenceType,
     override val name: String,
-    override val type: MethodType,
-    override val isInterface: Boolean = false,
+    override val type: HandleType,
 ) : Handle {
     override val tag: HandleTag
         get() = HandleTag.PUT_STATIC
@@ -78,8 +76,7 @@ public data class PutStaticHandle(
 public data class InvokeVirtualHandle(
     override val owner: ReferenceType,
     override val name: String,
-    override val type: MethodType,
-    override val isInterface: Boolean = false,
+    override val type: HandleType,
 ) : Handle {
     override val tag: HandleTag
         get() = HandleTag.INVOKE_VIRTUAL
@@ -88,8 +85,7 @@ public data class InvokeVirtualHandle(
 public data class InvokeStaticHandle(
     override val owner: ReferenceType,
     override val name: String,
-    override val type: MethodType,
-    override val isInterface: Boolean = false,
+    override val type: HandleType,
 ) : Handle {
     override val tag: HandleTag
         get() = HandleTag.INVOKE_STATIC
@@ -98,8 +94,7 @@ public data class InvokeStaticHandle(
 public data class InvokeSpecialHandle(
     override val owner: ReferenceType,
     override val name: String,
-    override val type: MethodType,
-    override val isInterface: Boolean = false,
+    override val type: HandleType,
 ) : Handle {
     override val tag: HandleTag
         get() = HandleTag.INVOKE_SPECIAL
@@ -108,8 +103,7 @@ public data class InvokeSpecialHandle(
 public data class NewInvokeSpecialHandle(
     override val owner: ReferenceType,
     override val name: String,
-    override val type: MethodType,
-    override val isInterface: Boolean = false,
+    override val type: HandleType,
 ) : Handle {
     override val tag: HandleTag
         get() = HandleTag.NEW_INVOKE_SPECIAL
@@ -118,9 +112,11 @@ public data class NewInvokeSpecialHandle(
 public data class InvokeInterfaceHandle(
     override val owner: ReferenceType,
     override val name: String,
-    override val type: MethodType,
-    override val isInterface: Boolean = true,
+    override val type: HandleType,
 ) : Handle {
     override val tag: HandleTag
         get() = HandleTag.INVOKE_INTERFACE
+
+    override val isInterface: Boolean
+        get() = true
 }
