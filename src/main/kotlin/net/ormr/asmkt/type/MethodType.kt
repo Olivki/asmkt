@@ -46,7 +46,7 @@ public class MethodType private constructor(private val delegate: AsmType) : Typ
     override fun asAsmType(): AsmType = delegate
 
     override fun asString(): String =
-        "(${argumentTypes.joinToString(", ") { it.asString() }}) -> ${returnType.asString()}}"
+        "(${argumentTypes.joinToString(", ") { it.asString() }}) -> ${returnType.asString()}"
 
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
