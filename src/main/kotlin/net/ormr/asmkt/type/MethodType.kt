@@ -57,7 +57,7 @@ public class MethodType private constructor(private val delegate: AsmType) : Typ
 
     override fun hashCode(): Int = delegate.hashCode()
 
-    override fun toString(): String = "MethodTypeDesc(argumentTypes=$argumentTypes, returnType=$returnType)"
+    override fun toString(): String = "MethodType(argumentTypes=$argumentTypes, returnType=$returnType)"
 
     public companion object {
         /**

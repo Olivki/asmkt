@@ -79,7 +79,7 @@ public class ArrayType private constructor(private val delegate: AsmType) : Fiel
 
     override fun hashCode(): Int = delegate.hashCode()
 
-    override fun toString(): String = "ArrayTypeDesc(elementType=$elementType, dimensions=$dimensions)"
+    override fun toString(): String = "ArrayType(elementType=$elementType, dimensions=$dimensions)"
 
     public companion object {
         // needs to be declared before the constants, or we'll get a NPE

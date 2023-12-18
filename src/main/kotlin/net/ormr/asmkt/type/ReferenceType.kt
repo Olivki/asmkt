@@ -93,7 +93,7 @@ public class ReferenceType private constructor(private val delegate: AsmType) : 
 
     override fun hashCode(): Int = delegate.hashCode()
 
-    override fun toString(): String = "ReferenceTypeDesc(name='$name')"
+    override fun toString(): String = "ReferenceType(name='$name')"
 
     public companion object {
         // needs to be declared before the constants, or we'll get a NPE
