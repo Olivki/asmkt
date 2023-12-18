@@ -42,17 +42,15 @@ internal fun Any.convertToAsmConstant(): Any = when (this) {
 
 internal fun List<Any>.replaceTypes(): List<Any> = when {
     isEmpty() -> this
-    any { it is Type } -> map { convertToAsmConstant() }
-    else -> this
+    else -> map { convertToAsmConstant() }
 }
 
 internal fun Array<out Any>.replaceTypes(): Array<out Any> = when {
     isEmpty() -> this
-    any { it is Type } -> Array(size) {
+    else -> Array(size) {
         val value = this[it]
         if (value is Type) value.asAsmType() else value
     }
-    else -> this
 }
 
 internal fun Label.asLabelNode(): LabelNode = LabelNode(this)
