@@ -26,13 +26,13 @@ public typealias AsmConstantDynamic = org.objectweb.asm.ConstantDynamic
 public data class ConstantDynamic(
     public val name: String,
     public val type: FieldType,
-    public val bootstrapMethod: Handle,
-    public val bootstrapMethodArguments: List<Any>,
+    public val method: Handle,
+    public val arguments: List<Any>,
 ) {
     public fun toAsmConstantDynamic(): AsmConstantDynamic = AsmConstantDynamic(
         name,
         type.descriptor,
-        bootstrapMethod.toAsmHandle(),
-        *(Array(bootstrapMethodArguments.size) { toAsmConstant(bootstrapMethodArguments[it]) }),
+        method.toAsmHandle(),
+        *(Array(arguments.size) { toAsmConstant(arguments[it]) }),
     )
 }

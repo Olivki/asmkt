@@ -324,8 +324,8 @@ public class MethodBodyBuilder @PublishedApi internal constructor(public val met
     }
 
     /**
-     * Pushes a `LDC` instruction for a constant dynamic with the given [name], [type], [bootstrapMethod] and
-     * [bootstrapMethodArguments] onto the stack.
+     * Pushes a `LDC` instruction for a constant dynamic with the given [name], [type], [method] and
+     * [arguments] onto the stack.
      *
      * @throws [IllegalArgumentException] if [version] < [RELEASE_11][ClassFileVersion.RELEASE_11]
      */
@@ -333,16 +333,16 @@ public class MethodBodyBuilder @PublishedApi internal constructor(public val met
     public fun pushConstantDynamic(
         name: String,
         type: FieldType,
-        bootstrapMethod: Handle,
-        bootstrapMethodArguments: List<Any> = emptyList(),
+        method: Handle,
+        arguments: List<Any> = emptyList(),
     ) {
         requireMinVersion(ClassFileVersion.RELEASE_11) { "Constant Dynamic" }
         pushConstantDynamic(
             ConstantDynamic(
                 name = name,
                 type = type,
-                bootstrapMethod = bootstrapMethod,
-                bootstrapMethodArguments = bootstrapMethodArguments,
+                method = method,
+                arguments = arguments,
             )
         )
     }
