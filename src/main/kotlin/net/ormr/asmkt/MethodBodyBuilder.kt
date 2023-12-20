@@ -26,8 +26,7 @@ import kotlin.contracts.contract
 
 @AsmKtDsl
 public class MethodBodyBuilder @PublishedApi internal constructor(public val method: MethodElementBuilder) :
-    ElementBuilder,
-    VersionedElementBuilder {
+    ElementBuilder, VersionedElementBuilder {
     public val codeChunk: CodeChunkBuilder = CodeChunkBuilder(this)
 
     override val version: ClassFileVersion
@@ -919,7 +918,7 @@ public class MethodBodyBuilder @PublishedApi internal constructor(public val met
     /**
      * Sets the line number for the instruction at the given [start] to [line].
      *
-     * By default, the line number is set to the line number of the previous instruction.
+     * By default, the line number is set to the line number of the *next* instruction.
      *
      * @param [line] the line number
      * @param [start] the label of the first instruction at the line number
@@ -927,7 +926,7 @@ public class MethodBodyBuilder @PublishedApi internal constructor(public val met
      * @see [LineNumberNode]
      */
     @AsmKtDsl
-    public fun lineNumber(line: Int, start: LabelElement = newLabel()) {
+    public fun lineNumber(line: Int, start: LabelElement = newBoundLabel()) {
         codeChunk.lineNumber(line, start)
     }
 
