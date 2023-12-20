@@ -1397,7 +1397,7 @@ public class CodeChunkBuilder internal constructor(public val body: MethodBodyBu
     /**
      * Sets the line number for the instruction at the given [label] to [line].
      *
-     * By default, the line number is set to the line number of the *next* instruction.
+     * By default, this sets the line number of the *next* instruction.
      *
      * @param [line] the line number
      * @param [start] the label of the first instruction at the line number

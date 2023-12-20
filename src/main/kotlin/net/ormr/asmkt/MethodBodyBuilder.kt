@@ -918,7 +918,7 @@ public class MethodBodyBuilder @PublishedApi internal constructor(public val met
     /**
      * Sets the line number for the instruction at the given [start] to [line].
      *
-     * By default, the line number is set to the line number of the *next* instruction.
+     * By default, this sets the line number of the *next* instruction.
      *
      * @param [line] the line number
      * @param [start] the label of the first instruction at the line number
