@@ -73,7 +73,7 @@ public class CodeChunkBuilder internal constructor(public val body: MethodBodyBu
      */
     @AsmKtDsl
     public fun ldc(value: Any) {
-        val fixedValue = value.convertToAsmConstant()
+        val fixedValue = toAsmConstant(value)
         addLdcInstruction(fixedValue)
     }
 
@@ -1342,7 +1342,7 @@ public class CodeChunkBuilder internal constructor(public val body: MethodBodyBu
                 name,
                 descriptor,
                 method,
-                *arguments.replaceTypes().toTypedArray(),
+                *(arguments.replaceTypes().toTypedArray()),
             )
         )
     }

@@ -33,24 +33,16 @@ internal inline fun checkInitialFieldValue(value: Any?) {
     }
 }
 
-internal fun Any.convertToAsmConstant(): Any = when (this) {
-    is Type -> asAsmType()
-    is Handle -> toAsmHandle()
-    is ConstantDynamic -> toAsmConstantDynamic()
-    else -> this
+internal fun toAsmConstant(value: Any): Any = when (value) {
+    is Type -> value.asAsmType()
+    is Handle -> value.toAsmHandle()
+    is ConstantDynamic -> value.toAsmConstantDynamic()
+    else -> value
 }
 
 internal fun List<Any>.replaceTypes(): List<Any> = when {
     isEmpty() -> this
-    else -> map { convertToAsmConstant() }
-}
-
-internal fun Array<out Any>.replaceTypes(): Array<out Any> = when {
-    isEmpty() -> this
-    else -> Array(size) {
-        val value = this[it]
-        if (value is Type) value.asAsmType() else value
-    }
+    else -> map(::toAsmConstant)
 }
 
 internal fun Label.asLabelNode(): LabelNode = LabelNode(this)

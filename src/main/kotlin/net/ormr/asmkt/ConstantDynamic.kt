@@ -33,6 +33,6 @@ public data class ConstantDynamic(
         name,
         type.descriptor,
         bootstrapMethod.toAsmHandle(),
-        *(Array(bootstrapMethodArguments.size) { bootstrapMethodArguments[it].convertToAsmConstant() }),
+        *(Array(bootstrapMethodArguments.size) { toAsmConstant(bootstrapMethodArguments[it]) }),
     )
 }
