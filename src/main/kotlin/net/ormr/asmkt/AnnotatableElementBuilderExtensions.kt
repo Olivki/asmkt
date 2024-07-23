@@ -52,7 +52,8 @@ public inline fun AnnotatableElementBuilder.annotation(
         buildAnnotationElement(
             type = type,
             isVisibleAtRuntime = isVisibleAtRuntime,
-            allowRepeats = allowRepeats
+            allowRepeats = allowRepeats,
+            builder = builder,
         )
     )
 }
