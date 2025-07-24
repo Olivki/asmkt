@@ -4,6 +4,7 @@ asm = "9.6"
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+mavenDeployer = { id = "io.deepmedia.tools.deployer", version = "0.18.0" }
 
 [libraries]
 asm-commons = { group = "org.ow2.asm", name = "asm-commons", version.ref = "asm" }
