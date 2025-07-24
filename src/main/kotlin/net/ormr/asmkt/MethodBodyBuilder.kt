@@ -1151,7 +1151,7 @@ public class MethodBodyBuilder @PublishedApi internal constructor(public val met
 }
 
 @AsmKtDsl
-public inline fun buildMethodBody(
+public inline fun MethodBody(
     method: MethodElementBuilder,
     builder: MethodBodyBuilder.() -> Unit,
 ): MethodBody {

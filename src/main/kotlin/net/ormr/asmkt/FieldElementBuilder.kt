@@ -65,7 +65,7 @@ public class FieldElementBuilder @PublishedApi internal constructor(
 }
 
 @AsmKtDsl
-public inline fun buildFieldElement(
+public inline fun FieldElement(
     owner: ClassElementBuilder,
     name: String,
     flags: FieldAccessFlags,

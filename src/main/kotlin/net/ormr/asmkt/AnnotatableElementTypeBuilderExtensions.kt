@@ -53,7 +53,7 @@ public inline fun AnnotatableElementTypeBuilder.typeAnnotation(
         callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
     }
 
-    typeAnnotation(buildTypeAnnotationElement(typeRef, typePath, type, isVisibleAtRuntime, allowRepeats, builder))
+    typeAnnotation(TypeAnnotationElement(typeRef, typePath, type, isVisibleAtRuntime, allowRepeats, builder))
 }
 
 /**

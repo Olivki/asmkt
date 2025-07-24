@@ -65,7 +65,7 @@ public class AnnotationElementBuilder @PublishedApi internal constructor(
 }
 
 @AsmKtDsl
-public inline fun buildAnnotationElement(
+public inline fun AnnotationElement(
     type: ReferenceType,
     isVisibleAtRuntime: Boolean = true,
     allowRepeats: Boolean = false,
@@ -102,7 +102,7 @@ public class TypeAnnotationElementBuilder @PublishedApi internal constructor(
 }
 
 @AsmKtDsl
-public inline fun buildTypeAnnotationElement(
+public inline fun TypeAnnotationElement(
     typeRef: Int,
     typePath: TypePath? = null,
     type: ReferenceType,
@@ -135,7 +135,7 @@ public class ChildAnnotationElementBuilder @PublishedApi internal constructor(
 }
 
 @AsmKtDsl
-public inline fun buildChildAnnotationElement(
+public inline fun ChildAnnotationElement(
     type: ReferenceType,
     builder: ChildAnnotationElementBuilder.() -> Unit = {},
 ): ChildAnnotationElement {

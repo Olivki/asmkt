@@ -49,7 +49,7 @@ public inline fun AnnotatableElementBuilder.annotation(
     }
 
     annotation(
-        buildAnnotationElement(
+        AnnotationElement(
             type = type,
             isVisibleAtRuntime = isVisibleAtRuntime,
             allowRepeats = allowRepeats,

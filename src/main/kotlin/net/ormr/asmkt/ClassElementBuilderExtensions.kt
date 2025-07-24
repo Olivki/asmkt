@@ -89,7 +89,7 @@ public inline fun ClassElementBuilder.field(
         callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
     }
 
-    return field(buildFieldElement(this, name, flags, type, signature, builder))
+    return field(FieldElement(this, name, flags, type, signature, builder))
 }
 
 @AsmKtDsl

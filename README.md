@@ -63,7 +63,7 @@ public final class HelloWorld {
 We could write something like this:
 
 ```kotlin
-val element = buildClassElement(
+val element = ClassElement(
     // Sets the minimum JDK version required to load the class to JDK 8
     version = ClassFileVersion.RELEASE_8,
     // Defines a class located in the package 'foo.bar' with the name 'HelloWorld' 
@@ -148,7 +148,7 @@ public interface Foo {
 We could do something like this:
 
 ```kotlin
-buildClassElement(
+ClassElement(
     version = ClassFileVersion.RELEASE_8,
     type = ReferenceType("foo/bar/Foo"),
     flags = AccessFlag.PUBLIC,
@@ -201,7 +201,7 @@ to generate an interface, see the previous chapter.
 The following code will generate a similar result:
 
 ```kotlin
-val element = buildClassElement(
+val element = ClassElement(
     version = ClassFileVersion.RELEASE_8,
     type = ReferenceType("foo/bar/IfTestImpl"),
     flags = AccessFlag.PUBLIC,

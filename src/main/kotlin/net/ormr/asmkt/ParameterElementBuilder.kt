@@ -35,7 +35,7 @@ public class ParameterElementBuilder @PublishedApi internal constructor(
 }
 
 @AsmKtDsl
-public inline fun buildParameterElement(
+public inline fun ParameterElement(
     index: Int,
     name: String,
     flags: AccessFlags<ParameterAccessFlag>,

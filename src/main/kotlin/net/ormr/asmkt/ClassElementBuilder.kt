@@ -143,7 +143,7 @@ public class ClassElementBuilder @PublishedApi internal constructor(
 }
 
 @AsmKtDsl
-public inline fun buildClassElement(
+public inline fun ClassElement(
     version: ClassFileVersion,
     type: ReferenceType,
     flags: SimpleClassAccessFlags = AccessFlag.PUBLIC.asAccessFlags(),
@@ -177,7 +177,7 @@ public inline fun buildClassElement(
 }
 
 @AsmKtDsl
-public inline fun buildClassElement(
+public inline fun ClassElement(
     version: ClassFileVersion,
     type: ReferenceType,
     flags: SimpleClassAccessFlag,
@@ -195,7 +195,7 @@ public inline fun buildClassElement(
         callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
     }
 
-    return buildClassElement(
+    return ClassElement(
         version = version,
         type = type,
         flags = flags.asAccessFlags(),

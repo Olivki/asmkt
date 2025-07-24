@@ -73,7 +73,7 @@ public inline fun AbstractAnnotationElementBuilder<*>.annotation(
         callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
     }
 
-    annotation(name, buildChildAnnotationElement(type, builder))
+    annotation(name, ChildAnnotationElement(type, builder))
 }
 
 // -- VALUES -- \\

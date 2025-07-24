@@ -22,7 +22,7 @@ public inline fun MethodElementBuilder.parameter(
     name: String,
     flags: ParameterAccessFlags = AccessFlags.none(),
     builder: ParameterElementBuilder.() -> Unit = {},
-): ParameterElement = parameter(buildParameterElement(index, name, flags, builder))
+): ParameterElement = parameter(ParameterElement(index, name, flags, builder))
 
 @AsmKtDsl
 public inline fun MethodElementBuilder.parameter(
