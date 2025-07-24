@@ -1,6 +1,5 @@
 plugins {
     kotlin("jvm") version "1.9.20-RC"
-    id("me.him188.maven-central-publish") version "1.0.0-dev-3"
 }
 
 group = "net.ormr.asmkt"
@@ -14,12 +13,6 @@ repositories {
 dependencies {
     api("org.ow2.asm:asm-commons:9.6")
     implementation(kotlin("reflect"))
-}
-
-mavenCentralPublish {
-    useCentralS01()
-    singleDevGithubProject("Olivki", "asmkt")
-    licenseApacheV2()
 }
 
 kotlin {
