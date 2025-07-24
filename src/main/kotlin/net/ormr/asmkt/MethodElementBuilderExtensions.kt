@@ -16,22 +16,13 @@
 
 package net.ormr.asmkt
 
-import kotlin.contracts.InvocationKind
-import kotlin.contracts.contract
-
 @AsmKtDsl
 public inline fun MethodElementBuilder.parameter(
     index: Int,
     name: String,
     flags: ParameterAccessFlags = AccessFlags.none(),
     builder: ParameterElementBuilder.() -> Unit = {},
-): ParameterElement {
-    contract {
-        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
-    }
-
-    return parameter(buildParameterElement(index, name, flags, builder))
-}
+): ParameterElement = parameter(buildParameterElement(index, name, flags, builder))
 
 @AsmKtDsl
 public inline fun MethodElementBuilder.parameter(
@@ -39,10 +30,4 @@ public inline fun MethodElementBuilder.parameter(
     name: String,
     flags: ParameterAccessFlag,
     builder: ParameterElementBuilder.() -> Unit = {},
-): ParameterElement {
-    contract {
-        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
-    }
-
-    return parameter(index, name, flags.asAccessFlags(), builder)
-}
+): ParameterElement = parameter(index, name, flags.asAccessFlags(), builder)

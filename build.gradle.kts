@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.mavenDeployer)
@@ -23,11 +26,19 @@ kotlin {
 
 tasks {
     compileKotlin {
-        kotlinOptions {
-            jvmTarget = "1.8"
-            freeCompilerArgs += "-opt-in=kotlin.contracts.ExperimentalContracts"
-            freeCompilerArgs += "-Xcontext-receivers"
-            freeCompilerArgs += "-Xjvm-default=all"
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_1_8
+            jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
+
+            freeCompilerArgs.add("-Xcontext-parameters")
+
+            freeCompilerArgs.add("-opt-in=kotlin.contracts.ExperimentalContracts")
+        }
+    }
+
+    compileTestKotlin {
+        compilerOptions {
+            freeCompilerArgs.add("-Xcontext-parameters")
         }
     }
 }

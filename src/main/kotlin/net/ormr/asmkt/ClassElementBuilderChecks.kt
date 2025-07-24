@@ -74,37 +74,37 @@ internal inline fun ClassElementBuilder.verifyStateBeforeBuild() {
     }
 }
 
-context(ClassElementBuilder)
+context(builder: ClassElementBuilder)
 private fun checkFlags() {
-    val kind = ClassKind.fromFlagsOrNull(flags)
+    val kind = ClassKind.fromFlagsOrNull(builder.flags)
     if (kind != null) {
         throw IllegalArgumentException("Flag '${kind.flagName}' found in 'flags', use 'kind = BytecodeClassKind.${kind.name}' instead.")
     }
 }
 
-context(ClassElementBuilder)
+context(builder: ClassElementBuilder)
 internal inline fun requireSuperType(otherSuperType: ReferenceType, feature: () -> String) {
-    require(supertype == otherSuperType) { "${feature()} requires super type to be ${otherSuperType.asString()}, but super type was ${supertype.asString()}." }
+    require(builder.supertype == otherSuperType) { "${feature()} requires super type to be ${otherSuperType.asString()}, but super type was ${builder.supertype.asString()}." }
 }
 
-context(ClassElementBuilder)
+context(builder: ClassElementBuilder)
 internal inline fun requireKind(otherKind: ClassKind, feature: () -> String) {
-    require(kind == otherKind) { "Only a class of kind $otherKind can use ${feature()}, but current kind is $kind" }
+    require(builder.kind == otherKind) { "Only a class of kind $otherKind can use ${feature()}, but current kind is ${builder.kind}" }
 }
 
-context(ClassElementBuilder)
+context(builder: ClassElementBuilder)
 internal inline fun requireOneKindOf(kinds: Set<ClassKind>, feature: () -> String) {
-    require(kind in kinds) { "Only classes of kind ${kinds.listOut()} are allowed to have ${feature()}, but current kind is $kind" }
+    require(builder.kind in kinds) { "Only classes of kind ${kinds.listOut()} are allowed to have ${feature()}, but current kind is ${builder.kind}" }
 }
 
-context(ClassElementBuilder)
+context(builder: ClassElementBuilder)
 internal inline fun requireNotKind(otherKind: ClassKind, feature: () -> String) {
-    require(kind != otherKind) { "Classes of kind $otherKind are not allowed to have ${feature()}" }
+    require(builder.kind != otherKind) { "Classes of kind $otherKind are not allowed to have ${feature()}" }
 }
 
-context(ClassElementBuilder)
+context(builder: ClassElementBuilder)
 internal inline fun requireNotOneKindOf(kinds: Set<ClassKind>, feature: () -> String) {
-    require(kind !in kinds) { "Classes of kind $kind are not allowed to have ${feature()}" }
+    require(builder.kind !in kinds) { "Classes of kind ${builder.kind} are not allowed to have ${feature()}" }
 }
 
 internal fun ClassElementBuilder.checkInterfaceField(field: FieldElement) {
