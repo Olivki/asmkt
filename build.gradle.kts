@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.9.20-RC"
+    alias(libs.plugins.kotlin.jvm)
 }
 
 group = "net.ormr.asmkt"
@@ -11,12 +11,13 @@ repositories {
 }
 
 dependencies {
-    api("org.ow2.asm:asm-commons:9.6")
+    api(libs.asm.commons)
     implementation(kotlin("reflect"))
 }
 
 kotlin {
     explicitApi()
+    jvmToolchain(21)
 }
 
 tasks {

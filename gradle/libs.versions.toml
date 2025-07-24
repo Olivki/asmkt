@@ -1,0 +1,9 @@
+[versions]
+kotlin = "1.9.20-RC"
+asm = "9.6"
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+
+[libraries]
+asm-commons = { group = "org.ow2.asm", name = "asm-commons", version.ref = "asm" }
