@@ -45,6 +45,9 @@ public class CodeChunkBuilder internal constructor(public val body: MethodBodyBu
     public var isReachable: Boolean = true
         private set
 
+    private var hasStartBeenMarked: Boolean = false
+    private var hasEndBeenMarked: Boolean = false
+
     /**
      * Returns a new [LabelElement].
      *
@@ -1524,11 +1527,18 @@ public class CodeChunkBuilder internal constructor(public val body: MethodBodyBu
     @PublishedApi
     internal fun markStart() {
         bindLabel(startLabel)
+        hasStartBeenMarked = true
     }
 
     @PublishedApi
     internal fun markEnd() {
         bindLabel(endLabel)
+        hasEndBeenMarked = true
+    }
+
+    internal fun verify() {
+        check(hasStartBeenMarked) { "'markStart' has not been called" }
+        check(hasEndBeenMarked) { "'markEnd' has not been called" }
     }
 
     private fun Array<out Any>.replaceLabels(): Array<out Any> = Array(size) {

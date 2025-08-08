@@ -1127,11 +1127,14 @@ public class MethodBodyBuilder @PublishedApi internal constructor(public val met
     }
 
     @PublishedApi
-    internal fun build(): MethodBody = MethodBody(
-        instructions = codeChunk.instructions.asInstructionList(),
-        startLabel = startLabel,
-        endLabel = endLabel,
-    )
+    internal fun build(): MethodBody {
+        codeChunk.verify()
+        return MethodBody(
+            instructions = codeChunk.instructions.asInstructionList(),
+            startLabel = startLabel,
+            endLabel = endLabel,
+        )
+    }
 
     @PublishedApi
     internal fun newChild(): MethodBodyBuilder = MethodBodyBuilder(method)

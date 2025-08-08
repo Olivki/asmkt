@@ -121,16 +121,20 @@ public inline fun ClassElementBuilder.method(
         callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
     }
 
-    return method(
-        MethodElementBuilder(
-            owner = this,
-            name = name,
-            flags = flags,
-            type = type,
-            signature = signature,
-            exceptions = exceptions,
-        ).apply(builder).build(),
+    val methodBuilder = MethodElementBuilder(
+        owner = this,
+        name = name,
+        flags = flags,
+        type = type,
+        signature = signature,
+        exceptions = exceptions,
     )
+
+    methodBuilder.body.markStart()
+    methodBuilder.apply(builder)
+    methodBuilder.body.markEnd()
+
+    return method(methodBuilder.build())
 }
 
 @AsmKtDsl
