@@ -89,6 +89,7 @@ public inline fun MethodBodyBuilder.ifThenElse(
         callsInPlace(elseBuilder, InvocationKind.EXACTLY_ONCE)
     }
 
+    val elseLabel = newLabel()
     val exitLabel = newLabel()
     val context = BlockBuilderContextImpl(exitLabel)
     val thenBody = newChild()
@@ -100,6 +101,7 @@ public inline fun MethodBodyBuilder.ifThenElse(
             goto(exitLabel)
         }
     }
+    bindLabel(elseLabel)
     withChildBuilder(elseBody) { elseBuilder(context, this) }
     bindLabel(exitLabel)
 }
