@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Oliver Berg
+ * Copyright 2023-2025 Oliver Berg
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public sealed interface InstructionList : List<AbstractInsnNode> {
      * Returns the underlying [InsnList] that the list is wrapped around.
      *
      * Note that this is marked as [UnsafeAsmKt] as using the underlying `InsnList` can violate assumptions that
-     * AsmKt makes about the mutability of the `InstructionList`. It is therefore recommending to instead use
+     * AsmKt makes about the mutability of the `InstructionList`. It is therefore recommended to instead use
      * [toInsnList] unless one *specifically* needs the underlying `InsnList` instance.
      *
      * @see [toInsnList]
