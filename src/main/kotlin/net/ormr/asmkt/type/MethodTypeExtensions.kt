@@ -22,9 +22,6 @@ public fun MethodType.prependArguments(vararg newArgumentTypes: FieldType): Meth
     prependArguments(newArgumentTypes.asIterable())
 
 public fun MethodType.prependArguments(newArgumentTypes: Iterable<FieldType>): MethodType {
-    if (newArgumentTypes.none()) {
-        return this
-    }
     val newDescriptor = buildString {
         append('(')
         newArgumentTypes.joinTo(this, "") { it.descriptor }
@@ -36,9 +33,6 @@ public fun MethodType.prependArguments(newArgumentTypes: Iterable<FieldType>): M
 }
 
 public fun MethodType.appendArguments(newArgumentTypes: Iterable<FieldType>): MethodType {
-    if (newArgumentTypes.none()) {
-        return this
-    }
     val newDescriptor = buildString {
         append('(')
         argumentTypes.joinTo(this, "") { it.descriptor }
