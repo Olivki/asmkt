@@ -130,7 +130,7 @@ public fun MethodType.insertArguments(index: Int, arguments: Iterable<FieldType>
  *
  * If the current `returnType` is the same as `newType` then `this` instance is returned.
  */
-public fun MethodType.withReturn(newType: FieldType): MethodType = when (returnType) {
+public fun MethodType.withReturn(newType: ReturnableType): MethodType = when (returnType) {
     newType -> this
     else -> {
         val newDescriptor = buildString {
