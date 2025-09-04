@@ -427,6 +427,16 @@ public class MethodBodyBuilder @PublishedApi internal constructor(public val met
     }
 
     /**
+     * This is needed if you are generating code that calls static methods on an interface.
+     *
+     * See [invokestatic][CodeChunkBuilder.invokestatic].
+     */
+    @AsmKtDsl
+    public fun invokeStaticInterface(owner: ReferenceType, name: String, type: MethodType) {
+        codeChunk.invokestaticinterface(owner.internalName, name, type.descriptor)
+    }
+
+    /**
      * See [invokespecial][CodeChunkBuilder.invokespecial].
      */
     @AsmKtDsl

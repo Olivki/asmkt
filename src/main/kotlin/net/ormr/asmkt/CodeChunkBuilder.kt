@@ -1323,6 +1323,16 @@ public class CodeChunkBuilder internal constructor(public val body: MethodBodyBu
     }
 
     /**
+     * This is needed if you are generating code that calls static methods on an interface.
+     *
+     * See [invokestatic](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.invokestatic).
+     */
+    @AsmKtDsl
+    public fun invokestaticinterface(owner: String, name: String, descriptor: String) {
+        addMethodInstruction(INVOKESTATIC, owner, name, descriptor, isInterface = true)
+    }
+
+    /**
      * See [invokeinterface](https://docs.oracle.com/javase/specs/jvms/se9/html/jvms-6.html#jvms-6.5.invokeinterface).
      */
     @AsmKtDsl
