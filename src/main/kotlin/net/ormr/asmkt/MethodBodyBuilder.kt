@@ -1128,6 +1128,11 @@ public class MethodBodyBuilder @PublishedApi internal constructor(public val met
         codeChunk.markEnd()
     }
 
+    /**
+     * Adds the instructions from [body] to the end of this body.
+     *
+     * The backing [org.objectweb.asm.tree.InsnList] will be *cleared* in the process of doing this.
+     */
     @PublishedApi
     @OptIn(UnsafeAsmKt::class)
     internal fun addBody(body: MethodBody) {

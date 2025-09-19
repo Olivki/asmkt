@@ -213,9 +213,10 @@ public inline fun MethodBodyBuilder.trying(
     val exitLabel = newLabel()
     val tryContext = BlockBuilderContextImpl(exitLabel)
     val tryBody = newChild()
-    withChildBuilder(tryBody) { tryBuilder(tryContext, tryBody) }
-    require(tryBody.codeChunk.isNotEmpty()) { "'try' block body may not be empty" }
-
+    withChildBuilder(tryBody) {
+        tryBuilder(tryContext, tryBody)
+        require(tryBody.codeChunk.isNotEmpty()) { "'try' block body may not be empty" }
+    }
     val catchContext = TryingBuilderContextImpl(tryBody, exitLabel)
     catchesBuilder(catchContext)
     catchContext.closeContext(this)
